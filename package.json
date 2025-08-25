@@ -1,0 +1,40 @@
+{
+	"name": "flavor-pairings",
+	"version": "0.0.1",
+	"description": "",
+	"homepage": "https://github.com/ampkz/flavor-pairings#readme",
+	"bugs": {
+		"url": "https://github.com/ampkz/flavor-pairings/issues"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/ampkz/flavor-pairings.git"
+	},
+	"license": "GPL-3.0-or-later",
+	"author": "Andrew M. Pankratz",
+	"type": "module",
+	"main": "dist/index.js",
+	"scripts": {
+		"build": "tsc",
+		"dev": "tsx src/index.ts",
+		"test": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest -c=jest.config.ts --no-cache",
+		"test-coverage": "cross-env NODE_OPTIONS=\"$NODE_OPTIONS --experimental-vm-modules\" npx jest -c=jest.config.ts --no-cache --coverage"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.34.0",
+		"@types/jest": "^30.0.0",
+		"@types/node": "^24.3.0",
+		"@typescript-eslint/eslint-plugin": "^8.40.0",
+		"@typescript-eslint/parser": "^8.40.0",
+		"cross-env": "^10.0.0",
+		"eslint": "^9.34.0",
+		"globals": "^16.3.0",
+		"jest": "^30.0.5",
+		"jiti": "^2.5.1",
+		"ts-jest": "^29.4.1",
+		"ts-node": "^10.9.2",
+		"tsx": "^4.20.5",
+		"typescript": "^5.9.2",
+		"typescript-eslint": "^8.40.0"
+	}
+}
