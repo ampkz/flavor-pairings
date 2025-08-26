@@ -6,4 +6,5 @@ export default {
 		tsconfig: 'tsconfig.json',
 	}),
 	globalSetup: './jestGlobalConfigs/globalSetup.ts',
+	globalTeardown: './jestGlobalConfigs/globalTeardown.ts',
 } satisfies Config;
