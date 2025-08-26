@@ -15,8 +15,11 @@
 	"type": "commonjs",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "tsc",
+		"build": "npm run clean && tsc && npm run copy-schema",
+		"clean": "rimraf ./dist",
+		"copy-schema": "copyfiles --error -u 2 ./src/graphql/**/*.graphql ./dist/graphql",
 		"dev": "cross-env NODE_ENV=development ts-node src/index.ts",
+		"start": "npm run build && cross-env NODE_ENV=production node ./dist/index.js",
 		"test": "jest",
 		"test-coverage": "jest --coverage",
 		"codegen": "graphql-codegen --config codegen.ts"
@@ -31,21 +34,25 @@
 		"@types/node": "^24.3.0",
 		"@typescript-eslint/eslint-plugin": "^8.40.0",
 		"@typescript-eslint/parser": "^8.40.0",
+		"copyfiles": "^2.4.1",
 		"cross-env": "^10.0.0",
 		"eslint": "^9.34.0",
 		"globals": "^16.3.0",
 		"jest": "^30.0.5",
 		"jiti": "^2.5.1",
+		"rimraf": "^6.0.1",
 		"ts-jest": "^29.4.1",
 		"ts-node": "^10.9.2",
 		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.40.0"
 	},
 	"dependencies": {
+		"@ampkz/auth-neo4j": "^0.10.2",
 		"@apollo/server": "^5.0.0",
 		"@as-integrations/express5": "^1.1.2",
 		"express": "^5.1.0",
 		"graphql": "^16.11.0",
-		"graphql-tools": "^9.0.20"
+		"graphql-tools": "^9.0.20",
+		"neo4j-driver": "^5.28.1"
 	}
 }
