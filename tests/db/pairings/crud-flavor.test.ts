@@ -1,5 +1,5 @@
 import { Flavor } from '../../../src/pairings/flavor';
-import { createFlavor, getFlavor, updateFlavor } from '../../../src/db/pairings/crud-flavor';
+import { createFlavor, deleteFlavor, getFlavor, updateFlavor } from '../../../src/db/pairings/crud-flavor';
 import * as crud from '../../../src/db/utils/crud';
 import { faker } from '@faker-js/faker';
 
@@ -48,5 +48,18 @@ describe('CRUD Flavor', () => {
 	it('should return null if no flavor was found to update', async () => {
 		const updatedFlavor = await updateFlavor({ name: 'non_existing_flavor', updatedName: 'updated_name' });
 		expect(updatedFlavor).toBeNull();
+	});
+
+	it('should delete a flavor', async () => {
+		const name = 'df_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		await createFlavor(flavor);
+		const deletedFlavor = await deleteFlavor(flavor.name);
+		expect(deletedFlavor!.name).toBe(flavor.name);
+	});
+
+	it('should return null if no flavor was found to delete', async () => {
+		const deletedFlavor = await deleteFlavor('non_existing_flavor');
+		expect(deletedFlavor).toBeNull();
 	});
 });
