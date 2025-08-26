@@ -7,3 +7,12 @@ type Flavor {
 	name: ID!
 	pairings: [Flavor!]
 }
+
+type Mutation {
+	createFlavor(input: CreateFlavorInput!): Flavor!
+	deleteFlavor(name: ID!): Flavor
+}
+
+input CreateFlavorInput {
+	name: ID!
+}
