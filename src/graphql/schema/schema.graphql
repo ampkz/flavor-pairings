@@ -9,11 +9,17 @@ type Flavor {
 }
 
 type Mutation {
-	createFlavor(input: CreateFlavorInput!): Flavor!
+	createFlavor(input: CreateFlavorInput!): Flavor
+	updateFlavor(input: UpdateFlavorInput!): Flavor
 	deleteFlavor(name: ID!): Flavor
 	createPairing(flavor1: ID!, flavor2: ID!): Boolean!
 }
 
 input CreateFlavorInput {
 	name: ID!
+}
+
+input UpdateFlavorInput {
+	name: ID!
+	updatedName: ID!
 }

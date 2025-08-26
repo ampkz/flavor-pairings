@@ -28,9 +28,10 @@ export type Flavor = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  createFlavor: Flavor;
+  createFlavor?: Maybe<Flavor>;
   createPairing: Scalars['Boolean']['output'];
   deleteFlavor?: Maybe<Flavor>;
+  updateFlavor?: Maybe<Flavor>;
 };
 
 
@@ -49,6 +50,11 @@ export type MutationDeleteFlavorArgs = {
   name: Scalars['ID']['input'];
 };
 
+
+export type MutationUpdateFlavorArgs = {
+  input: UpdateFlavorInput;
+};
+
 export type Query = {
   __typename?: 'Query';
   flavor?: Maybe<Flavor>;
@@ -58,6 +64,11 @@ export type Query = {
 
 export type QueryFlavorArgs = {
   name: Scalars['ID']['input'];
+};
+
+export type UpdateFlavorInput = {
+  name: Scalars['ID']['input'];
+  updatedName: Scalars['ID']['input'];
 };
 
 
@@ -138,6 +149,7 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  UpdateFlavorInput: UpdateFlavorInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
@@ -149,6 +161,7 @@ export type ResolversParentTypes = {
   Mutation: {};
   Query: {};
   String: Scalars['String']['output'];
+  UpdateFlavorInput: UpdateFlavorInput;
 };
 
 export type FlavorResolvers<ContextType = any, ParentType extends ResolversParentTypes['Flavor'] = ResolversParentTypes['Flavor']> = {
@@ -158,9 +171,10 @@ export type FlavorResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
-  createFlavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
+  createFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
   createPairing?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'flavor1' | 'flavor2'>>;
   deleteFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationDeleteFlavorArgs, 'name'>>;
+  updateFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationUpdateFlavorArgs, 'input'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
