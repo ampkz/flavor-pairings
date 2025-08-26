@@ -1,7 +1,7 @@
 import { NodeType } from '../../_helpers/nodes';
 import { UpdateFlavorInput } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
-import { createNode, deleteNode, getNode, updateNode } from '../utils/crud';
+import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
 
 export async function createFlavor(flavor: Flavor): Promise<Flavor | null> {
 	const createdNode = await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor.name });
@@ -21,4 +21,14 @@ export async function updateFlavor(updatedFlavor: UpdateFlavorInput): Promise<Fl
 export async function deleteFlavor(name: string): Promise<Flavor | null> {
 	const deletedNode = await deleteNode(NodeType.FLAVOR, ['name: $name'], { name });
 	return deletedNode ? new Flavor(deletedNode) : null;
+}
+
+export async function getFlavors(): Promise<Flavor[]> {
+	const flavors: Flavor[] = [];
+
+	const nodes = await getNodes(NodeType.FLAVOR);
+
+	flavors.push(...nodes.map(node => new Flavor(node)));
+
+	return flavors;
 }
