@@ -15,7 +15,7 @@
 	"type": "commonjs",
 	"main": "dist/index.js",
 	"scripts": {
-		"build": "npm run clean && tsc && npm run copy-schema",
+		"build": "npm run codegen && npm run clean && tsc && npm run copy-schema",
 		"clean": "rimraf ./dist",
 		"copy-schema": "copyfiles --error -u 2 ./src/graphql/**/*.graphql ./dist/graphql",
 		"dev": "cross-env NODE_ENV=development ts-node src/index.ts",
@@ -50,6 +50,7 @@
 		"@ampkz/auth-neo4j": "^0.10.2",
 		"@apollo/server": "^5.0.0",
 		"@as-integrations/express5": "^1.1.2",
+		"dotenv": "^17.2.1",
 		"express": "^5.1.0",
 		"graphql": "^16.11.0",
 		"graphql-tools": "^9.0.20",

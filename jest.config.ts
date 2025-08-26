@@ -5,4 +5,5 @@ export default {
 	...createDefaultEsmPreset({
 		tsconfig: 'tsconfig.json',
 	}),
+	globalSetup: './jestGlobalConfigs/globalSetup.ts',
 } satisfies Config;

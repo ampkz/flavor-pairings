@@ -1,3 +1,5 @@
+import Config from '../src/config/config';
+
 test('dummy test', () => {
-	expect(true).toBe(true);
+	expect(Config.PAIRINGS_DB).toBeDefined();
 });

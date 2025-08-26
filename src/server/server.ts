@@ -6,6 +6,7 @@ import { expressMiddleware } from '@as-integrations/express5';
 import { readFileSync } from 'fs';
 import path from 'path';
 import { resolvers as flavorResolvers } from '../graphql/resolvers/flavorResolvers';
+import Config from '../config/config';
 
 export interface MyContext {}
 
@@ -20,7 +21,7 @@ async function startServer() {
 	const server = new ApolloServer<MyContext>({
 		typeDefs,
 		resolvers: flavorResolvers,
-		includeStacktraceInErrorResponses: process.env.NODE_ENV === 'development' ? true : false,
+		includeStacktraceInErrorResponses: Config.IS_NOT_PROD,
 		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 	});
 
