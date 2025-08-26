@@ -1,5 +1,5 @@
 import { Flavor } from '../../../src/pairings/flavor';
-import { createFlavor, getFlavor } from '../../../src/db/pairings/crud-flavor';
+import { createFlavor, getFlavor, updateFlavor } from '../../../src/db/pairings/crud-flavor';
 import * as crud from '../../../src/db/utils/crud';
 import { faker } from '@faker-js/faker';
 
@@ -35,5 +35,18 @@ describe('CRUD Flavor', () => {
 	it('should return null if no flavor was found', async () => {
 		const fetchedFlavor = await getFlavor('non_existing_flavor');
 		expect(fetchedFlavor).toBeNull();
+	});
+
+	it('should update a flavor', async () => {
+		const name = 'uf_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		await createFlavor(flavor);
+		const updatedFlavor = await updateFlavor({ name, updatedName: 'updated_' + name });
+		expect(updatedFlavor!.name).toBe('updated_' + name);
+	});
+
+	it('should return null if no flavor was found to update', async () => {
+		const updatedFlavor = await updateFlavor({ name: 'non_existing_flavor', updatedName: 'updated_name' });
+		expect(updatedFlavor).toBeNull();
 	});
 });
