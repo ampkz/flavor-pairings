@@ -1,0 +1,39 @@
+import { Flavor } from '../../../src/pairings/flavor';
+import { createFlavor, getFlavor } from '../../../src/db/pairings/crud-flavor';
+import * as crud from '../../../src/db/utils/crud';
+import { faker } from '@faker-js/faker';
+
+describe('CRUD Flavor', () => {
+	beforeEach(() => {
+		jest.restoreAllMocks();
+	});
+
+	it('should create a flavor', async () => {
+		const name = 'cf_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		const createdFlavor = await createFlavor(flavor);
+		expect(createdFlavor!.name).toBe(flavor.name);
+	});
+
+	it('should return null if no flavor was created', async () => {
+		jest.spyOn(crud, 'createNode').mockResolvedValue(null);
+
+		const name = 'cf_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		const createdFlavor = await createFlavor(flavor);
+		expect(createdFlavor).toBeNull();
+	});
+
+	it('should get a flavor by name', async () => {
+		const name = 'df_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		await createFlavor(flavor);
+		const fetchedFlavor = await getFlavor(flavor.name);
+		expect(fetchedFlavor!.name).toBe(flavor.name);
+	});
+
+	it('should return null if no flavor was found', async () => {
+		const fetchedFlavor = await getFlavor('non_existing_flavor');
+		expect(fetchedFlavor).toBeNull();
+	});
+});
