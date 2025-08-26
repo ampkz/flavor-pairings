@@ -1,0 +1,9 @@
+type Query {
+	flavor(name: ID!): Flavor
+	flavors: [Flavor!]!
+}
+
+type Flavor {
+	name: ID!
+	pairings: [Flavor!]
+}
