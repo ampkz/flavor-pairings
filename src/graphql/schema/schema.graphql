@@ -11,6 +11,7 @@ type Flavor {
 type Mutation {
 	createFlavor(input: CreateFlavorInput!): Flavor!
 	deleteFlavor(name: ID!): Flavor
+	createPairing(flavor1: ID!, flavor2: ID!): Boolean!
 }
 
 input CreateFlavorInput {

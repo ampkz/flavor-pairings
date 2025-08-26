@@ -16,10 +16,37 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type CreateFlavorInput = {
+  name: Scalars['ID']['input'];
+};
+
 export type Flavor = {
   __typename?: 'Flavor';
   name: Scalars['ID']['output'];
   pairings?: Maybe<Array<Flavor>>;
+};
+
+export type Mutation = {
+  __typename?: 'Mutation';
+  createFlavor: Flavor;
+  createPairing: Scalars['Boolean']['output'];
+  deleteFlavor?: Maybe<Flavor>;
+};
+
+
+export type MutationCreateFlavorArgs = {
+  input: CreateFlavorInput;
+};
+
+
+export type MutationCreatePairingArgs = {
+  flavor1: Scalars['ID']['input'];
+  flavor2: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteFlavorArgs = {
+  name: Scalars['ID']['input'];
 };
 
 export type Query = {
@@ -105,8 +132,10 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
+  CreateFlavorInput: CreateFlavorInput;
   Flavor: ResolverTypeWrapper<Flavor>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
+  Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
 };
@@ -114,8 +143,10 @@ export type ResolversTypes = {
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
+  CreateFlavorInput: CreateFlavorInput;
   Flavor: Flavor;
   ID: Scalars['ID']['output'];
+  Mutation: {};
   Query: {};
   String: Scalars['String']['output'];
 };
@@ -126,6 +157,12 @@ export type FlavorResolvers<ContextType = any, ParentType extends ResolversParen
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  createFlavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
+  createPairing?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'flavor1' | 'flavor2'>>;
+  deleteFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationDeleteFlavorArgs, 'name'>>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   flavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<QueryFlavorArgs, 'name'>>;
   flavors?: Resolver<Array<ResolversTypes['Flavor']>, ParentType, ContextType>;
@@ -133,6 +170,7 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
 
 export type Resolvers<ContextType = any> = {
   Flavor?: FlavorResolvers<ContextType>;
+  Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
 };
 
