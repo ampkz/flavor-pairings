@@ -35,7 +35,9 @@ describe('Pairing Queries', () => {
                     flavor(name: $name) {
                         name
                         pairings {
-                            name
+                            items {
+                                name
+                            }
                         }
                     }
                 }
@@ -44,7 +46,7 @@ describe('Pairing Queries', () => {
 			})
 			.expect(200);
 
-		expect(response.body.data.flavor).toEqual({ name: flavor1, pairings: [{ name: flavor2 }, { name: flavor3 }] });
+		expect(response.body.data.flavor).toEqual({ name: flavor1, pairings: { items: [{ name: flavor2 }, { name: flavor3 }] } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -77,7 +79,9 @@ describe('Pairing Queries', () => {
                     flavor(name: $name) {
                         name
                         pairings {
-                            name
+                            items {
+                                name
+                            }
                         }
                     }
                 }

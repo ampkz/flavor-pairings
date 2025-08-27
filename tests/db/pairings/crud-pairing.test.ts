@@ -33,10 +33,10 @@ describe('CRUD Pairing', () => {
 	});
 
 	it('should return a list of created pairings', async () => {
-		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
 		await createFlavor(flavor1);
 
-		const flavors = Array.from({ length: 5 }, () => new Flavor({ name: (global as any).getNextNoun() }));
+		const flavors = Array.from({ length: 5 }, () => new Flavor({ name: (global as any).getNextNoun('lcp_') }));
 		await Promise.all(
 			flavors.map(async flavor => {
 				const createdFlavor = (await createFlavor(flavor))!;

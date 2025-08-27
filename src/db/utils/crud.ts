@@ -2,7 +2,7 @@ import { Driver, RecordShape, Session } from 'neo4j-driver';
 import { connect } from './connection';
 import { getSessionOptions } from '../../_helpers/db-helper';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
-import { NodeType } from '../../_helpers/nodes';
+import { Node, NodeType } from '../../_helpers/nodes';
 import Config from '../../config/config';
 
 export enum Errors {

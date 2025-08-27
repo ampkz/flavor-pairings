@@ -1,7 +1,8 @@
-import { NodeType } from '../../_helpers/nodes';
+import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import { createFlavor, deleteFlavor, getFlavor, getFlavors, updateFlavor } from '../../db/pairings/crud-flavor';
 import { createPairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
 import { getTotalNodeCountByType } from '../../db/utils/crud';
+import { getTotalRelationshipsToNodes } from '../../db/utils/relationship/crud-relationship';
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { Pairing } from '../../pairings/pairing';
@@ -26,6 +27,14 @@ export const resolvers: Resolvers = {
 			createPairing(new Pairing(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }))),
 	},
 	Flavor: {
-		pairings: flavor => getFlavorPairings(flavor),
+		pairings: async (parent, { limit, cursor }) => {
+			const items = await getFlavorPairings(parent, limit, cursor);
+			const node: Node = new Node(NodeType.FLAVOR, 'name', parent.name);
+			const totalCount = await getTotalRelationshipsToNodes(node, NodeType.FLAVOR, RelationshipType.PAIRS_WITH);
+			return {
+				items,
+				totalCount,
+			};
+		},
 	},
 };

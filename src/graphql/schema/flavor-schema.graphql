@@ -13,10 +13,15 @@ extend type Mutation {
 type Flavor {
 	name: ID!
 	taste: [Taste!]
-	pairings: [Flavor!]
+	pairings(limit: Int, cursor: ID): PairingSubList
 }
 
 type FlavorSubList {
+	items: [Flavor!]!
+	totalCount: Int!
+}
+
+type PairingSubList {
 	items: [Flavor!]!
 	totalCount: Int!
 }

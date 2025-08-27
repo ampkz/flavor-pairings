@@ -13,6 +13,14 @@ export async function createPairing(pairing: Pairing): Promise<[Flavor | null, F
 	return [null, null];
 }
 
-export async function getFlavorPairings(flavor: Flavor): Promise<Flavor[]> {
-	return await getRelationshipsToNode(new Node(NodeType.FLAVOR, 'name', flavor.name), NodeType.FLAVOR, RelationshipType.PAIRS_WITH, true);
+export async function getFlavorPairings(flavor: Flavor, limit?: number | null, cursor?: string | null): Promise<Flavor[]> {
+	return await getRelationshipsToNode(
+		new Node(NodeType.FLAVOR, 'name', flavor.name),
+		NodeType.FLAVOR,
+		RelationshipType.PAIRS_WITH,
+		true,
+		'n2.name ASC',
+		limit,
+		`${cursor ? `n2.name > "${cursor}"` : ''}`
+	);
 }

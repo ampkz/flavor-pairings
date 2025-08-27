@@ -4,6 +4,7 @@ import { connect } from '../connection';
 import { getSessionOptions } from '../../../_helpers/db-helper';
 import Config from '../../../config/config';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
+import { Errors as CRUDErrors } from '../crud';
 
 export enum Errors {
 	COULD_NOT_CREATE_RELATIONSHIP = 'Could not create relationship.',
@@ -42,7 +43,10 @@ export async function getRelationshipsToNode(
 	node: Node,
 	secondNodeType: NodeType,
 	relationshipType: RelationshipType,
-	undirectedMatch: boolean = false
+	undirectedMatch: boolean = false,
+	orderByClause?: string,
+	limit?: number | null,
+	whereClause?: string
 ): Promise<any[]> {
 	const driver: Driver = await connect();
 	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
@@ -51,9 +55,9 @@ export async function getRelationshipsToNode(
 
 	try {
 		match = await session.run(
-			`MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[:${relationshipType}]-${
-				undirectedMatch ? '' : '>'
-			}(n2:${secondNodeType}) RETURN n2`,
+			`MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[:${relationshipType}]-${undirectedMatch ? '' : '>'}(n2:${secondNodeType}) ${
+				whereClause ? `WHERE ${whereClause}` : ''
+			} RETURN n2 ${orderByClause ? `ORDER BY ${orderByClause}` : ''} ${limit ? `LIMIT ${limit}` : ''}`,
 			node.getIdParams()
 		);
 	} catch (error) {
@@ -64,6 +68,35 @@ export async function getRelationshipsToNode(
 	}
 
 	return match.records.map((record: Record) => record.get('n2').properties);
+}
+
+export async function getTotalRelationshipsToNodes(
+	node: Node,
+	secondNodeType: NodeType,
+	relationshipType: RelationshipType,
+	undirectedMatch: boolean = true
+): Promise<number> {
+	const driver: Driver = await connect();
+	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
+
+	let count = 0;
+
+	try {
+		const match = await session.run(
+			`MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[r:${relationshipType}]-${
+				undirectedMatch ? '' : '>'
+			}(n2:${secondNodeType}) RETURN count(r) AS totalNodes`,
+			node.getIdParams()
+		);
+		count = match.records[0]!.get('totalNodes').toNumber();
+	} catch (error) {
+		throw new InternalError(CRUDErrors.CANNOT_GET_TOTAL_NODES, { cause: error });
+	} finally {
+		await session.close();
+		await driver.close();
+	}
+
+	return count;
 }
 
 export async function deleteRelationship(relationship: Relationship, undirectedMatch: boolean = false): Promise<[any | null, any | null]> {

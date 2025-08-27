@@ -72,8 +72,8 @@ describe('Node CRUD Operations', () => {
 	});
 
 	it('should update a node', async () => {
-		const flavor = (global as any).getNextNoun();
-		const updatedFlavor = (global as any).getNextNoun();
+		const flavor = (global as any).getNextNoun('un_');
+		const updatedFlavor = (global as any).getNextNoun('un_');
 		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		const result = await updateNode(NodeType.FLAVOR, 'f', ['name: $name'], ['f.name = $updatedName'], {
 			name: flavor,
@@ -91,7 +91,7 @@ describe('Node CRUD Operations', () => {
 	});
 
 	it('should delete a node', async () => {
-		const flavor = (global as any).getNextNoun();
+		const flavor = (global as any).getNextNoun('dn_');
 		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		const result = await deleteNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		expect(result).toHaveProperty('name', flavor);
