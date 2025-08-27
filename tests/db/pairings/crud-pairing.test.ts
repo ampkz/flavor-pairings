@@ -1,5 +1,6 @@
+import { create } from 'domain';
 import { createFlavor } from '../../../src/db/pairings/crud-flavor';
-import { createPairing } from '../../../src/db/pairings/crud-pairing';
+import { createPairing, getFlavorPairings } from '../../../src/db/pairings/crud-pairing';
 import { Flavor } from '../../../src/pairings/flavor';
 import { Pairing } from '../../../src/pairings/pairing';
 
@@ -29,5 +30,24 @@ describe('CRUD Pairing', () => {
 
 		expect(f1).toBeNull();
 		expect(f2).toBeNull();
+	});
+
+	it('should return a list of created pairings', async () => {
+		const flavor1 = new Flavor({ name: (global as any).uniqueNounsIterator.next().value });
+		await createFlavor(flavor1);
+
+		const flavors = Array.from({ length: 5 }, () => new Flavor({ name: (global as any).uniqueNounsIterator.next().value }));
+		await Promise.all(
+			flavors.map(async flavor => {
+				const createdFlavor = (await createFlavor(flavor))!;
+				await createPairing(new Pairing(flavor1, createdFlavor));
+			})
+		);
+
+		const pairings = await getFlavorPairings(flavor1);
+
+		flavors.map(flavor => {
+			expect(pairings).toContainEqual(flavor);
+		});
 	});
 });

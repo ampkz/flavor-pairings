@@ -1,5 +1,5 @@
 import { createFlavor, deleteFlavor, getFlavor, getFlavors, updateFlavor } from '../../db/pairings/crud-flavor';
-import { createPairing } from '../../db/pairings/crud-pairing';
+import { createPairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { Pairing } from '../../pairings/pairing';
@@ -17,14 +17,6 @@ export const resolvers: Resolvers = {
 			createPairing(new Pairing(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }))),
 	},
 	Flavor: {
-		pairings: flavor => {
-			if (flavor.name === 'Vanilla') {
-				return [{ name: 'Coca Cola' }];
-			}
-			if (flavor.name === 'Chocolate') {
-				return [{ name: 'Coffee' }];
-			}
-			return [];
-		},
+		pairings: flavor => getFlavorPairings(flavor),
 	},
 };
