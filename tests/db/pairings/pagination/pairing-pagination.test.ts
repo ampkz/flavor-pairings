@@ -1,7 +1,6 @@
 import { Node, NodeType, RelationshipType } from '../../../../src/_helpers/nodes';
-import { createFlavor, getFlavors } from '../../../../src/db/pairings/crud-flavor';
+import { createFlavor } from '../../../../src/db/pairings/crud-flavor';
 import { createPairing, getFlavorPairings } from '../../../../src/db/pairings/crud-pairing';
-import { getTotalNodeCountByType } from '../../../../src/db/utils/crud';
 import { getTotalRelationshipsToNodes } from '../../../../src/db/utils/relationship/crud-relationship';
 import { Flavor } from '../../../../src/pairings/flavor';
 import { Pairing } from '../../../../src/pairings/pairing';
