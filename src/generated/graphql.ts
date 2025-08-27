@@ -20,6 +20,11 @@ export type CreateFlavorInput = {
   name: Scalars['ID']['input'];
 };
 
+export type CreatePairingInput = {
+  flavor1: Scalars['ID']['input'];
+  flavor2: Scalars['ID']['input'];
+};
+
 export type Flavor = {
   __typename?: 'Flavor';
   name: Scalars['ID']['output'];
@@ -29,7 +34,7 @@ export type Flavor = {
 export type Mutation = {
   __typename?: 'Mutation';
   createFlavor?: Maybe<Flavor>;
-  createPairing: Scalars['Boolean']['output'];
+  createPairing?: Maybe<Array<Maybe<Flavor>>>;
   deleteFlavor?: Maybe<Flavor>;
   updateFlavor?: Maybe<Flavor>;
 };
@@ -41,8 +46,7 @@ export type MutationCreateFlavorArgs = {
 
 
 export type MutationCreatePairingArgs = {
-  flavor1: Scalars['ID']['input'];
-  flavor2: Scalars['ID']['input'];
+  input: CreatePairingInput;
 };
 
 
@@ -144,6 +148,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CreateFlavorInput: CreateFlavorInput;
+  CreatePairingInput: CreatePairingInput;
   Flavor: ResolverTypeWrapper<Flavor>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
@@ -156,6 +161,7 @@ export type ResolversTypes = {
 export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   CreateFlavorInput: CreateFlavorInput;
+  CreatePairingInput: CreatePairingInput;
   Flavor: Flavor;
   ID: Scalars['ID']['output'];
   Mutation: {};
@@ -172,7 +178,7 @@ export type FlavorResolvers<ContextType = any, ParentType extends ResolversParen
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
   createFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
-  createPairing?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'flavor1' | 'flavor2'>>;
+  createPairing?: Resolver<Maybe<Array<Maybe<ResolversTypes['Flavor']>>>, ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'input'>>;
   deleteFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationDeleteFlavorArgs, 'name'>>;
   updateFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationUpdateFlavorArgs, 'input'>>;
 };
