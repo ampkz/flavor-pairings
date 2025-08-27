@@ -2,6 +2,7 @@ import { createNode, Errors as CRUDErrors, deleteNode, getNode, getNodes, remove
 import { NodeType } from '../../../src/_helpers/nodes';
 import { faker } from '@faker-js/faker';
 import neo4j, { Driver, Neo4jError, Record, Session } from 'neo4j-driver';
+import { isSortedAlphabetically } from '../../../src/_helpers/array';
 
 describe('Node CRUD Operations', () => {
 	beforeEach(() => {
@@ -25,6 +26,30 @@ describe('Node CRUD Operations', () => {
 		const flavors = Array.from({ length: 5 }, () => (global as any).getNextNoun());
 		await Promise.all(flavors.map(flavor => createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor })));
 		const result = await getNodes(NodeType.FLAVOR);
+		flavors.forEach(flavor => {
+			expect(result).toContainEqual(expect.objectContaining({ name: flavor }));
+		});
+	});
+
+	it('should alphabetically order an array of created nodes', async () => {
+		const flavors = Array.from({ length: 5 }, () => (global as any).getNextNoun('goa_'));
+		await Promise.all(flavors.map(flavor => createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor })));
+		const result = await getNodes(NodeType.FLAVOR, 'n.name ASC');
+		expect(isSortedAlphabetically(result)).toBe(true);
+	});
+
+	test('getNodes should return a list of limited nodes', async () => {
+		const flavors = Array.from({ length: 5 }, () => (global as any).getNextNoun('gnl_'));
+		await Promise.all(flavors.map(flavor => createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor })));
+		const result = await getNodes(NodeType.FLAVOR, 'n.name ASC', 3);
+		expect(result.length).toEqual(3);
+	});
+
+	test('getNodes should return a list of nodes matching a where clause', async () => {
+		const flavors = Array.from({ length: 5 }, () => (global as any).getNextNoun('gmw_'));
+		await Promise.all(flavors.map(flavor => createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor })));
+		const result = await getNodes(NodeType.FLAVOR, 'n.name ASC', 5, 'n.name STARTS WITH "gmw_"');
+		expect(result.length).toEqual(5);
 		flavors.forEach(flavor => {
 			expect(result).toContainEqual(expect.objectContaining({ name: flavor }));
 		});

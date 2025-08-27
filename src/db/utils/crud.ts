@@ -86,12 +86,16 @@ export async function getNode(
 	return matchedNode;
 }
 
-export async function getNodes(nodeType: string, dbName: string = Config.PAIRINGS_DB): Promise<any[]> {
+export async function getNodes(nodeType: string, orderByClause?: string, limit?: number, whereClause?: string): Promise<any[]> {
 	const nodes: any[] = [];
 	const driver: Driver = await connect();
-	const session: Session = driver.session(getSessionOptions(dbName));
+	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
 
-	const match = await session.run(`MATCH (n:${nodeType}) RETURN n`);
+	const match = await session.run(
+		`MATCH (n:${nodeType}) ${whereClause ? 'WHERE ' + whereClause : ''} RETURN n ${orderByClause ? 'ORDER BY ' + orderByClause : ''} ${
+			limit ? 'LIMIT ' + limit : ''
+		}`
+	);
 
 	match.records.map(record => {
 		nodes.push(record.get(0).properties);
