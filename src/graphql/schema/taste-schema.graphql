@@ -1,0 +1,25 @@
+extend type Query {
+	taste(name: ID!): Taste
+	tastes: [Taste!]!
+}
+
+extend type Mutation {
+	createTaste(name: ID!): Taste
+	updateTaste(input: UpdateTasteInput!): Taste
+	deleteTaste(name: ID!): Taste
+	addTaste(input: AddTasteInput!): Taste
+}
+
+type Taste {
+	name: ID!
+}
+
+input AddTasteInput {
+	flavor: ID!
+	taste: ID!
+}
+
+input UpdateTasteInput {
+	name: ID!
+	updatedName: ID!
+}

@@ -16,6 +16,11 @@ export type Scalars = {
   Float: { input: number; output: number; }
 };
 
+export type AddTasteInput = {
+  flavor: Scalars['ID']['input'];
+  taste: Scalars['ID']['input'];
+};
+
 export type CreateFlavorInput = {
   name: Scalars['ID']['input'];
 };
@@ -29,14 +34,24 @@ export type Flavor = {
   __typename?: 'Flavor';
   name: Scalars['ID']['output'];
   pairings?: Maybe<Array<Flavor>>;
+  taste?: Maybe<Array<Taste>>;
 };
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addTaste?: Maybe<Taste>;
   createFlavor?: Maybe<Flavor>;
   createPairing?: Maybe<Array<Maybe<Flavor>>>;
+  createTaste?: Maybe<Taste>;
   deleteFlavor?: Maybe<Flavor>;
+  deleteTaste?: Maybe<Taste>;
   updateFlavor?: Maybe<Flavor>;
+  updateTaste?: Maybe<Taste>;
+};
+
+
+export type MutationAddTasteArgs = {
+  input: AddTasteInput;
 };
 
 
@@ -50,7 +65,17 @@ export type MutationCreatePairingArgs = {
 };
 
 
+export type MutationCreateTasteArgs = {
+  name: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteFlavorArgs = {
+  name: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteTasteArgs = {
   name: Scalars['ID']['input'];
 };
 
@@ -59,10 +84,17 @@ export type MutationUpdateFlavorArgs = {
   input: UpdateFlavorInput;
 };
 
+
+export type MutationUpdateTasteArgs = {
+  input: UpdateTasteInput;
+};
+
 export type Query = {
   __typename?: 'Query';
   flavor?: Maybe<Flavor>;
   flavors: Array<Flavor>;
+  taste?: Maybe<Taste>;
+  tastes: Array<Taste>;
 };
 
 
@@ -70,7 +102,22 @@ export type QueryFlavorArgs = {
   name: Scalars['ID']['input'];
 };
 
+
+export type QueryTasteArgs = {
+  name: Scalars['ID']['input'];
+};
+
+export type Taste = {
+  __typename?: 'Taste';
+  name: Scalars['ID']['output'];
+};
+
 export type UpdateFlavorInput = {
+  name: Scalars['ID']['input'];
+  updatedName: Scalars['ID']['input'];
+};
+
+export type UpdateTasteInput = {
   name: Scalars['ID']['input'];
   updatedName: Scalars['ID']['input'];
 };
@@ -146,6 +193,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 
 /** Mapping between all available schema types and the resolvers types */
 export type ResolversTypes = {
+  AddTasteInput: AddTasteInput;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CreateFlavorInput: CreateFlavorInput;
   CreatePairingInput: CreatePairingInput;
@@ -154,11 +202,14 @@ export type ResolversTypes = {
   Mutation: ResolverTypeWrapper<{}>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
+  Taste: ResolverTypeWrapper<Taste>;
   UpdateFlavorInput: UpdateFlavorInput;
+  UpdateTasteInput: UpdateTasteInput;
 };
 
 /** Mapping between all available schema types and the resolvers parents */
 export type ResolversParentTypes = {
+  AddTasteInput: AddTasteInput;
   Boolean: Scalars['Boolean']['output'];
   CreateFlavorInput: CreateFlavorInput;
   CreatePairingInput: CreatePairingInput;
@@ -167,30 +218,45 @@ export type ResolversParentTypes = {
   Mutation: {};
   Query: {};
   String: Scalars['String']['output'];
+  Taste: Taste;
   UpdateFlavorInput: UpdateFlavorInput;
+  UpdateTasteInput: UpdateTasteInput;
 };
 
 export type FlavorResolvers<ContextType = any, ParentType extends ResolversParentTypes['Flavor'] = ResolversParentTypes['Flavor']> = {
   name?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   pairings?: Resolver<Maybe<Array<ResolversTypes['Flavor']>>, ParentType, ContextType>;
+  taste?: Resolver<Maybe<Array<ResolversTypes['Taste']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type MutationResolvers<ContextType = any, ParentType extends ResolversParentTypes['Mutation'] = ResolversParentTypes['Mutation']> = {
+  addTaste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<MutationAddTasteArgs, 'input'>>;
   createFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
   createPairing?: Resolver<Maybe<Array<Maybe<ResolversTypes['Flavor']>>>, ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'input'>>;
+  createTaste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<MutationCreateTasteArgs, 'name'>>;
   deleteFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationDeleteFlavorArgs, 'name'>>;
+  deleteTaste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<MutationDeleteTasteArgs, 'name'>>;
   updateFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationUpdateFlavorArgs, 'input'>>;
+  updateTaste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<MutationUpdateTasteArgs, 'input'>>;
 };
 
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
   flavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<QueryFlavorArgs, 'name'>>;
   flavors?: Resolver<Array<ResolversTypes['Flavor']>, ParentType, ContextType>;
+  taste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<QueryTasteArgs, 'name'>>;
+  tastes?: Resolver<Array<ResolversTypes['Taste']>, ParentType, ContextType>;
+};
+
+export type TasteResolvers<ContextType = any, ParentType extends ResolversParentTypes['Taste'] = ResolversParentTypes['Taste']> = {
+  name?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type Resolvers<ContextType = any> = {
   Flavor?: FlavorResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
+  Taste?: TasteResolvers<ContextType>;
 };
 
