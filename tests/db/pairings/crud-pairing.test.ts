@@ -6,8 +6,8 @@ import { Pairing } from '../../../src/pairings/pairing';
 
 describe('CRUD Pairing', () => {
 	it('should create a pairing', async () => {
-		const flavor1 = new Flavor({ name: (global as any).uniqueNounsIterator.next().value });
-		const flavor2 = new Flavor({ name: (global as any).uniqueNounsIterator.next().value });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
 
 		await createFlavor(flavor1);
 		await createFlavor(flavor2);
@@ -21,8 +21,8 @@ describe('CRUD Pairing', () => {
 	});
 
 	it('should return null if pairing was not created', async () => {
-		const flavor1 = new Flavor({ name: (global as any).uniqueNounsIterator.next().value });
-		const flavor2 = new Flavor({ name: (global as any).uniqueNounsIterator.next().value });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
 
 		const pairing = new Pairing(flavor1, flavor2);
 
@@ -33,10 +33,10 @@ describe('CRUD Pairing', () => {
 	});
 
 	it('should return a list of created pairings', async () => {
-		const flavor1 = new Flavor({ name: (global as any).uniqueNounsIterator.next().value });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
 		await createFlavor(flavor1);
 
-		const flavors = Array.from({ length: 5 }, () => new Flavor({ name: (global as any).uniqueNounsIterator.next().value }));
+		const flavors = Array.from({ length: 5 }, () => new Flavor({ name: (global as any).getNextNoun() }));
 		await Promise.all(
 			flavors.map(async flavor => {
 				const createdFlavor = (await createFlavor(flavor))!;

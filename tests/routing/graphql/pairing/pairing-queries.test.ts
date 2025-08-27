@@ -19,9 +19,9 @@ describe('Pairing Queries', () => {
 	});
 
 	it('should return a list of pairings', async () => {
-		const flavor1 = (global as any).uniqueNounsIterator.next().value;
-		const flavor2 = (global as any).uniqueNounsIterator.next().value;
-		const flavor3 = (global as any).uniqueNounsIterator.next().value;
+		const flavor1 = (global as any).getNextNoun();
+		const flavor2 = (global as any).getNextNoun();
+		const flavor3 = (global as any).getNextNoun();
 
 		jest.spyOn(crudFlavor, 'getFlavor').mockResolvedValue(new Flavor({ name: flavor1 }));
 
@@ -66,7 +66,7 @@ describe('Pairing Queries', () => {
 	});
 
 	it('should throw an error if there was issue with the server', async () => {
-		jest.spyOn(crudFlavor, 'getFlavor').mockResolvedValue(new Flavor({ name: (global as any).uniqueNounsIterator.next().value }));
+		jest.spyOn(crudFlavor, 'getFlavor').mockResolvedValue(new Flavor({ name: (global as any).getNextNoun() }));
 		jest.spyOn(crudPairing, 'getFlavorPairings').mockRejectedValue(new InternalError('Server error'));
 
 		const response = await request(app)

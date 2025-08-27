@@ -10,7 +10,7 @@ describe('CRUD Taste', () => {
 	});
 
 	it('should create a taste', async () => {
-		const name = (global as any).uniqueNounsIterator.next().value;
+		const name = (global as any).getNextNoun();
 		const taste = new Taste({ name });
 		const createdTaste = await createTaste(taste);
 		expect(createdTaste!.name).toBe(taste.name);
@@ -19,14 +19,14 @@ describe('CRUD Taste', () => {
 	it('should return null if no taste was created', async () => {
 		jest.spyOn(crud, 'createNode').mockResolvedValue(null);
 
-		const name = (global as any).uniqueNounsIterator.next().value;
+		const name = (global as any).getNextNoun();
 		const taste = new Taste({ name });
 		const createdTaste = await createTaste(taste);
 		expect(createdTaste).toBeNull();
 	});
 
 	it('should get a taste by name', async () => {
-		const name = (global as any).uniqueNounsIterator.next().value;
+		const name = (global as any).getNextNoun();
 		const taste = new Taste({ name });
 		await createTaste(taste);
 		const fetchedTaste = await getTaste(taste.name);
@@ -39,7 +39,7 @@ describe('CRUD Taste', () => {
 	});
 
 	it('should update a taste', async () => {
-		const name = (global as any).uniqueNounsIterator.next().value;
+		const name = (global as any).getNextNoun();
 		const taste = new Taste({ name });
 		await createTaste(taste);
 		const updatedTaste = await updateTaste({ name, updatedName: 'updated_' + name });
@@ -52,7 +52,7 @@ describe('CRUD Taste', () => {
 	});
 
 	it('should delete a taste', async () => {
-		const name = (global as any).uniqueNounsIterator.next().value;
+		const name = (global as any).getNextNoun();
 		const taste = new Taste({ name });
 		await createTaste(taste);
 		const deletedTaste = await deleteTaste(taste.name);
@@ -65,7 +65,7 @@ describe('CRUD Taste', () => {
 	});
 
 	it('should return a list of created tastes', async () => {
-		const tastes = Array.from({ length: 5 }, () => (global as any).uniqueNounsIterator.next().value);
+		const tastes = Array.from({ length: 5 }, () => (global as any).getNextNoun());
 		await Promise.all(tastes.map(taste => createTaste({ name: taste })));
 
 		const fetchedTastes = await getTastes();
@@ -74,8 +74,8 @@ describe('CRUD Taste', () => {
 	});
 
 	it('should return a taste when a FlavorTaste is added', async () => {
-		const flavor = (global as any).uniqueNounsIterator.next().value;
-		const taste = (global as any).uniqueNounsIterator.next().value;
+		const flavor = (global as any).getNextNoun();
+		const taste = (global as any).getNextNoun();
 
 		const createdTaste = await createTaste(new Taste({ name: taste }));
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
@@ -86,8 +86,8 @@ describe('CRUD Taste', () => {
 	});
 
 	it('should return null if no FlavorTaste is added', async () => {
-		const flavor = (global as any).uniqueNounsIterator.next().value;
-		const taste = (global as any).uniqueNounsIterator.next().value;
+		const flavor = (global as any).getNextNoun();
+		const taste = (global as any).getNextNoun();
 
 		const createdTaste = new Taste({ name: taste });
 		const createdFlavor = new Flavor({ name: flavor });

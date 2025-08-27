@@ -12,4 +12,9 @@ const nountIterator = {
 	},
 };
 
-(global as any).uniqueNounsIterator = nountIterator;
+const getNextNoun = (prefix: string = '') => {
+	const next = nountIterator.next();
+	return next.done ? null : `${prefix}${next.value}`;
+};
+
+(global as any).getNextNoun = getNextNoun;
