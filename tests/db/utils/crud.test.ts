@@ -1,4 +1,13 @@
-import { createNode, Errors as CRUDErrors, deleteNode, getNode, getNodes, removeProperties, updateNode } from '../../../src/db/utils/crud';
+import {
+	createNode,
+	Errors as CRUDErrors,
+	deleteNode,
+	getNode,
+	getNodes,
+	getTotalNodeCountByType,
+	removeProperties,
+	updateNode,
+} from '../../../src/db/utils/crud';
 import { NodeType } from '../../../src/_helpers/nodes';
 import { faker } from '@faker-js/faker';
 import neo4j, { Driver, Neo4jError, Record, Session } from 'neo4j-driver';
@@ -53,6 +62,13 @@ describe('Node CRUD Operations', () => {
 		flavors.forEach(flavor => {
 			expect(result).toContainEqual(expect.objectContaining({ name: flavor }));
 		});
+	});
+
+	it('should return a total number of created nodes by nodeType', async () => {
+		const flavor = (global as any).getNextNoun('tn_');
+		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
+		const result = await getTotalNodeCountByType(NodeType.FLAVOR);
+		expect(result).toBeGreaterThanOrEqual(1);
 	});
 
 	it('should update a node', async () => {
@@ -129,6 +145,22 @@ describe('Node CRUD Operations', () => {
 		driverSpy.mockReturnValueOnce(driverMock);
 
 		await expect(getNode(NodeType.FLAVOR, ['name: $name'], { name: faker.word.noun() })).rejects.toThrow(CRUDErrors.CANNOT_MATCH_NODE);
+	});
+
+	it(`should throw an error if there was an issue with getting total nodes`, async () => {
+		const driverMock = {
+			session: jest.fn().mockReturnValue({
+				run: jest.fn().mockRejectedValue(new Neo4jError('', '', '', '')),
+				close: jest.fn(),
+			} as unknown as Session),
+			close: jest.fn(),
+			getServerInfo: jest.fn(),
+		} as unknown as Driver;
+
+		const driverSpy = jest.spyOn(neo4j, 'driver');
+		driverSpy.mockReturnValueOnce(driverMock);
+
+		await expect(getTotalNodeCountByType(NodeType.FLAVOR)).rejects.toThrow(CRUDErrors.CANNOT_GET_TOTAL_NODES);
 	});
 
 	it(`should throw an error if there was an issue deleting the node`, async () => {

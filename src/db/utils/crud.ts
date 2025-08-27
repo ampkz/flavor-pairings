@@ -10,6 +10,7 @@ export enum Errors {
 	CANNOT_MATCH_NODE = 'Cannot Match Node',
 	CANNOT_DELETE_NODE = 'Cannot Delete Node',
 	CANNOT_UPDATE_NODE = 'Cannot Update Node',
+	CANNOT_GET_TOTAL_NODES = 'Cannot Get Total Nodes',
 }
 
 export async function createNode(nodeType: NodeType, idProps: string[], params: object, dbName: string = Config.PAIRINGS_DB): Promise<any | null> {
@@ -104,6 +105,25 @@ export async function getNodes(nodeType: string, orderByClause?: string, limit?:
 	await session.close();
 	await driver.close();
 	return nodes;
+}
+
+export async function getTotalNodeCountByType(nodeType: NodeType): Promise<number> {
+	const driver: Driver = await connect();
+	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
+
+	let count = 0;
+
+	try {
+		const match = await session.run(`MATCH (n:${nodeType}) RETURN COUNT(n) AS count`);
+		count = match.records[0]!.get('count').toNumber();
+	} catch (error) {
+		throw new InternalError(Errors.CANNOT_GET_TOTAL_NODES, { cause: error });
+	} finally {
+		await session.close();
+		await driver.close();
+	}
+
+	return count;
 }
 
 export async function deleteNode(nodeType: NodeType, idProps: string[], params: object, dbName: string = Config.PAIRINGS_DB): Promise<any | null> {
