@@ -87,7 +87,7 @@ export async function getNode(
 	return matchedNode;
 }
 
-export async function getNodes(nodeType: string, orderByClause?: string, limit?: number, whereClause?: string): Promise<any[]> {
+export async function getNodes(nodeType: string, orderByClause?: string, limit?: number | null, whereClause?: string): Promise<any[]> {
 	const nodes: any[] = [];
 	const driver: Driver = await connect();
 	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));

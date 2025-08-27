@@ -2,6 +2,7 @@ import request from 'supertest';
 import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudFlavor from '../../../../src/db/pairings/crud-flavor';
+import * as crud from '../../../../src/db/utils/crud';
 import { faker } from '@faker-js/faker';
 
 describe('Flavor Queries', () => {
@@ -77,6 +78,7 @@ describe('Flavor Queries', () => {
 
 	it('should return a list of flavors', async () => {
 		const flavors = Array.from({ length: 3 }, () => ({ name: faker.word.noun() }));
+		jest.spyOn(crud, 'getTotalNodeCountByType').mockResolvedValue(flavors.length);
 		jest.spyOn(crudFlavor, 'getFlavors').mockResolvedValue(flavors);
 
 		const response = await request(app)
@@ -85,13 +87,17 @@ describe('Flavor Queries', () => {
 				query: `
                 query GetFlavors {
                     flavors {
-                        name
+                        items {
+                            name
+                        }
+                        totalCount
                     }
                 }
             `,
 			})
 			.expect(200);
 
-		expect(response.body.data.flavors).toEqual(flavors);
+		expect(response.body.data.flavors.items).toEqual(flavors);
+		expect(response.body.data.flavors.totalCount).toEqual(flavors.length);
 	});
 });

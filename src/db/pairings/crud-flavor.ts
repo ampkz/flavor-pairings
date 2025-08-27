@@ -23,10 +23,10 @@ export async function deleteFlavor(name: string): Promise<Flavor | null> {
 	return deletedNode ? new Flavor(deletedNode) : null;
 }
 
-export async function getFlavors(): Promise<Flavor[]> {
+export async function getFlavors(limit?: number | null, cursor?: string | null): Promise<Flavor[]> {
 	const flavors: Flavor[] = [];
 
-	const nodes = await getNodes(NodeType.FLAVOR);
+	const nodes = await getNodes(NodeType.FLAVOR, 'n.name ASC', limit, cursor ? 'n.name > "' + cursor + '"' : undefined);
 
 	flavors.push(...nodes.map(node => new Flavor(node)));
 

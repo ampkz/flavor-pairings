@@ -1,6 +1,6 @@
 extend type Query {
 	flavor(name: ID!): Flavor
-	flavors: [Flavor!]!
+	flavors(limit: Int, cursor: ID): FlavorSubList
 }
 
 extend type Mutation {
@@ -14,6 +14,11 @@ type Flavor {
 	name: ID!
 	taste: [Taste!]
 	pairings: [Flavor!]
+}
+
+type FlavorSubList {
+	items: [Flavor!]!
+	totalCount: Int!
 }
 
 input CreateFlavorInput {
