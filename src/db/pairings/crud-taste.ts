@@ -27,7 +27,7 @@ export async function deleteTaste(name: string): Promise<Taste | null> {
 export async function getTastes(): Promise<Taste[]> {
 	const tastes: Taste[] = [];
 
-	const nodes = await getNodes(NodeType.TASTE);
+	const nodes = await getNodes(NodeType.TASTE, 'n.name ASC');
 
 	tastes.push(...nodes.map(node => new Taste(node)));
 
