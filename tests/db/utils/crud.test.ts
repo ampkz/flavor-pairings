@@ -9,20 +9,20 @@ describe('Node CRUD Operations', () => {
 	});
 
 	it('should create a node', async () => {
-		const flavor = `c_${faker.word.noun()}`;
+		const flavor = (global as any).uniqueNounsIterator.next().value;
 		const result = await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		expect(result).toHaveProperty('name', flavor);
 	});
 
 	it('should get a node', async () => {
-		const flavor = `g_${faker.word.noun()}`;
+		const flavor = (global as any).uniqueNounsIterator.next().value;
 		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		const result = await getNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		expect(result).toHaveProperty('name', flavor);
 	});
 
 	it('should get an array of created nodes', async () => {
-		const flavors = Array.from({ length: 5 }, () => `g_${faker.word.noun()}`);
+		const flavors = Array.from({ length: 5 }, () => (global as any).uniqueNounsIterator.next().value);
 		await Promise.all(flavors.map(flavor => createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor })));
 		const result = await getNodes(NodeType.FLAVOR);
 		flavors.forEach(flavor => {
@@ -31,8 +31,8 @@ describe('Node CRUD Operations', () => {
 	});
 
 	it('should update a node', async () => {
-		const flavor = `u_${faker.word.noun()}`;
-		const updatedFlavor = `u2_${faker.word.noun()}`;
+		const flavor = (global as any).uniqueNounsIterator.next().value;
+		const updatedFlavor = (global as any).uniqueNounsIterator.next().value;
 		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		const result = await updateNode(NodeType.FLAVOR, 'f', ['name: $name'], ['f.name = $updatedName'], {
 			name: flavor,
@@ -50,14 +50,14 @@ describe('Node CRUD Operations', () => {
 	});
 
 	it('should delete a node', async () => {
-		const flavor = `d_${faker.word.noun()}`;
+		const flavor = (global as any).uniqueNounsIterator.next().value;
 		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		const result = await deleteNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		expect(result).toHaveProperty('name', flavor);
 	});
 
 	it('should remove properties from a node', async () => {
-		const flavor = `r_${faker.word.noun()}`;
+		const flavor = (global as any).uniqueNounsIterator.next().value;
 		await createNode(NodeType.FLAVOR, ['name: $name', 'propToRemove: $propToRemove'], { name: flavor, propToRemove: 'removeMe' });
 		const result = await removeProperties(NodeType.FLAVOR, 'f', ['name: $name'], ['f.propToRemove'], {
 			name: flavor,
@@ -67,7 +67,7 @@ describe('Node CRUD Operations', () => {
 	});
 
 	it('should return null if no properties were removed from a node', async () => {
-		const flavor = `r_${faker.word.noun()}`;
+		const flavor = (global as any).uniqueNounsIterator.next().value;
 		const result = await removeProperties(NodeType.FLAVOR, 'f', ['name: $name'], ['f.propToRemove'], {
 			name: flavor,
 		});

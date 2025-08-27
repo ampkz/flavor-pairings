@@ -6,23 +6,21 @@ export class Node {
 	public idProp: string;
 	public idValue: string;
 	public nodeType: NodeType;
-	public shouldReturnFromQuery: boolean;
 
-	constructor(nodeType: NodeType, idProp: string, idValue: string, shouldReturnFromQuery: boolean = false) {
+	constructor(nodeType: NodeType, idProp: string, idValue: string) {
 		this.idProp = idProp;
 		this.idValue = idValue;
 		this.nodeType = nodeType;
-		this.shouldReturnFromQuery = shouldReturnFromQuery;
 	}
 
-	getIdString(): string {
-		return `${this.idProp}:$${this.idProp}`;
+	getIdString(prefix: string = ''): string {
+		return `${this.idProp}:$${prefix}${this.idProp}`;
 	}
 
-	getIdParams() {
+	getIdParams(prefix: string = '') {
 		const params: any = {};
 
-		params[this.idProp] = this.idValue;
+		params[`${prefix}${this.idProp}`] = this.idValue;
 
 		return params;
 	}
@@ -35,18 +33,18 @@ export enum RelationshipType {
 export class Relationship {
 	public node1: Node;
 	public node2: Node;
-	public name: RelationshipType;
+	public type: RelationshipType;
 
-	constructor(node1: Node, node2: Node, name: RelationshipType) {
+	constructor(node1: Node, node2: Node, type: RelationshipType) {
 		this.node1 = node1;
 		this.node2 = node2;
-		this.name = name;
+		this.type = type;
 	}
 
-	getRelationshipParams() {
+	getRelationshipParams(n1Prefix: string = '', n2Prefix: string = '') {
 		return {
-			...this.node1.getIdParams(),
-			...this.node2.getIdParams(),
+			...this.node1.getIdParams(n1Prefix),
+			...this.node2.getIdParams(n2Prefix),
 		};
 	}
 }

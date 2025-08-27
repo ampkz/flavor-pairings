@@ -7,4 +7,5 @@ export default {
 	}),
 	globalSetup: './jestGlobalConfigs/globalSetup.ts',
 	globalTeardown: './jestGlobalConfigs/globalTeardown.ts',
+	setupFiles: ['./jestGlobalConfigs/globalUniqueNouns.ts'],
 } satisfies Config;

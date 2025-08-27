@@ -3,16 +3,16 @@ type Query {
 	flavors: [Flavor!]!
 }
 
-type Flavor {
-	name: ID!
-	pairings: [Flavor!]
-}
-
 type Mutation {
 	createFlavor(input: CreateFlavorInput!): Flavor
 	updateFlavor(input: UpdateFlavorInput!): Flavor
 	deleteFlavor(name: ID!): Flavor
 	createPairing(flavor1: ID!, flavor2: ID!): Boolean!
+}
+
+type Flavor {
+	name: ID!
+	pairings: [Flavor!]
 }
 
 input CreateFlavorInput {
