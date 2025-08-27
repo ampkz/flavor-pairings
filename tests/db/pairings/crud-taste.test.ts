@@ -1,6 +1,8 @@
-import { Taste } from '../../../src/pairings/taste';
-import { createTaste, deleteTaste, getTaste, getTastes, updateTaste } from '../../../src/db/pairings/crud-taste';
+import { FlavorTaste, Taste } from '../../../src/pairings/taste';
+import { addTaste, createTaste, deleteTaste, getTaste, getTastes, updateTaste } from '../../../src/db/pairings/crud-taste';
 import * as crud from '../../../src/db/utils/crud';
+import { Flavor } from '../../../src/pairings/flavor';
+import { createFlavor } from '../../../src/db/pairings/crud-flavor';
 
 describe('CRUD Taste', () => {
 	beforeEach(() => {
@@ -69,5 +71,29 @@ describe('CRUD Taste', () => {
 		const fetchedTastes = await getTastes();
 		expect(fetchedTastes).toBeInstanceOf(Array<Taste>);
 		expect(fetchedTastes.length).toBeGreaterThan(0);
+	});
+
+	it('should return a taste when a FlavorTaste is added', async () => {
+		const flavor = (global as any).uniqueNounsIterator.next().value;
+		const taste = (global as any).uniqueNounsIterator.next().value;
+
+		const createdTaste = await createTaste(new Taste({ name: taste }));
+		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
+
+		const flavorTaste = new FlavorTaste(createdFlavor!, createdTaste!);
+		const addedTaste = await addTaste(flavorTaste);
+		expect(addedTaste!.name).toBe(taste);
+	});
+
+	it('should return null if no FlavorTaste is added', async () => {
+		const flavor = (global as any).uniqueNounsIterator.next().value;
+		const taste = (global as any).uniqueNounsIterator.next().value;
+
+		const createdTaste = new Taste({ name: taste });
+		const createdFlavor = new Flavor({ name: flavor });
+
+		const flavorTaste = new FlavorTaste(createdFlavor!, createdTaste!);
+		const addedTaste = await addTaste(flavorTaste);
+		expect(addedTaste).toBeNull();
 	});
 });
