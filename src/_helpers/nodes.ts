@@ -41,7 +41,7 @@ export class Relationship {
 		this.type = type;
 	}
 
-	getRelationshipParams(n1Prefix: string = '', n2Prefix: string = '') {
+	getRelationshipParams(n1Prefix: string, n2Prefix: string) {
 		return {
 			...this.node1.getIdParams(n1Prefix),
 			...this.node2.getIdParams(n2Prefix),
