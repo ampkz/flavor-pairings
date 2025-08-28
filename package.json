@@ -23,6 +23,7 @@
 		"test": "jest",
 		"test-coverage": "jest --coverage",
 		"codegen": "graphql-codegen --config codegen.ts",
+		"init-prod": "npm run build && cross-env NODE_ENV=production node ./build/server/utils/init-server.js",
 		"init-dev": "cross-env NODE_ENV=development ts-node ./src/server/utils/init-server.ts",
 		"destroy-dev": "cross-env NODE_ENV=development ts-node ./src/server/utils/destroy-server.ts",
 		"destroy-test": "cross-env NODE_ENV=test ts-node ./src/server/utils/destroy-server.ts"

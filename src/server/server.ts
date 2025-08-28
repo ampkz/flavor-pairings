@@ -76,7 +76,7 @@ async function startServer() {
 	/* istanbul ignore next line */
 	app.use(
 		cors<cors.CorsRequest>({
-			origin: `${Config.IS_NOT_PROD ? [`http://localhost:3000`, 'https://studio.apollographql.com'] : ``}`,
+			origin: `${Config.IS_NOT_PROD ? [`http://localhost:${Config.CLIENT_PORT}`, 'https://studio.apollographql.com'] : ``}`,
 			methods: 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
 			credentials: true,
 		})
@@ -95,9 +95,7 @@ async function startServer() {
 				}
 
 				const token = req.cookies.token;
-
 				const svr = await validateSessionToken(token);
-
 				return { authorizedUser: svr.user };
 			},
 		})

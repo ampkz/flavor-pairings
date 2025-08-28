@@ -9,6 +9,10 @@ export default class Config {
 	static PAIRINGS_DB: string = process.env.PAIRINGS_DB as string;
 	/* istanbul ignore next line */
 	static PORT: number = process.env.PORT ? parseInt(process.env.PORT) : 4000;
+
+	/* istanbul ignore next line */
+	static CLIENT_PORT: number = process.env.CLIENT_PORT ? parseInt(process.env.CLIENT_PORT) : 3000;
+
 	/* istanbul ignore next line */
 	static IS_NOT_PROD: boolean = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
 }
