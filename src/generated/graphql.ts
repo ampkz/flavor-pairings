@@ -41,6 +41,7 @@ export type CreateFlavorInput = {
 };
 
 export type CreatePairingInput = {
+  affinity: PairingAffinity;
   flavor1: Scalars['ID']['input'];
   flavor2: Scalars['ID']['input'];
 };
@@ -71,7 +72,7 @@ export type Mutation = {
   addVolume?: Maybe<Volume>;
   addWeight?: Maybe<Weight>;
   createFlavor?: Maybe<Flavor>;
-  createPairing?: Maybe<Array<Maybe<Flavor>>>;
+  createPairing?: Maybe<Pairing>;
   createTaste?: Maybe<Taste>;
   createTechnique?: Maybe<Technique>;
   createVolume?: Maybe<Volume>;
@@ -188,9 +189,29 @@ export type MutationUpdateWeightArgs = {
   input: UpdateWeightInput;
 };
 
+export type Paired = {
+  __typename?: 'Paired';
+  affinity: PairingAffinity;
+  flavor: Flavor;
+};
+
+export type Pairing = {
+  __typename?: 'Pairing';
+  flavor: Flavor;
+  paired: Paired;
+};
+
+export enum PairingAffinity {
+  Asterisk = 'ASTERISK',
+  Avoid = 'AVOID',
+  Bold = 'BOLD',
+  Caps = 'CAPS',
+  Regular = 'REGULAR'
+}
+
 export type PairingSubList = {
   __typename?: 'PairingSubList';
-  items: Array<Flavor>;
+  items: Array<Paired>;
   totalCount: Scalars['Int']['output'];
 };
 
@@ -367,6 +388,9 @@ export type ResolversTypes = {
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
   Int: ResolverTypeWrapper<Scalars['Int']['output']>;
   Mutation: ResolverTypeWrapper<{}>;
+  Paired: ResolverTypeWrapper<Paired>;
+  Pairing: ResolverTypeWrapper<Pairing>;
+  PairingAffinity: PairingAffinity;
   PairingSubList: ResolverTypeWrapper<PairingSubList>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
@@ -395,6 +419,8 @@ export type ResolversParentTypes = {
   ID: Scalars['ID']['output'];
   Int: Scalars['Int']['output'];
   Mutation: {};
+  Paired: Paired;
+  Pairing: Pairing;
   PairingSubList: PairingSubList;
   Query: {};
   String: Scalars['String']['output'];
@@ -428,7 +454,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addVolume?: Resolver<Maybe<ResolversTypes['Volume']>, ParentType, ContextType, RequireFields<MutationAddVolumeArgs, 'input'>>;
   addWeight?: Resolver<Maybe<ResolversTypes['Weight']>, ParentType, ContextType, RequireFields<MutationAddWeightArgs, 'input'>>;
   createFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
-  createPairing?: Resolver<Maybe<Array<Maybe<ResolversTypes['Flavor']>>>, ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'input'>>;
+  createPairing?: Resolver<Maybe<ResolversTypes['Pairing']>, ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'input'>>;
   createTaste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<MutationCreateTasteArgs, 'name'>>;
   createTechnique?: Resolver<Maybe<ResolversTypes['Technique']>, ParentType, ContextType, RequireFields<MutationCreateTechniqueArgs, 'name'>>;
   createVolume?: Resolver<Maybe<ResolversTypes['Volume']>, ParentType, ContextType, RequireFields<MutationCreateVolumeArgs, 'name'>>;
@@ -445,8 +471,20 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   updateWeight?: Resolver<Maybe<ResolversTypes['Weight']>, ParentType, ContextType, RequireFields<MutationUpdateWeightArgs, 'input'>>;
 };
 
+export type PairedResolvers<ContextType = any, ParentType extends ResolversParentTypes['Paired'] = ResolversParentTypes['Paired']> = {
+  affinity?: Resolver<ResolversTypes['PairingAffinity'], ParentType, ContextType>;
+  flavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type PairingResolvers<ContextType = any, ParentType extends ResolversParentTypes['Pairing'] = ResolversParentTypes['Pairing']> = {
+  flavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
+  paired?: Resolver<ResolversTypes['Paired'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type PairingSubListResolvers<ContextType = any, ParentType extends ResolversParentTypes['PairingSubList'] = ResolversParentTypes['PairingSubList']> = {
-  items?: Resolver<Array<ResolversTypes['Flavor']>, ParentType, ContextType>;
+  items?: Resolver<Array<ResolversTypes['Paired']>, ParentType, ContextType>;
   totalCount?: Resolver<ResolversTypes['Int'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
@@ -488,6 +526,8 @@ export type Resolvers<ContextType = any> = {
   Flavor?: FlavorResolvers<ContextType>;
   FlavorSubList?: FlavorSubListResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
+  Paired?: PairedResolvers<ContextType>;
+  Pairing?: PairingResolvers<ContextType>;
   PairingSubList?: PairingSubListResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Taste?: TasteResolvers<ContextType>;

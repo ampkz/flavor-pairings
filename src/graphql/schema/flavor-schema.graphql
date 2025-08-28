@@ -7,7 +7,7 @@ extend type Mutation {
 	createFlavor(input: CreateFlavorInput!): Flavor
 	updateFlavor(input: UpdateFlavorInput!): Flavor
 	deleteFlavor(name: ID!): Flavor
-	createPairing(input: CreatePairingInput!): [Flavor]
+	createPairing(input: CreatePairingInput!): Pairing
 }
 
 type Flavor {
@@ -22,7 +22,7 @@ type FlavorSubList {
 }
 
 type PairingSubList {
-	items: [Flavor!]!
+	items: [Paired!]!
 	totalCount: Int!
 }
 
@@ -35,7 +35,26 @@ input UpdateFlavorInput {
 	updatedName: ID!
 }
 
+type Pairing {
+	flavor: Flavor!
+	paired: Paired!
+}
+
+type Paired {
+	flavor: Flavor!
+	affinity: PairingAffinity!
+}
+
 input CreatePairingInput {
 	flavor1: ID!
 	flavor2: ID!
+	affinity: PairingAffinity!
+}
+
+enum PairingAffinity {
+	REGULAR
+	BOLD
+	CAPS
+	ASTERISK
+	AVOID
 }

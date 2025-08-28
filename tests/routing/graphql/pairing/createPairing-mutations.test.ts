@@ -4,6 +4,8 @@ import { Express } from 'express';
 import * as crudPairing from '../../../../src/db/pairings/crud-pairing';
 import { faker } from '@faker-js/faker';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
+import { PairingAffinity } from '../../../../src/generated/graphql';
+import { Pairing } from '../../../../src/pairings/pairing';
 
 describe('CreateFlavor mutations', () => {
 	let app: Express;
@@ -19,39 +21,46 @@ describe('CreateFlavor mutations', () => {
 	it('should create a pairing', async () => {
 		const flavor1 = faker.word.noun();
 		const flavor2 = faker.word.noun();
-		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue([{ name: flavor1 }, { name: flavor2 }]);
+		const affinity = PairingAffinity.Regular;
+		const pairing: Pairing = new Pairing({ name: flavor1 }, { name: flavor2 }, affinity);
+		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue(pairing);
 
 		const response = await request(app)
 			.post('/graphql')
 			.send({
 				query: `
-                mutation CreatePairing($input: CreatePairingInput!) {
-                    createPairing(input: $input) {
-                        name
-                    }
-                }
+					mutation CreatePairing($input: CreatePairingInput!) {
+					createPairing(input: $input) {
+						flavor {
+							name
+						}
+					}
+				}
             `,
-				variables: { input: { flavor1, flavor2 } },
+				variables: { input: { flavor1, flavor2, affinity } },
 			})
 			.expect(200);
 
-		expect(response.body.data.createPairing).toEqual([{ name: flavor1 }, { name: flavor2 }]);
+		expect(response.body.data.createPairing.flavor.name).toEqual(pairing.flavor1.name);
 	});
 
 	it('should throw an error with a bad input', async () => {
 		const flavor1 = faker.word.noun();
 		const flavor2 = faker.word.noun();
-		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue([{ name: flavor1 }, { name: flavor2 }]);
+		const pairing = new Pairing({ name: flavor1 }, { name: flavor2 }, PairingAffinity.Regular);
+		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue(pairing);
 
 		const response = await request(app)
 			.post('/graphql')
 			.send({
 				query: `
                 mutation CreatePairing($input: CreatePairingInput!) {
-                    createPairing(input: $input) {
-                        name
-                    }
-                }
+					createPairing(input: $input) {
+						flavor {
+							name
+						}
+					}
+				}
             `,
 				variables: { input: { flavor1: null, flavor2: null } },
 			})
@@ -68,12 +77,14 @@ describe('CreateFlavor mutations', () => {
 			.send({
 				query: `
                 mutation CreatePairing($input: CreatePairingInput!) {
-                    createPairing(input: $input) {
-                        name
-                    }
-                }
+					createPairing(input: $input) {
+						flavor {
+							name
+						}
+					}
+				}
             `,
-				variables: { input: { flavor1: 'test1', flavor2: 'test2' } },
+				variables: { input: { flavor1: 'test1', flavor2: 'test2', affinity: PairingAffinity.Regular } },
 			})
 			.expect(200);
 

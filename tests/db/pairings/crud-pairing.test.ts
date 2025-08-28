@@ -1,8 +1,8 @@
-import { create } from 'domain';
 import { createFlavor } from '../../../src/db/pairings/crud-flavor';
 import { createPairing, getFlavorPairings } from '../../../src/db/pairings/crud-pairing';
 import { Flavor } from '../../../src/pairings/flavor';
 import { Pairing } from '../../../src/pairings/pairing';
+import { PairingAffinity } from '../../../src/generated/graphql';
 
 describe('CRUD Pairing', () => {
 	it('should create a pairing', async () => {
@@ -12,24 +12,21 @@ describe('CRUD Pairing', () => {
 		await createFlavor(flavor1);
 		await createFlavor(flavor2);
 
-		const pairing = new Pairing(flavor1, flavor2);
+		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular);
+		const createdPairing = await createPairing(pairing);
 
-		const [createdFlavor1, createdFlavor2] = await createPairing(pairing);
-
-		expect(createdFlavor1).toEqual(flavor1);
-		expect(createdFlavor2).toEqual(flavor2);
+		expect(createdPairing).toEqual(pairing);
 	});
 
 	it('should return null if pairing was not created', async () => {
 		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
 		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
 
-		const pairing = new Pairing(flavor1, flavor2);
+		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Bold);
 
-		const [f1, f2] = await createPairing(pairing);
+		const createdPairing = await createPairing(pairing);
 
-		expect(f1).toBeNull();
-		expect(f2).toBeNull();
+		expect(createdPairing).toBeNull();
 	});
 
 	it('should return a list of created pairings', async () => {
@@ -40,14 +37,14 @@ describe('CRUD Pairing', () => {
 		await Promise.all(
 			flavors.map(async flavor => {
 				const createdFlavor = (await createFlavor(flavor))!;
-				await createPairing(new Pairing(flavor1, createdFlavor));
+				await createPairing(new Pairing(flavor1, createdFlavor, PairingAffinity.Regular));
 			})
 		);
 
 		const pairings = await getFlavorPairings(flavor1);
 
 		flavors.map(flavor => {
-			expect(pairings).toContainEqual(flavor);
+			expect(pairings).toContainEqual({ flavor, affinity: PairingAffinity.Regular });
 		});
 	});
 });

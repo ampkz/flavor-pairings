@@ -12,7 +12,7 @@ export enum Errors {
 	COULD_NOT_GET_RELATIONSHIPS = 'Could not get relationships.',
 }
 
-export async function createRelationship(relationship: Relationship): Promise<[any | null, any | null]> {
+export async function createRelationship(relationship: Relationship): Promise<[any | null, any | null, any | null]> {
 	const driver: Driver = await connect();
 	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
 
@@ -22,8 +22,10 @@ export async function createRelationship(relationship: Relationship): Promise<[a
 		match = await session.run(
 			`MATCH (n1:${relationship.node1.nodeType} { ${relationship.node1.getIdString('n1')} }), (n2:${
 				relationship.node2.nodeType
-			} { ${relationship.node2.getIdString('n2')} }) CREATE (n1)-[:${relationship.type}]->(n2) RETURN n1, n2`,
-			relationship.getRelationshipParams('n1', 'n2')
+			} { ${relationship.node2.getIdString('n2')} }) CREATE (n1)-[r:${relationship.type} ${
+				relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''
+			}]->(n2) RETURN n1, n2, r`,
+			relationship.getRelationshipParams('n1', 'n2', 'r')
 		);
 	} catch (error) {
 		throw new InternalError(Errors.COULD_NOT_CREATE_RELATIONSHIP, { cause: error });
@@ -33,10 +35,14 @@ export async function createRelationship(relationship: Relationship): Promise<[a
 	}
 
 	if (match.summary.counters._stats.relationshipsCreated !== 1) {
-		return [null, null];
+		return [null, null, null];
 	}
 
-	return [match.records[0].get('n1').properties, match.records[0].get('n2').properties];
+	return [
+		match.records[0].get('n1').properties,
+		match.records[0].get('n2').properties,
+		{ type: match.records[0].get('r').type, ...match.records[0].get('r').properties },
+	];
 }
 
 export async function getRelationshipsToNode(
@@ -55,9 +61,9 @@ export async function getRelationshipsToNode(
 
 	try {
 		match = await session.run(
-			`MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[:${relationshipType}]-${undirectedMatch ? '' : '>'}(n2:${secondNodeType}) ${
+			`MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[r:${relationshipType}]-${undirectedMatch ? '' : '>'}(n2:${secondNodeType}) ${
 				whereClause ? `WHERE ${whereClause}` : ''
-			} RETURN n2 ${orderByClause ? `ORDER BY ${orderByClause}` : ''} ${limit ? `LIMIT ${limit}` : ''}`,
+			} RETURN r, n2 ${orderByClause ? `ORDER BY ${orderByClause}` : ''} ${limit ? `LIMIT ${limit}` : ''}`,
 			node.getIdParams()
 		);
 	} catch (error) {
@@ -67,7 +73,7 @@ export async function getRelationshipsToNode(
 		await driver.close();
 	}
 
-	return match.records.map((record: Record) => record.get('n2').properties);
+	return match.records.map((record: Record) => [record.get('n2').properties, { type: record.get('r').type, ...record.get('r').properties }]);
 }
 
 export async function getTotalRelationshipsToNodes(

@@ -1,20 +1,23 @@
 import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
+import { Paired } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { Pairing } from '../../pairings/pairing';
 import { createRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
-export async function createPairing(pairing: Pairing): Promise<[Flavor | null, Flavor | null]> {
-	const [f1, f2] = await createRelationship(pairing.getRelationship());
+export async function createPairing(pairing: Pairing): Promise<Pairing | null> {
+	const [f1, f2, r] = await createRelationship(pairing.getRelationship());
 
-	if (f1 !== null && f2 !== null) {
-		return [new Flavor(f1), new Flavor(f2)];
+	if (f1 !== null && f2 !== null && r !== null) {
+		return new Pairing(new Flavor(f1), new Flavor(f2), r.affinity);
 	}
 
-	return [null, null];
+	return null;
 }
 
-export async function getFlavorPairings(flavor: Flavor, limit?: number | null, cursor?: string | null): Promise<Flavor[]> {
-	return await getRelationshipsToNode(
+export async function getFlavorPairings(flavor: Flavor, limit?: number | null, cursor?: string | null): Promise<Paired[]> {
+	const pairings: Paired[] = [];
+
+	const relationships = await getRelationshipsToNode(
 		new Node(NodeType.FLAVOR, 'name', flavor.name),
 		NodeType.FLAVOR,
 		RelationshipType.PAIRS_WITH,
@@ -23,4 +26,10 @@ export async function getFlavorPairings(flavor: Flavor, limit?: number | null, c
 		limit,
 		`${cursor ? `n2.name > "${cursor}"` : ''}`
 	);
+
+	relationships.forEach(([n2, r]) => {
+		pairings.push({ flavor: new Flavor(n2), affinity: r.affinity });
+	});
+
+	return pairings;
 }

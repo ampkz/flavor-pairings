@@ -23,15 +23,16 @@ describe('CRUD Relationship', () => {
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
-		const [matchedn1, matchedn2] = await createRelationship(r);
+		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
 
 		expect(matchedn1.name).toEqual(n1.idValue);
 		expect(matchedn2.name).toEqual(n2.idValue);
+		expect(matchedR.type).toEqual(r.type);
 	});
 
 	it('should get relationships', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun());
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun());
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('gr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('gr_'));
 
 		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
@@ -40,8 +41,9 @@ describe('CRUD Relationship', () => {
 		await createRelationship(r);
 
 		const relationships = await getRelationshipsToNode(n1, n2.nodeType, r.type);
+
 		expect(relationships).toHaveLength(1);
-		expect(relationships[0].name).toEqual(n2.idValue);
+		expect(relationships[0][0].name).toEqual(n2.idValue);
 	});
 
 	it('should return the total number of relationships to node', async () => {
@@ -84,7 +86,7 @@ describe('CRUD Relationship', () => {
 
 		const relationships = await getRelationshipsToNode(n2, n1.nodeType, r.type, true);
 		expect(relationships).toHaveLength(1);
-		expect(relationships[0].name).toEqual(n1.idValue);
+		expect(relationships[0][0].name).toEqual(n1.idValue);
 	});
 
 	it('should return a null tuple if no relationship was created', async () => {
@@ -92,9 +94,10 @@ describe('CRUD Relationship', () => {
 		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun());
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
-		const [matchedn1, matchedn2] = await createRelationship(r);
+		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
 		expect(matchedn1).toBeNull();
 		expect(matchedn2).toBeNull();
+		expect(matchedR).toBeNull();
 	});
 
 	it('should delete a relationship', async () => {
@@ -105,7 +108,7 @@ describe('CRUD Relationship', () => {
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
-		const [matchedn1, matchedn2] = await createRelationship(r);
+		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
 
 		const [deletedn1, deletedn2] = await deleteRelationship(r);
 
@@ -121,7 +124,7 @@ describe('CRUD Relationship', () => {
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
-		const [matchedn1, matchedn2] = await createRelationship(r);
+		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
 		const undirectedR: Relationship = new Relationship(n2, n1, RelationshipType.PAIRS_WITH);
 		const [deletedn1, deletedn2] = await deleteRelationship(undirectedR, true);
 
