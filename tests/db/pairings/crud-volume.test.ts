@@ -10,7 +10,7 @@ describe('CRUD Volume', () => {
 	});
 
 	it('should create a volume', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('volume_');
 		const volume = new Volume({ name });
 		const createdVolume = await createVolume(volume);
 		expect(createdVolume!.name).toBe(volume.name);
@@ -19,14 +19,14 @@ describe('CRUD Volume', () => {
 	it('should return null if no volume was created', async () => {
 		jest.spyOn(crud, 'createNode').mockResolvedValue(null);
 
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('volume_');
 		const volume = new Volume({ name });
 		const createdVolume = await createVolume(volume);
 		expect(createdVolume).toBeNull();
 	});
 
 	it('should get a volume by name', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('volume_');
 		const volume = new Volume({ name });
 		await createVolume(volume);
 		const fetchedVolume = await getVolume(volume.name);
@@ -39,7 +39,7 @@ describe('CRUD Volume', () => {
 	});
 
 	it('should update a volume', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('volume_');
 		const volume = new Volume({ name });
 		await createVolume(volume);
 		const updatedVolume = await updateVolume({ name, updatedName: 'updated_' + name });
@@ -52,7 +52,7 @@ describe('CRUD Volume', () => {
 	});
 
 	it('should delete a volume', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('volume_');
 		const volume = new Volume({ name });
 		await createVolume(volume);
 		const deletedVolume = await deleteVolume(volume.name);
@@ -65,7 +65,7 @@ describe('CRUD Volume', () => {
 	});
 
 	it('should return a list of created volumes', async () => {
-		const volumes = Array.from({ length: 5 }, () => (global as any).getNextNoun());
+		const volumes = Array.from({ length: 5 }, () => (global as any).getNextNoun('volume_'));
 		await Promise.all(volumes.map(v => createVolume({ name: v })));
 
 		const fetchedVolumes = await getVolumes();
@@ -74,8 +74,8 @@ describe('CRUD Volume', () => {
 	});
 
 	it('should return a volume when a FlavorVolume is added', async () => {
-		const flavor = (global as any).getNextNoun();
-		const volume = (global as any).getNextNoun();
+		const flavor = (global as any).getNextNoun('volume_');
+		const volume = (global as any).getNextNoun('volume_');
 
 		const createdVolume = await createVolume(new Volume({ name: volume }));
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
@@ -86,8 +86,8 @@ describe('CRUD Volume', () => {
 	});
 
 	it('should return null if no FlavorVolume is added', async () => {
-		const flavor = (global as any).getNextNoun();
-		const volume = (global as any).getNextNoun();
+		const flavor = (global as any).getNextNoun('volume_');
+		const volume = (global as any).getNextNoun('volume_');
 
 		const createdVolume = new Volume({ name: volume });
 		const createdFlavor = new Flavor({ name: flavor });

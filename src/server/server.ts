@@ -18,6 +18,8 @@ import { User } from '@ampkz/auth-neo4j/user';
 import { validateSessionToken } from '@ampkz/auth-neo4j/token';
 import cors from 'cors';
 import { Auth } from '@ampkz/auth-neo4j/auth';
+import { error404, errorHandler } from '../middleware/errors';
+import cookieParser from 'cookie-parser';
 
 export interface MyContext {
 	authorizedUser?: User;
@@ -79,7 +81,7 @@ async function startServer() {
 			credentials: true,
 		})
 	);
-
+	app.use(cookieParser());
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
 	app.use(limiter);
@@ -88,17 +90,23 @@ async function startServer() {
 		'/graphql',
 		expressMiddleware(server, {
 			context: async ({ req }) => {
-				if (Config.IS_NOT_PROD) {
+				if (Config.IS_NOT_PROD && req.headers.host === `localhost:${Config.PORT}`) {
 					return { authorizedUser: new User({ email: 'apollo', auth: Auth.CONTRIBUTOR }) };
 				}
 
 				const token = req.cookies.token;
+
 				const svr = await validateSessionToken(token);
+
 				return { authorizedUser: svr.user };
 			},
 		})
 	);
+
 	app.use(authNeo4j());
+	app.use(error404);
+	app.use(errorHandler);
+
 	return app;
 }
 

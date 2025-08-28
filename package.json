@@ -33,6 +33,7 @@
 		"@graphql-codegen/cli": "5.0.7",
 		"@graphql-codegen/typescript": "4.1.6",
 		"@graphql-codegen/typescript-resolvers": "4.5.1",
+		"@types/cookie-parser": "^1.4.9",
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.3",
 		"@types/jest": "^30.0.0",

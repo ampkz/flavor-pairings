@@ -10,7 +10,7 @@ describe('CRUD Weight', () => {
 	});
 
 	it('should create a weight', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('w_');
 		const weight = new Weight({ name });
 		const createdWeight = await createWeight(weight);
 		expect(createdWeight!.name).toBe(weight.name);
@@ -19,14 +19,14 @@ describe('CRUD Weight', () => {
 	it('should return null if no weight was created', async () => {
 		jest.spyOn(crud, 'createNode').mockResolvedValue(null);
 
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('w_');
 		const weight = new Weight({ name });
 		const createdWeight = await createWeight(weight);
 		expect(createdWeight).toBeNull();
 	});
 
 	it('should get a weight by name', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('w_');
 		const weight = new Weight({ name });
 		await createWeight(weight);
 		const fetchedWeight = await getWeight(weight.name);
@@ -39,7 +39,7 @@ describe('CRUD Weight', () => {
 	});
 
 	it('should update a weight', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('w_');
 		const weight = new Weight({ name });
 		await createWeight(weight);
 		const updatedWeight = await updateWeight({ name, updatedName: 'updated_' + name });
@@ -52,7 +52,7 @@ describe('CRUD Weight', () => {
 	});
 
 	it('should delete a weight', async () => {
-		const name = (global as any).getNextNoun();
+		const name = (global as any).getNextNoun('w_');
 		const weight = new Weight({ name });
 		await createWeight(weight);
 		const deletedWeight = await deleteWeight(weight.name);
@@ -74,8 +74,8 @@ describe('CRUD Weight', () => {
 	});
 
 	it('should return a weight when a FlavorWeight is added', async () => {
-		const flavor = (global as any).getNextNoun();
-		const weight = (global as any).getNextNoun();
+		const flavor = (global as any).getNextNoun('fw_');
+		const weight = (global as any).getNextNoun('fw_');
 
 		const createdWeight = await createWeight(new Weight({ name: weight }));
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
@@ -86,8 +86,8 @@ describe('CRUD Weight', () => {
 	});
 
 	it('should return null if no FlavorWeight is added', async () => {
-		const flavor = (global as any).getNextNoun();
-		const weight = (global as any).getNextNoun();
+		const flavor = (global as any).getNextNoun('fw_');
+		const weight = (global as any).getNextNoun('fw_');
 
 		const createdWeight = new Weight({ name: weight });
 		const createdFlavor = new Flavor({ name: flavor });
