@@ -33,6 +33,7 @@
 		"@graphql-codegen/cli": "5.0.7",
 		"@graphql-codegen/typescript": "4.1.6",
 		"@graphql-codegen/typescript-resolvers": "4.5.1",
+		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.3",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^24.3.0",
@@ -55,10 +56,15 @@
 		"@ampkz/auth-neo4j": "^0.10.2",
 		"@apollo/server": "^5.0.0",
 		"@as-integrations/express5": "^1.1.2",
+		"cookie-parser": "^1.4.7",
+		"cors": "^2.8.5",
 		"dotenv": "^17.2.1",
 		"express": "^5.1.0",
+		"express-rate-limit": "^8.0.1",
 		"graphql": "^16.11.0",
 		"graphql-tools": "^9.0.20",
-		"neo4j-driver": "^5.28.1"
+		"helmet": "^8.1.0",
+		"neo4j-driver": "^5.28.1",
+		"winston": "^3.17.0"
 	}
 }
