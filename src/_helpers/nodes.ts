@@ -1,6 +1,7 @@
 export enum NodeType {
 	FLAVOR = 'Flavor',
 	TASTE = 'Taste',
+	VOLUME = 'Volume',
 }
 
 export class Node {

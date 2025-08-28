@@ -1,0 +1,25 @@
+extend type Query {
+	volume(name: ID!): Volume
+	volumes: [Volume!]!
+}
+
+extend type Mutation {
+	createVolume(name: ID!): Volume
+	updateVolume(input: UpdateVolumeInput!): Volume
+	deleteVolume(name: ID!): Volume
+	addVolume(input: AddVolumeInput!): Volume
+}
+
+type Volume {
+	name: ID!
+}
+
+input AddVolumeInput {
+	flavor: ID!
+	volume: ID!
+}
+
+input UpdateVolumeInput {
+	name: ID!
+	updatedName: ID!
+}
