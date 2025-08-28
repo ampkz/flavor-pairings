@@ -3,6 +3,9 @@ import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudTechnique from '../../../../src/db/pairings/crud-technique';
 import { faker } from '@faker-js/faker';
+import sessions from '@ampkz/auth-neo4j/token';
+import { User } from '@ampkz/auth-neo4j/user';
+import { Auth } from '@ampkz/auth-neo4j/auth';
 
 describe('DeleteTechnique mutations', () => {
 	let app: Express;
@@ -19,6 +22,14 @@ describe('DeleteTechnique mutations', () => {
 		const techniqueName = faker.word.noun();
 		jest.spyOn(crudTechnique, 'deleteTechnique').mockResolvedValue({ name: techniqueName });
 
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -31,6 +42,7 @@ describe('DeleteTechnique mutations', () => {
             `,
 				variables: { name: techniqueName },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.deleteTechnique).toEqual({ name: techniqueName });

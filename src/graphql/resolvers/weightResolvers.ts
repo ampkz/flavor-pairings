@@ -2,6 +2,9 @@ import { addWeight, createWeight, deleteWeight, getWeight, getWeights, updateWei
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { FlavorWeight, Weight } from '../../pairings/weight';
+import { Auth } from '@ampkz/auth-neo4j/auth';
+import { isPermitted } from '../../_helpers/auth-helper';
+import { unauthorizedError } from '../errors/errors';
 
 export const resolvers: Resolvers = {
 	Query: {
@@ -9,9 +12,21 @@ export const resolvers: Resolvers = {
 		weights: () => getWeights(),
 	},
 	Mutation: {
-		createWeight: (_root, { name }) => createWeight({ name }),
-		updateWeight: (_root, { input: { name, updatedName } }) => updateWeight({ name, updatedName }),
-		deleteWeight: (_root, { name }) => deleteWeight(name),
-		addWeight: (_root, { input: { flavor, weight } }) => addWeight(new FlavorWeight(new Flavor({ name: flavor }), new Weight({ name: weight }))),
+		createWeight: async (_root, { name }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a weight');
+			return createWeight({ name });
+		},
+		updateWeight: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a weight');
+			return updateWeight({ name, updatedName });
+		},
+		deleteWeight: async (_root, { name }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a weight');
+			return deleteWeight(name);
+		},
+		addWeight: async (_root, { input: { flavor, weight } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a weight');
+			return addWeight(new FlavorWeight(new Flavor({ name: flavor }), new Weight({ name: weight })));
+		},
 	},
 };

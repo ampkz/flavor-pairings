@@ -3,6 +3,9 @@ import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudWeight from '../../../../src/db/pairings/crud-weight';
 import { faker } from '@faker-js/faker';
+import sessions from '@ampkz/auth-neo4j/token';
+import { User } from '@ampkz/auth-neo4j/user';
+import { Auth } from '@ampkz/auth-neo4j/auth';
 
 describe('DeleteWeight mutations', () => {
 	let app: Express;
@@ -19,6 +22,14 @@ describe('DeleteWeight mutations', () => {
 		const weightName = faker.word.noun();
 		jest.spyOn(crudWeight, 'deleteWeight').mockResolvedValue({ name: weightName });
 
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -31,6 +42,7 @@ describe('DeleteWeight mutations', () => {
             `,
 				variables: { name: weightName },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.deleteWeight).toEqual({ name: weightName });

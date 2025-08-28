@@ -2,6 +2,9 @@ import { addVolume, createVolume, deleteVolume, getVolume, getVolumes, updateVol
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { FlavorVolume, Volume } from '../../pairings/volume';
+import { Auth } from '@ampkz/auth-neo4j/auth';
+import { isPermitted } from '../../_helpers/auth-helper';
+import { unauthorizedError } from '../errors/errors';
 
 export const resolvers: Resolvers = {
 	Query: {
@@ -9,9 +12,21 @@ export const resolvers: Resolvers = {
 		volumes: () => getVolumes(),
 	},
 	Mutation: {
-		createVolume: (_root, { name }) => createVolume({ name }),
-		updateVolume: (_root, { input: { name, updatedName } }) => updateVolume({ name, updatedName }),
-		deleteVolume: (_root, { name }) => deleteVolume(name),
-		addVolume: (_root, { input: { flavor, volume } }) => addVolume(new FlavorVolume(new Flavor({ name: flavor }), new Volume({ name: volume }))),
+		createVolume: async (_root, { name }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a volume');
+			return createVolume({ name });
+		},
+		updateVolume: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a volume');
+			return updateVolume({ name, updatedName });
+		},
+		deleteVolume: async (_root, { name }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a volume');
+			return deleteVolume(name);
+		},
+		addVolume: async (_root, { input: { flavor, volume } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a volume');
+			return addVolume(new FlavorVolume(new Flavor({ name: flavor }), new Volume({ name: volume })));
+		},
 	},
 };

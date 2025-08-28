@@ -3,6 +3,9 @@ import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudTaste from '../../../../src/db/pairings/crud-taste';
 import { faker } from '@faker-js/faker';
+import sessions from '@ampkz/auth-neo4j/token';
+import { User } from '@ampkz/auth-neo4j/user';
+import { Auth } from '@ampkz/auth-neo4j/auth';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
 
 describe('UpdateTaste mutations', () => {
@@ -20,6 +23,14 @@ describe('UpdateTaste mutations', () => {
 		const tasteName = faker.word.noun();
 		jest.spyOn(crudTaste, 'updateTaste').mockResolvedValue({ name: 'updated_' + tasteName });
 
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -32,6 +43,7 @@ describe('UpdateTaste mutations', () => {
             `,
 				variables: { input: { name: tasteName, updatedName: 'updated_' + tasteName } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.updateTaste).toEqual({ name: 'updated_' + tasteName });

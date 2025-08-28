@@ -3,10 +3,10 @@ import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudTaste from '../../../../src/db/pairings/crud-taste';
 import { faker } from '@faker-js/faker';
-import { InternalError } from '@ampkz/auth-neo4j/errors';
 import sessions from '@ampkz/auth-neo4j/token';
 import { User } from '@ampkz/auth-neo4j/user';
 import { Auth } from '@ampkz/auth-neo4j/auth';
+import { InternalError } from '@ampkz/auth-neo4j/errors';
 
 describe('AddTaste mutations', () => {
 	let app: Express;
