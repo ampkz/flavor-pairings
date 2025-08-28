@@ -22,7 +22,7 @@ export class FlavorVolume {
 		this._relationship = new Relationship(
 			new Node(NodeType.FLAVOR, 'name', this.flavor.name),
 			new Node(NodeType.VOLUME, 'name', this.volume.name),
-			RelationshipType.HAS
+			RelationshipType.IS
 		);
 	}
 

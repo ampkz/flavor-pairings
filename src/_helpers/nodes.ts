@@ -31,6 +31,7 @@ export class Node {
 export enum RelationshipType {
 	PAIRS_WITH = 'PAIRS_WITH',
 	HAS = 'HAS',
+	IS = 'IS',
 }
 
 export class Relationship {
