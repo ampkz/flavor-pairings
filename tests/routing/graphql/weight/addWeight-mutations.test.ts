@@ -3,8 +3,6 @@ import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudWeight from '../../../../src/db/pairings/crud-weight';
 import { faker } from '@faker-js/faker';
-import { Flavor } from '../../../../src/pairings/flavor';
-import { Weight } from '../../../../src/pairings/weight';
 
 describe('AddWeight mutations', () => {
 	let app: Express;

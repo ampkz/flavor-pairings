@@ -108,7 +108,7 @@ describe('CRUD Relationship', () => {
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
-		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
+		const [matchedn1, matchedn2] = await createRelationship(r);
 
 		const [deletedn1, deletedn2] = await deleteRelationship(r);
 
@@ -124,7 +124,7 @@ describe('CRUD Relationship', () => {
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
-		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
+		const [matchedn1, matchedn2] = await createRelationship(r);
 		const undirectedR: Relationship = new Relationship(n2, n1, RelationshipType.PAIRS_WITH);
 		const [deletedn1, deletedn2] = await deleteRelationship(undirectedR, true);
 

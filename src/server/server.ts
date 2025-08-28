@@ -3,7 +3,7 @@ import http from 'http';
 import { ApolloServer } from '@apollo/server';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { expressMiddleware } from '@as-integrations/express5';
-import { read, readFileSync } from 'fs';
+import { readFileSync } from 'fs';
 import path from 'path';
 import { resolvers as flavorResolvers } from '../graphql/resolvers/flavorResolvers';
 import { resolvers as tasteResolvers } from '../graphql/resolvers/tasteResolvers';

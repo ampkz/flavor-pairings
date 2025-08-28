@@ -3,8 +3,6 @@ import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudTechnique from '../../../../src/db/pairings/crud-technique';
 import { faker } from '@faker-js/faker';
-import { Flavor } from '../../../../src/pairings/flavor';
-import { Technique } from '../../../../src/pairings/technique';
 
 describe('AddTechnique mutations', () => {
 	let app: Express;

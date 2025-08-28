@@ -3,8 +3,6 @@ import startServer from '../../../../src/server/server';
 import { Express } from 'express';
 import * as crudVolume from '../../../../src/db/pairings/crud-volume';
 import { faker } from '@faker-js/faker';
-import { Flavor } from '../../../../src/pairings/flavor';
-import { Volume } from '../../../../src/pairings/volume';
 
 describe('AddVolume mutations', () => {
 	let app: Express;
