@@ -1,0 +1,25 @@
+extend type Query {
+	technique(name: ID!): Technique
+	techniques: [Technique!]!
+}
+
+extend type Mutation {
+	createTechnique(name: ID!): Technique
+	updateTechnique(input: UpdateTechniqueInput!): Technique
+	deleteTechnique(name: ID!): Technique
+	addTechnique(input: AddTechniqueInput!): Technique
+}
+
+type Technique {
+	name: ID!
+}
+
+input AddTechniqueInput {
+	flavor: ID!
+	technique: ID!
+}
+
+input UpdateTechniqueInput {
+	name: ID!
+	updatedName: ID!
+}

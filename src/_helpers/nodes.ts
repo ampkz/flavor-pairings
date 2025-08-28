@@ -3,6 +3,7 @@ export enum NodeType {
 	TASTE = 'Taste',
 	VOLUME = 'Volume',
 	WEIGHT = 'Weight',
+	TECHNIQUE = 'Technique',
 }
 
 export class Node {
@@ -33,6 +34,7 @@ export enum RelationshipType {
 	PAIRS_WITH = 'PAIRS_WITH',
 	HAS = 'HAS',
 	IS = 'IS',
+	PREPARE_AS = 'PREPARE_AS',
 }
 
 export class Relationship {
