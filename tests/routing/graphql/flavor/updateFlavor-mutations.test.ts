@@ -4,6 +4,9 @@ import { Express } from 'express';
 import * as crudFlavor from '../../../../src/db/pairings/crud-flavor';
 import { faker } from '@faker-js/faker';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
+import sessions from '@ampkz/auth-neo4j/token';
+import { User } from '@ampkz/auth-neo4j/user';
+import { Auth } from '@ampkz/auth-neo4j/auth';
 
 describe('UpdateFlavor mutations', () => {
 	let app: Express;
@@ -20,6 +23,14 @@ describe('UpdateFlavor mutations', () => {
 		const flavorName = faker.word.noun();
 		jest.spyOn(crudFlavor, 'updateFlavor').mockResolvedValue({ name: 'updated_' + flavorName });
 
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -32,6 +43,7 @@ describe('UpdateFlavor mutations', () => {
             `,
 				variables: { input: { name: flavorName, updatedName: 'updated_' + flavorName } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.updateFlavor).toEqual({ name: 'updated_' + flavorName });

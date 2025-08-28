@@ -1,3 +1,5 @@
+import { Auth } from '@ampkz/auth-neo4j/auth';
+import { isPermitted } from '../../_helpers/auth-helper';
 import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import { createFlavor, deleteFlavor, getFlavor, getFlavors, updateFlavor } from '../../db/pairings/crud-flavor';
 import { createPairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
@@ -6,6 +8,7 @@ import { getTotalRelationshipsToNodes } from '../../db/utils/relationship/crud-r
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { Pairing } from '../../pairings/pairing';
+import { unauthorizedError } from '../errors/errors';
 
 export const resolvers: Resolvers = {
 	Query: {
@@ -20,10 +23,20 @@ export const resolvers: Resolvers = {
 		},
 	},
 	Mutation: {
-		createFlavor: (_root, { input: { name } }) => createFlavor({ name }),
-		updateFlavor: (_root, { input: { name, updatedName } }) => updateFlavor({ name, updatedName }),
-		deleteFlavor: (_root, { name }) => deleteFlavor(name),
-		createPairing: async (_root, { input: { flavor1, flavor2, affinity } }) => {
+		createFlavor: async (_root, { input: { name } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a flavor');
+			return createFlavor({ name });
+		},
+		updateFlavor: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a flavor');
+			return updateFlavor({ name, updatedName });
+		},
+		deleteFlavor: async (_root, { name }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a flavor');
+			return deleteFlavor(name);
+		},
+		createPairing: async (_root, { input: { flavor1, flavor2, affinity } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a pairing');
 			const createdPair = await createPairing(new Pairing(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }), affinity));
 			return { flavor: createdPair!.flavor1, paired: { flavor: createdPair!.flavor2, affinity: createdPair!.affinity } };
 		},

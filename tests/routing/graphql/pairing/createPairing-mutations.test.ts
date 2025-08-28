@@ -6,6 +6,9 @@ import { faker } from '@faker-js/faker';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
 import { PairingAffinity } from '../../../../src/generated/graphql';
 import { Pairing } from '../../../../src/pairings/pairing';
+import sessions from '@ampkz/auth-neo4j/token';
+import { User } from '@ampkz/auth-neo4j/user';
+import { Auth } from '@ampkz/auth-neo4j/auth';
 
 describe('CreateFlavor mutations', () => {
 	let app: Express;
@@ -25,6 +28,14 @@ describe('CreateFlavor mutations', () => {
 		const pairing: Pairing = new Pairing({ name: flavor1 }, { name: flavor2 }, affinity);
 		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue(pairing);
 
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -39,6 +50,7 @@ describe('CreateFlavor mutations', () => {
             `,
 				variables: { input: { flavor1, flavor2, affinity } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.createPairing.flavor.name).toEqual(pairing.flavor1.name);
