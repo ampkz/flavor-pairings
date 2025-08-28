@@ -8,6 +8,7 @@ import path from 'path';
 import { resolvers as flavorResolvers } from '../graphql/resolvers/flavorResolvers';
 import { resolvers as tasteResolvers } from '../graphql/resolvers/tasteResolvers';
 import { resolvers as volumeResolvers } from '../graphql/resolvers/volumeResolvers';
+import { resolvers as weightResolvers } from '../graphql/resolvers/weightResolvers';
 import Config from '../config/config';
 
 export interface MyContext {}
@@ -22,10 +23,11 @@ async function startServer() {
 	typeDefs += readFileSync(parentPath + '/graphql/schema/flavor-schema.graphql', { encoding: 'utf-8' });
 	typeDefs += readFileSync(parentPath + '/graphql/schema/taste-schema.graphql', { encoding: 'utf-8' });
 	typeDefs += readFileSync(parentPath + '/graphql/schema/volume-schema.graphql', { encoding: 'utf-8' });
+	typeDefs += readFileSync(parentPath + '/graphql/schema/weight-schema.graphql', { encoding: 'utf-8' });
 
 	const server = new ApolloServer<MyContext>({
 		typeDefs,
-		resolvers: [flavorResolvers, tasteResolvers, volumeResolvers],
+		resolvers: [flavorResolvers, tasteResolvers, volumeResolvers, weightResolvers],
 		includeStacktraceInErrorResponses: Config.IS_NOT_PROD,
 		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
 	});

@@ -1,0 +1,25 @@
+extend type Query {
+	weight(name: ID!): Weight
+	weights: [Weight!]!
+}
+
+extend type Mutation {
+	createWeight(name: ID!): Weight
+	updateWeight(input: UpdateWeightInput!): Weight
+	deleteWeight(name: ID!): Weight
+	addWeight(input: AddWeightInput!): Weight
+}
+
+type Weight {
+	name: ID!
+}
+
+input AddWeightInput {
+	flavor: ID!
+	weight: ID!
+}
+
+input UpdateWeightInput {
+	name: ID!
+	updatedName: ID!
+}

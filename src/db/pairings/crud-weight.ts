@@ -1,0 +1,40 @@
+import { NodeType } from '../../_helpers/nodes';
+import { UpdateFlavorInput } from '../../generated/graphql';
+import { FlavorWeight, Weight } from '../../pairings/weight';
+import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
+import { createRelationship } from '../utils/relationship/crud-relationship';
+
+export async function createWeight(weight: Weight): Promise<Weight | null> {
+	const createdNode = await createNode(NodeType.WEIGHT, ['name: $name'], { name: weight.name });
+	return createdNode ? new Weight(createdNode) : null;
+}
+
+export async function getWeight(name: string): Promise<Weight | null> {
+	const matchedNode = await getNode(NodeType.WEIGHT, ['name: $name'], { name });
+	return matchedNode ? new Weight(matchedNode) : null;
+}
+
+export async function updateWeight(updatedWeight: UpdateFlavorInput): Promise<Weight | null> {
+	const updatedNode = await updateNode(NodeType.WEIGHT, 'w', ['name: $name'], ['w.name = $updatedName'], updatedWeight);
+	return updatedNode ? new Weight(updatedNode) : null;
+}
+
+export async function deleteWeight(name: string): Promise<Weight | null> {
+	const deletedNode = await deleteNode(NodeType.WEIGHT, ['name: $name'], { name });
+	return deletedNode ? new Weight(deletedNode) : null;
+}
+
+export async function getWeights(): Promise<Weight[]> {
+	const weights: Weight[] = [];
+
+	const nodes = await getNodes(NodeType.WEIGHT, 'n.name ASC');
+
+	weights.push(...nodes.map(node => new Weight(node)));
+
+	return weights;
+}
+
+export async function addWeight(flavorWeight: FlavorWeight): Promise<Weight | null> {
+	const [, w] = await createRelationship(flavorWeight.getRelationship());
+	return w;
+}
