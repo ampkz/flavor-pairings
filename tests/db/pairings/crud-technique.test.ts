@@ -3,6 +3,7 @@ import {
 	addTechnique,
 	createTechnique,
 	deleteTechnique,
+	getFlavorTechniques,
 	getTechnique,
 	getTechniques,
 	updateTechnique,
@@ -102,5 +103,19 @@ describe('CRUD Technique', () => {
 		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
 		const addedTechnique = await addTechnique(flavorTechnique);
 		expect(addedTechnique).toBeNull();
+	});
+
+	it('should return a list of techniques related to a flavor', async () => {
+		const flavor = (global as any).getNextNoun();
+		const technique = (global as any).getNextNoun();
+
+		const createdTechnique = await createTechnique(new Technique({ name: technique }));
+		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
+
+		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
+		await addTechnique(flavorTechnique);
+
+		const relatedTechniques = await getFlavorTechniques(createdFlavor!);
+		expect(relatedTechniques).toContainEqual(expect.objectContaining({ name: technique }));
 	});
 });

@@ -51,6 +51,9 @@ export type Flavor = {
   name: Scalars['ID']['output'];
   pairings?: Maybe<PairingSubList>;
   taste?: Maybe<Array<Taste>>;
+  technique?: Maybe<Array<Technique>>;
+  volume?: Maybe<Array<Volume>>;
+  weight?: Maybe<Array<Weight>>;
 };
 
 
@@ -439,6 +442,9 @@ export type FlavorResolvers<ContextType = any, ParentType extends ResolversParen
   name?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   pairings?: Resolver<Maybe<ResolversTypes['PairingSubList']>, ParentType, ContextType, Partial<FlavorPairingsArgs>>;
   taste?: Resolver<Maybe<Array<ResolversTypes['Taste']>>, ParentType, ContextType>;
+  technique?: Resolver<Maybe<Array<ResolversTypes['Technique']>>, ParentType, ContextType>;
+  volume?: Resolver<Maybe<Array<ResolversTypes['Volume']>>, ParentType, ContextType>;
+  weight?: Resolver<Maybe<Array<ResolversTypes['Weight']>>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 

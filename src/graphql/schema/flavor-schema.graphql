@@ -13,6 +13,9 @@ extend type Mutation {
 type Flavor {
 	name: ID!
 	taste: [Taste!]
+	volume: [Volume!]
+	weight: [Weight!]
+	technique: [Technique!]
 	pairings(limit: Int, cursor: ID): PairingSubList
 }
 

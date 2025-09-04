@@ -1,8 +1,9 @@
-import { NodeType } from '../../_helpers/nodes';
+import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import { UpdateFlavorInput } from '../../generated/graphql';
+import { Flavor } from '../../pairings/flavor';
 import { FlavorTaste, Taste } from '../../pairings/taste';
 import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
-import { createRelationship } from '../utils/relationship/crud-relationship';
+import { createRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
 export async function createTaste(taste: Taste): Promise<Taste | null> {
 	const createdNode = await createNode(NodeType.TASTE, ['name: $name'], { name: taste.name });
@@ -37,4 +38,16 @@ export async function getTastes(): Promise<Taste[]> {
 export async function addTaste(flavorTaste: FlavorTaste): Promise<Taste | null> {
 	const [, t] = await createRelationship(flavorTaste.getRelationship());
 	return t;
+}
+
+export async function getFlavorTastes(flavor: Flavor): Promise<Taste[]> {
+	const tastes: Taste[] = [];
+
+	const flavorNode = new Node(NodeType.FLAVOR, 'name', flavor.name);
+
+	const nodes = await getRelationshipsToNode(flavorNode, NodeType.TASTE, RelationshipType.HAS);
+
+	tastes.push(...nodes.map(node => new Taste(node[0])));
+
+	return tastes;
 }

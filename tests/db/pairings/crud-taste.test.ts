@@ -1,8 +1,10 @@
 import { FlavorTaste, Taste } from '../../../src/pairings/taste';
-import { addTaste, createTaste, deleteTaste, getTaste, getTastes, updateTaste } from '../../../src/db/pairings/crud-taste';
+import { addTaste, createTaste, deleteTaste, getFlavorTastes, getTaste, getTastes, updateTaste } from '../../../src/db/pairings/crud-taste';
 import * as crud from '../../../src/db/utils/crud';
 import { Flavor } from '../../../src/pairings/flavor';
 import { createFlavor } from '../../../src/db/pairings/crud-flavor';
+import { addTechnique, createTechnique, getFlavorTechniques } from '../../../src/db/pairings/crud-technique';
+import { FlavorTechnique, Technique } from '../../../src/pairings/technique';
 
 describe('CRUD Taste', () => {
 	beforeEach(() => {
@@ -95,5 +97,43 @@ describe('CRUD Taste', () => {
 		const flavorTaste = new FlavorTaste(createdFlavor!, createdTaste!);
 		const addedTaste = await addTaste(flavorTaste);
 		expect(addedTaste).toBeNull();
+	});
+
+	it('should return a list of tastes attached to a flavor', async () => {
+		const flavor = (global as any).getNextNoun('gft_');
+		const taste = (global as any).getNextNoun('gft_');
+		const taste2 = (global as any).getNextNoun('gft_');
+
+		const createdTaste = await createTaste(new Taste({ name: taste }));
+		const createdTaste2 = await createTaste(new Taste({ name: taste2 }));
+		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
+
+		const flavorTaste = new FlavorTaste(createdFlavor!, createdTaste!);
+		const flavorTaste2 = new FlavorTaste(createdFlavor!, createdTaste2!);
+		await addTaste(flavorTaste);
+		await addTaste(flavorTaste2);
+
+		const fetchedTastes = await getFlavorTastes(createdFlavor!);
+		expect(fetchedTastes).toContainEqual(createdTaste);
+		expect(fetchedTastes).toContainEqual(createdTaste2);
+	});
+
+	it('should return a list of techniques attached to a flavor', async () => {
+		const flavor = (global as any).getNextNoun('gftq_');
+		const technique = (global as any).getNextNoun('gftq_');
+		const technique2 = (global as any).getNextNoun('gftq_');
+
+		const createdTechnique = await createTechnique(new Technique({ name: technique }));
+		const createdTechnique2 = await createTechnique(new Technique({ name: technique2 }));
+		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
+
+		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
+		const flavorTechnique2 = new FlavorTechnique(createdFlavor!, createdTechnique2!);
+		await addTechnique(flavorTechnique);
+		await addTechnique(flavorTechnique2);
+
+		const fetchedTechniques = await getFlavorTechniques(createdFlavor!);
+		expect(fetchedTechniques).toContainEqual(createdTechnique);
+		expect(fetchedTechniques).toContainEqual(createdTechnique2);
 	});
 });

@@ -76,7 +76,7 @@ async function startServer() {
 	/* istanbul ignore next line */
 	app.use(
 		cors<cors.CorsRequest>({
-			origin: `${Config.IS_NOT_PROD ? [`http://localhost:${Config.CLIENT_PORT}`, 'https://studio.apollographql.com'] : ``}`,
+			origin: `${Config.IS_NOT_PROD ? [`http://localhost:${Config.CLIENT_PORT}`] : ``}`,
 			methods: 'GET,PUT,POST,DELETE,PATCH,OPTIONS',
 			credentials: true,
 		})

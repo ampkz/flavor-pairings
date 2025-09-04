@@ -1,8 +1,9 @@
-import { NodeType } from '../../_helpers/nodes';
+import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import { UpdateFlavorInput } from '../../generated/graphql';
+import { Flavor } from '../../pairings/flavor';
 import { FlavorTechnique, Technique } from '../../pairings/technique';
 import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
-import { createRelationship } from '../utils/relationship/crud-relationship';
+import { createRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
 export async function createTechnique(technique: Technique): Promise<Technique | null> {
 	const createdNode = await createNode(NodeType.TECHNIQUE, ['name: $name'], { name: technique.name });
@@ -37,4 +38,16 @@ export async function getTechniques(): Promise<Technique[]> {
 export async function addTechnique(flavorTechnique: FlavorTechnique): Promise<Technique | null> {
 	const [, tq] = await createRelationship(flavorTechnique.getRelationship());
 	return tq;
+}
+
+export async function getFlavorTechniques(flavor: Flavor): Promise<Technique[]> {
+	const techniques: Technique[] = [];
+
+	const flavorNode = new Node(NodeType.FLAVOR, 'name', flavor.name);
+
+	const nodes = await getRelationshipsToNode(flavorNode, NodeType.TECHNIQUE, RelationshipType.PREPARE_AS);
+
+	techniques.push(...nodes.map(node => new Technique(node[0])));
+
+	return techniques;
 }

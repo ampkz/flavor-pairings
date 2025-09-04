@@ -9,6 +9,10 @@ import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { Pairing } from '../../pairings/pairing';
 import { unauthorizedError } from '../errors/errors';
+import { getFlavorTastes } from '../../db/pairings/crud-taste';
+import { getFlavorTechniques } from '../../db/pairings/crud-technique';
+import { getFlavorWeights } from '../../db/pairings/crud-weight';
+import { getFlavorVolumes } from '../../db/pairings/crud-volume';
 
 export const resolvers: Resolvers = {
 	Query: {
@@ -42,6 +46,10 @@ export const resolvers: Resolvers = {
 		},
 	},
 	Flavor: {
+		taste: parent => getFlavorTastes(parent),
+		technique: parent => getFlavorTechniques(parent),
+		weight: parent => getFlavorWeights(parent),
+		volume: parent => getFlavorVolumes(parent),
 		pairings: async (parent, { limit, cursor }) => {
 			const items = await getFlavorPairings(parent, limit, cursor);
 			const node: Node = new Node(NodeType.FLAVOR, 'name', parent.name);

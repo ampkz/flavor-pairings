@@ -1,8 +1,9 @@
-import { NodeType } from '../../_helpers/nodes';
+import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import { UpdateFlavorInput } from '../../generated/graphql';
+import { Flavor } from '../../pairings/flavor';
 import { FlavorVolume, Volume } from '../../pairings/volume';
 import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
-import { createRelationship } from '../utils/relationship/crud-relationship';
+import { createRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
 export async function createVolume(volume: Volume): Promise<Volume | null> {
 	const createdNode = await createNode(NodeType.VOLUME, ['name: $name'], { name: volume.name });
@@ -37,4 +38,16 @@ export async function getVolumes(): Promise<Volume[]> {
 export async function addVolume(flavorVolume: FlavorVolume): Promise<Volume | null> {
 	const [, v] = await createRelationship(flavorVolume.getRelationship());
 	return v;
+}
+
+export async function getFlavorVolumes(flavor: Flavor): Promise<Volume[]> {
+	const volumes: Volume[] = [];
+
+	const flavorNode = new Node(NodeType.FLAVOR, 'name', flavor.name);
+
+	const nodes = await getRelationshipsToNode(flavorNode, NodeType.VOLUME, RelationshipType.IS);
+
+	volumes.push(...nodes.map(node => new Volume(node[0])));
+
+	return volumes;
 }
