@@ -2,7 +2,7 @@ import { Auth } from '@ampkz/auth-neo4j/auth';
 import { isPermitted } from '../../_helpers/auth-helper';
 import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import { createFlavor, deleteFlavor, getFlavor, getFlavors, updateFlavor } from '../../db/pairings/crud-flavor';
-import { createPairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
+import { createPairing, deletePairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
 import { getTotalNodeCountByType } from '../../db/utils/crud';
 import { getTotalRelationshipsToNodes } from '../../db/utils/relationship/crud-relationship';
 import { Resolvers } from '../../generated/graphql';
@@ -75,6 +75,18 @@ export const resolvers: Resolvers = {
 			}
 
 			return { flavor: createdPair!.flavor1, paired: { flavor: createdPair!.flavor2, affinity: createdPair!.affinity } };
+		},
+		deletePairing: async (_root, { input: { flavor1, flavor2, affinity } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a pairing');
+			let deletedPair: Pairing | null = null;
+
+			try {
+				deletedPair = await deletePairing(new Pairing(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }), affinity));
+			} catch (error) {
+				throw getGraphQLError(`deleting pairing: ${flavor1}-${flavor2}`, error);
+			}
+
+			return !!deletedPair;
 		},
 	},
 	Flavor: {

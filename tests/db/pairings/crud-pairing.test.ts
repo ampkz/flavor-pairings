@@ -1,5 +1,5 @@
 import { createFlavor } from '../../../src/db/pairings/crud-flavor';
-import { createPairing, getFlavorPairings } from '../../../src/db/pairings/crud-pairing';
+import { createPairing, deletePairing, getFlavorPairings } from '../../../src/db/pairings/crud-pairing';
 import { Flavor } from '../../../src/pairings/flavor';
 import { Pairing } from '../../../src/pairings/pairing';
 import { PairingAffinity } from '../../../src/generated/graphql';
@@ -46,5 +46,19 @@ describe('CRUD Pairing', () => {
 		flavors.map(flavor => {
 			expect(pairings).toContainEqual({ flavor, affinity: PairingAffinity.Regular });
 		});
+	});
+
+	it('should delete a pairing', async () => {
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
+
+		await createFlavor(flavor1);
+		await createFlavor(flavor2);
+
+		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular);
+		await createPairing(pairing);
+
+		const deleted = await deletePairing(pairing);
+		expect(deleted).toBe(pairing);
 	});
 });

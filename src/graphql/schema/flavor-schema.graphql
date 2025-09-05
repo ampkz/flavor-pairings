@@ -8,6 +8,7 @@ extend type Mutation {
 	updateFlavor(input: UpdateFlavorInput!): Flavor
 	deleteFlavor(name: ID!): Flavor
 	createPairing(input: CreatePairingInput!): Pairing
+	deletePairing(input: DeletePairingInput!): Boolean!
 }
 
 type Flavor {
@@ -49,6 +50,12 @@ type Paired {
 }
 
 input CreatePairingInput {
+	flavor1: ID!
+	flavor2: ID!
+	affinity: PairingAffinity!
+}
+
+input DeletePairingInput {
 	flavor1: ID!
 	flavor2: ID!
 	affinity: PairingAffinity!

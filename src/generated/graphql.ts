@@ -46,6 +46,12 @@ export type CreatePairingInput = {
   flavor2: Scalars['ID']['input'];
 };
 
+export type DeletePairingInput = {
+  affinity: PairingAffinity;
+  flavor1: Scalars['ID']['input'];
+  flavor2: Scalars['ID']['input'];
+};
+
 export type Flavor = {
   __typename?: 'Flavor';
   name: Scalars['ID']['output'];
@@ -81,6 +87,7 @@ export type Mutation = {
   createVolume?: Maybe<Volume>;
   createWeight?: Maybe<Weight>;
   deleteFlavor?: Maybe<Flavor>;
+  deletePairing: Scalars['Boolean']['output'];
   deleteTaste?: Maybe<Taste>;
   deleteTechnique?: Maybe<Technique>;
   deleteVolume?: Maybe<Volume>;
@@ -145,6 +152,11 @@ export type MutationCreateWeightArgs = {
 
 export type MutationDeleteFlavorArgs = {
   name: Scalars['ID']['input'];
+};
+
+
+export type MutationDeletePairingArgs = {
+  input: DeletePairingInput;
 };
 
 
@@ -386,6 +398,7 @@ export type ResolversTypes = {
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CreateFlavorInput: CreateFlavorInput;
   CreatePairingInput: CreatePairingInput;
+  DeletePairingInput: DeletePairingInput;
   Flavor: ResolverTypeWrapper<Flavor>;
   FlavorSubList: ResolverTypeWrapper<FlavorSubList>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
@@ -417,6 +430,7 @@ export type ResolversParentTypes = {
   Boolean: Scalars['Boolean']['output'];
   CreateFlavorInput: CreateFlavorInput;
   CreatePairingInput: CreatePairingInput;
+  DeletePairingInput: DeletePairingInput;
   Flavor: Flavor;
   FlavorSubList: FlavorSubList;
   ID: Scalars['ID']['output'];
@@ -466,6 +480,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   createVolume?: Resolver<Maybe<ResolversTypes['Volume']>, ParentType, ContextType, RequireFields<MutationCreateVolumeArgs, 'name'>>;
   createWeight?: Resolver<Maybe<ResolversTypes['Weight']>, ParentType, ContextType, RequireFields<MutationCreateWeightArgs, 'name'>>;
   deleteFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationDeleteFlavorArgs, 'name'>>;
+  deletePairing?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationDeletePairingArgs, 'input'>>;
   deleteTaste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<MutationDeleteTasteArgs, 'name'>>;
   deleteTechnique?: Resolver<Maybe<ResolversTypes['Technique']>, ParentType, ContextType, RequireFields<MutationDeleteTechniqueArgs, 'name'>>;
   deleteVolume?: Resolver<Maybe<ResolversTypes['Volume']>, ParentType, ContextType, RequireFields<MutationDeleteVolumeArgs, 'name'>>;
