@@ -41,7 +41,20 @@ describe('CreateFlavor mutations', () => {
 			.send({
 				query: `
 					mutation CreatePairing($input: CreatePairingInput!) {
-					createPairing(input: $input)
+					createPairing(input: $input){
+                            success
+                            pairing {
+                                flavor {
+                                    name
+                                }
+                                paired {
+                                    flavor {
+                                        name
+                                    }
+                                    affinity
+                                }
+                            }
+                        }
 				}
             `,
 				variables: { input: { flavor1, flavor2, affinity } },
@@ -49,7 +62,7 @@ describe('CreateFlavor mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.createPairing).toBe(true);
+		expect(response.body.data.createPairing.success).toBe(true);
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -94,7 +107,20 @@ describe('CreateFlavor mutations', () => {
 			.send({
 				query: `
                 mutation CreatePairing($input: CreatePairingInput!) {
-					createPairing(input: $input)
+					createPairing(input: $input){
+                            success
+                            pairing {
+                                flavor {
+                                    name
+                                }
+                                paired {
+                                    flavor {
+                                        name
+                                    }
+                                    affinity
+                                }
+                            }
+                        }
 				}
             `,
 				variables: { input: { flavor1: 'test1', flavor2: 'test2', affinity: PairingAffinity.Regular } },

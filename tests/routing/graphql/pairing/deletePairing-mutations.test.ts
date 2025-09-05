@@ -41,7 +41,20 @@ describe('DeleteFlavor mutations', () => {
 			.send({
 				query: `
 					mutation DeletePairing($input: DeletePairingInput!) {
-                        deletePairing(input: $input)
+                        deletePairing(input: $input){
+                            success
+                            pairing {
+                                flavor {
+                                    name
+                                }
+                                paired {
+                                    flavor {
+                                        name
+                                    }
+                                    affinity
+                                }
+                            }
+                        }
                     }
                 `,
 				variables: { input: { flavor1, flavor2, affinity } },
@@ -49,7 +62,7 @@ describe('DeleteFlavor mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deletePairing).toBe(true);
+		expect(response.body.data.deletePairing.success).toBe(true);
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -94,7 +107,20 @@ describe('DeleteFlavor mutations', () => {
 			.send({
 				query: `
 					mutation DeletePairing($input: DeletePairingInput!) {
-                        deletePairing(input: $input)
+                        deletePairing(input: $input){
+                            success
+                            pairing {
+                                flavor {
+                                    name
+                                }
+                                paired {
+                                    flavor {
+                                        name
+                                    }
+                                    affinity
+                                }
+                            }
+                        }
                     }
                 `,
 				variables: { input: { flavor1: 'test1', flavor2: 'test2', affinity: PairingAffinity.Regular } },
