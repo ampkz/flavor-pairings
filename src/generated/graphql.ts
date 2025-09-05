@@ -81,7 +81,7 @@ export type Mutation = {
   addVolume?: Maybe<Volume>;
   addWeight?: Maybe<Weight>;
   createFlavor?: Maybe<Flavor>;
-  createPairing?: Maybe<Pairing>;
+  createPairing: Scalars['Boolean']['output'];
   createTaste?: Maybe<Taste>;
   createTechnique?: Maybe<Technique>;
   createVolume?: Maybe<Volume>;
@@ -474,7 +474,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addVolume?: Resolver<Maybe<ResolversTypes['Volume']>, ParentType, ContextType, RequireFields<MutationAddVolumeArgs, 'input'>>;
   addWeight?: Resolver<Maybe<ResolversTypes['Weight']>, ParentType, ContextType, RequireFields<MutationAddWeightArgs, 'input'>>;
   createFlavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
-  createPairing?: Resolver<Maybe<ResolversTypes['Pairing']>, ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'input'>>;
+  createPairing?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'input'>>;
   createTaste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<MutationCreateTasteArgs, 'name'>>;
   createTechnique?: Resolver<Maybe<ResolversTypes['Technique']>, ParentType, ContextType, RequireFields<MutationCreateTechniqueArgs, 'name'>>;
   createVolume?: Resolver<Maybe<ResolversTypes['Volume']>, ParentType, ContextType, RequireFields<MutationCreateVolumeArgs, 'name'>>;

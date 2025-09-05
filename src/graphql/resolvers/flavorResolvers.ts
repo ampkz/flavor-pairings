@@ -74,7 +74,7 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`creating pairing: ${flavor1}-${affinity}->${flavor2}`, error);
 			}
 
-			return { flavor: createdPair!.flavor1, paired: { flavor: createdPair!.flavor2, affinity: createdPair!.affinity } };
+			return !!createdPair;
 		},
 		deletePairing: async (_root, { input: { flavor1, flavor2, affinity } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a pairing');
