@@ -3,6 +3,7 @@ import { Driver, Session, RecordShape, Record } from 'neo4j-driver';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
 import Config from '../../config/config';
 import { getSessionOptions } from '../../_helpers/db-helper';
+import { NodeType } from '../../_helpers/nodes';
 
 export enum ErrorMsgs {
 	COULD_NOT_CREATE_DB = 'Could Not Create Database',
@@ -25,7 +26,11 @@ export async function initializeDB(): Promise<boolean> {
 
 	session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
 
-	await initializeConstraint(session, 'Flavor', 'name');
+	await initializeConstraint(session, NodeType.FLAVOR, 'name');
+	await initializeConstraint(session, NodeType.TASTE, 'name');
+	await initializeConstraint(session, NodeType.TECHNIQUE, 'name');
+	await initializeConstraint(session, NodeType.WEIGHT, 'name');
+	await initializeConstraint(session, NodeType.VOLUME, 'name');
 
 	await driver.close();
 

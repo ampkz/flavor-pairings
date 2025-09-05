@@ -53,7 +53,13 @@ describe('AddWeight mutations', () => {
 		const flavorName = faker.word.noun();
 		const weightName = faker.word.noun();
 		jest.spyOn(crudWeight, 'addWeight').mockResolvedValue(null);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -66,6 +72,7 @@ describe('AddWeight mutations', () => {
             `,
 				variables: { input: { flavor: flavorName, weight: weightName } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.addWeight).toBeNull();

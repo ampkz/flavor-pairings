@@ -50,7 +50,13 @@ describe('DeleteVolume mutations', () => {
 
 	it('should return null if no volume found', async () => {
 		jest.spyOn(crudVolume, 'deleteVolume').mockResolvedValue(null);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -63,6 +69,7 @@ describe('DeleteVolume mutations', () => {
             `,
 				variables: { name: 'not_found' },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.deleteVolume).toBeNull();

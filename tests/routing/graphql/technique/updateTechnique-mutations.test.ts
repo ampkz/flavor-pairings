@@ -50,7 +50,13 @@ describe('UpdateTechnique mutations', () => {
 
 	it('should return null if no technique was found to update', async () => {
 		jest.spyOn(crudTechnique, 'updateTechnique').mockResolvedValue(null);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -63,6 +69,7 @@ describe('UpdateTechnique mutations', () => {
             `,
 				variables: { input: { name: 'not_found', updatedName: 'updated_name' } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.updateTechnique).toBeNull();

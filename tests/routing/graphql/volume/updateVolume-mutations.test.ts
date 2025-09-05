@@ -50,7 +50,13 @@ describe('UpdateVolume mutations', () => {
 
 	it('should return null if no volume was found to update', async () => {
 		jest.spyOn(crudVolume, 'updateVolume').mockResolvedValue(null);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -63,6 +69,7 @@ describe('UpdateVolume mutations', () => {
             `,
 				variables: { input: { name: 'not_found', updatedName: 'updated_name' } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.updateVolume).toBeNull();

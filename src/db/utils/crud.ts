@@ -11,6 +11,8 @@ export enum Errors {
 	CANNOT_DELETE_NODE = 'Cannot Delete Node',
 	CANNOT_UPDATE_NODE = 'Cannot Update Node',
 	CANNOT_GET_TOTAL_NODES = 'Cannot Get Total Nodes',
+	NO_NODES_CREATED = 'No Nodes Were Created',
+	NO_NODES_DELETED = 'No Nodes Were Deleted',
 }
 
 export async function createNode(nodeType: NodeType, idProps: string[], params: object, dbName: string = Config.PAIRINGS_DB): Promise<any | null> {
@@ -26,7 +28,7 @@ export async function createNode(nodeType: NodeType, idProps: string[], params: 
 			await session.close();
 			await driver.close();
 
-			throw new InternalError(Errors.CANNOT_CREATE_NODE);
+			throw new InternalError(Errors.NO_NODES_CREATED);
 		} else {
 			createdNode = match.records[0].get(0).properties;
 		}
@@ -142,7 +144,7 @@ export async function deleteNode(nodeType: NodeType, idProps: string[], params: 
 			if (match.summary.counters._stats.nodesDeleted !== 1) {
 				await session.close();
 				await driver.close();
-				throw new InternalError(Errors.CANNOT_DELETE_NODE);
+				throw new InternalError(Errors.NO_NODES_DELETED);
 			}
 		} catch (error: unknown) {
 			await session.close();

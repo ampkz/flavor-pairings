@@ -61,7 +61,13 @@ describe('CreateFlavor mutations', () => {
 		const flavor2 = faker.word.noun();
 		const pairing = new Pairing({ name: flavor1 }, { name: flavor2 }, PairingAffinity.Regular);
 		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue(pairing);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -76,6 +82,7 @@ describe('CreateFlavor mutations', () => {
             `,
 				variables: { input: { flavor1: null, flavor2: null } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(400);
 
 		expect(response.body.errors).toBeDefined();
@@ -83,7 +90,13 @@ describe('CreateFlavor mutations', () => {
 
 	it('should throw an error if there was issue with the server', async () => {
 		jest.spyOn(crudPairing, 'createPairing').mockRejectedValue(new InternalError('Server error'));
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -98,7 +111,8 @@ describe('CreateFlavor mutations', () => {
             `,
 				variables: { input: { flavor1: 'test1', flavor2: 'test2', affinity: PairingAffinity.Regular } },
 			})
-			.expect(200);
+			.set('Cookie', [`token=${token}`])
+			.expect(500);
 
 		expect(response.body.errors).toBeDefined();
 	});

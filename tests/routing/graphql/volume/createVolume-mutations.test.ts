@@ -52,7 +52,13 @@ describe('CreateVolume mutations', () => {
 	it('should throw an error with a bad input', async () => {
 		const volumeName = faker.word.noun();
 		jest.spyOn(crudVolume, 'createVolume').mockResolvedValue({ name: volumeName });
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -65,6 +71,7 @@ describe('CreateVolume mutations', () => {
             `,
 				variables: { name: null },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(400);
 
 		expect(response.body.errors).toBeDefined();
@@ -72,7 +79,13 @@ describe('CreateVolume mutations', () => {
 
 	it('should throw an error if there was issue with the server', async () => {
 		jest.spyOn(crudVolume, 'createVolume').mockRejectedValue(new InternalError('Server error'));
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -85,6 +98,7 @@ describe('CreateVolume mutations', () => {
             `,
 				variables: { name: 'test' },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.errors).toBeDefined();

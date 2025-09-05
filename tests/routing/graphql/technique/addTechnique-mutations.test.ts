@@ -53,7 +53,13 @@ describe('AddTechnique mutations', () => {
 		const flavorName = faker.word.noun();
 		const techniqueName = faker.word.noun();
 		jest.spyOn(crudTechnique, 'addTechnique').mockResolvedValue(null);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
 
+		const token = sessions.generateSessionToken();
 		const response = await request(app)
 			.post('/graphql')
 			.send({
@@ -66,6 +72,7 @@ describe('AddTechnique mutations', () => {
             `,
 				variables: { input: { flavor: flavorName, technique: techniqueName } },
 			})
+			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
 		expect(response.body.data.addTechnique).toBeNull();
