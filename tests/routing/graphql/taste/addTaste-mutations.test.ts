@@ -93,7 +93,7 @@ describe('AddTaste mutations', () => {
 				variables: { input: { flavor: 'test1', taste: 'test2' } },
 			})
 			.set('Cookie', [`token=${token}`])
-			.expect(200);
+			.expect(500);
 
 		expect(response.body.errors).toBeDefined();
 	});

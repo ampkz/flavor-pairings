@@ -99,7 +99,7 @@ describe('DeleteTaste mutations', () => {
 				variables: { name: 'test' },
 			})
 			.set('Cookie', [`token=${token}`])
-			.expect(200);
+			.expect(500);
 
 		expect(response.body.errors).toBeDefined();
 	});

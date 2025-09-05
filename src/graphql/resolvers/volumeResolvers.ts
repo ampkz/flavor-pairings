@@ -4,7 +4,7 @@ import { Flavor } from '../../pairings/flavor';
 import { FlavorVolume, Volume } from '../../pairings/volume';
 import { Auth } from '@ampkz/auth-neo4j/auth';
 import { isPermitted } from '../../_helpers/auth-helper';
-import { unauthorizedError } from '../errors/errors';
+import { unauthorizedError, getGraphQLError } from '../errors/errors';
 
 export const resolvers: Resolvers = {
 	Query: {
@@ -14,19 +14,51 @@ export const resolvers: Resolvers = {
 	Mutation: {
 		createVolume: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a volume');
-			return createVolume({ name });
+			let createdVolume = null;
+
+			try {
+				createdVolume = await createVolume({ name });
+			} catch (error) {
+				throw getGraphQLError(`creating volume: ${name}`, error);
+			}
+
+			return createdVolume;
 		},
 		updateVolume: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a volume');
-			return updateVolume({ name, updatedName });
+			let updatedVolume = null;
+
+			try {
+				updatedVolume = await updateVolume({ name, updatedName });
+			} catch (error) {
+				throw getGraphQLError(`updating volume: ${name}`, error);
+			}
+
+			return updatedVolume;
 		},
 		deleteVolume: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a volume');
-			return deleteVolume(name);
+			let deletedVolume = null;
+
+			try {
+				deletedVolume = await deleteVolume(name);
+			} catch (error) {
+				throw getGraphQLError(`deleting volume: ${name}`, error);
+			}
+
+			return deletedVolume;
 		},
 		addVolume: async (_root, { input: { flavor, volume } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a volume');
-			return addVolume(new FlavorVolume(new Flavor({ name: flavor }), new Volume({ name: volume })));
+			let addedVolume = null;
+
+			try {
+				addedVolume = await addVolume(new FlavorVolume(new Flavor({ name: flavor }), new Volume({ name: volume })));
+			} catch (error) {
+				throw getGraphQLError(`adding volume: ${volume} to flavor: ${flavor}`, error);
+			}
+
+			return addedVolume;
 		},
 	},
 };

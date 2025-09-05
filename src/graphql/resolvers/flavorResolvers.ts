@@ -13,7 +13,6 @@ import { getFlavorTastes } from '../../db/pairings/crud-taste';
 import { getFlavorTechniques } from '../../db/pairings/crud-technique';
 import { getFlavorWeights } from '../../db/pairings/crud-weight';
 import { getFlavorVolumes } from '../../db/pairings/crud-volume';
-import { GraphQLError } from 'graphql';
 
 export const resolvers: Resolvers = {
 	Query: {
