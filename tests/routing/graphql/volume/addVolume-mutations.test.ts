@@ -77,4 +77,49 @@ describe('AddVolume mutations', () => {
 
 		expect(response.body.data.addVolume).toBeNull();
 	});
+
+	it('should throw an error if the user is not authenticated', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation AddVolume($input: AddVolumeInput!) {
+                    addVolume(input: $input) {
+                        name
+                    }
+                }
+            `,
+				variables: { input: { flavor: 'flavorName', volume: 'volumeName' } },
+			})
+			.expect(401);
+
+		expect(response.body.errors).toBeDefined();
+	});
+
+	it('should throw an error if there was an issue with the server', async () => {
+		jest.spyOn(crudVolume, 'addVolume').mockRejectedValue(new Error('Server error'));
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation AddVolume($input: AddVolumeInput!) {
+                    addVolume(input: $input) {
+                        name
+                    }
+                }
+            `,
+				variables: { input: { flavor: 'flavorName', volume: 'volumeName' } },
+			})
+			.set('Cookie', [`token=${token}`])
+			.expect(500);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });

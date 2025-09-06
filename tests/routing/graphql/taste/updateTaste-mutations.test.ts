@@ -96,4 +96,22 @@ describe('UpdateTaste mutations', () => {
 
 		expect(response.body.errors).toBeDefined();
 	});
+
+	it('should throw an error if the user is not authorized', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation UpdateTaste($input: UpdateTasteInput!) {
+                    updateTaste(input: $input) {
+                        name
+                    }
+                }
+            `,
+				variables: { input: { name: 'test', updatedName: 'updated_test' } },
+			})
+			.expect(401);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });

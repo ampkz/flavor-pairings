@@ -61,4 +61,14 @@ describe('CRUD Pairing', () => {
 		const deleted = await deletePairing(pairing);
 		expect(deleted).toBe(pairing);
 	});
+
+	it('should return null if no pairing was deleted', async () => {
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
+
+		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular);
+
+		const deleted = await deletePairing(pairing);
+		expect(deleted).toBeNull();
+	});
 });

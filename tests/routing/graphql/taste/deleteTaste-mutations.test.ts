@@ -103,4 +103,22 @@ describe('DeleteTaste mutations', () => {
 
 		expect(response.body.errors).toBeDefined();
 	});
+
+	it('should throw an error if user is not authenticated', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation DeleteTaste($name: ID!) {
+                    deleteTaste(name: $name) {
+                        name
+                    }
+                }
+            `,
+				variables: { name: 'not_found' },
+			})
+			.expect(401);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });

@@ -130,4 +130,33 @@ describe('DeleteFlavor mutations', () => {
 
 		expect(response.body.errors).toBeDefined();
 	});
+
+	it('should throw an error if the user is not authenticated', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+					mutation DeletePairing($input: DeletePairingInput!) {
+                        deletePairing(input: $input){
+                            success
+                            pairing {
+                                flavor {
+                                    name
+                                }
+                                paired {
+                                    flavor {
+                                        name
+                                    }
+                                    affinity
+                                }
+                            }
+                        }
+                    }
+                `,
+				variables: { input: { flavor1: 'test1', flavor2: 'test2', affinity: PairingAffinity.Regular } },
+			})
+			.expect(401);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });

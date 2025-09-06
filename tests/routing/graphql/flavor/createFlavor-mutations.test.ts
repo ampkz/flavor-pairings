@@ -96,4 +96,22 @@ describe('CreateFlavor mutations', () => {
 
 		expect(response.body.errors).toBeDefined();
 	});
+
+	it('should throw an error if the user is not authenticated', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+					mutation CreateFlavor($input: CreateFlavorInput!) {
+                    createFlavor(input: $input) {
+                        name
+                    }
+                }
+				`,
+				variables: { input: { name: 'test' } },
+			})
+			.expect(401);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });

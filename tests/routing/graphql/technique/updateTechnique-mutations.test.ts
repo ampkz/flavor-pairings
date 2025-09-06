@@ -74,4 +74,51 @@ describe('UpdateTechnique mutations', () => {
 
 		expect(response.body.data.updateTechnique).toBeNull();
 	});
+
+	it('should throw an error if the user is not authorized', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation UpdateTechnique($input: UpdateTechniqueInput!) {
+                    updateTechnique(input: $input) {
+                        name
+                    }
+                }
+            `,
+				variables: { input: { name: 'not_found', updatedName: 'updated_name' } },
+			})
+			.expect(401);
+
+		expect(response.body.data.updateTechnique).toBeNull();
+	});
+
+	it('should throw an error if there was an issue with the server', async () => {
+		jest.spyOn(crudTechnique, 'updateTechnique').mockRejectedValue(new Error('Server error'));
+
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation UpdateTechnique($input: UpdateTechniqueInput!) {
+                    updateTechnique(input: $input) {
+                        name
+                    }
+                }
+            `,
+				variables: { input: { name: 'not_found', updatedName: 'updated_name' } },
+			})
+			.set('Cookie', [`token=${token}`])
+			.expect(500);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });

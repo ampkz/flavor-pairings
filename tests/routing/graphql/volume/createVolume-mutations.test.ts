@@ -103,4 +103,22 @@ describe('CreateVolume mutations', () => {
 
 		expect(response.body.errors).toBeDefined();
 	});
+
+	it('should throw an error if the user is not authenticated', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation CreateVolume($name: ID!) {
+                    createVolume(name: $name) {
+                        name
+                    }
+                }
+            `,
+				variables: { name: 'test' },
+			})
+			.expect(401);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });

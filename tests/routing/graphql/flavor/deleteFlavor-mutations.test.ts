@@ -96,4 +96,22 @@ describe('DeleteFlavor mutations', () => {
 
 		expect(response.body.errors).toBeDefined();
 	});
+
+	it('should throw an error if the user is not authenticated', async () => {
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+					mutation DeleteFlavor($name: ID!) {
+                    deleteFlavor(name: $name) {
+                        name
+                    }
+                }
+				`,
+				variables: { name: 'test' },
+			})
+			.expect(401);
+
+		expect(response.body.errors).toBeDefined();
+	});
 });
