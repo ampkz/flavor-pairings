@@ -15,7 +15,7 @@ export async function createPairing(pairing: Pairing): Promise<Pairing | null> {
 }
 
 export async function deletePairing(pairing: Pairing): Promise<Pairing | null> {
-	const [f1, f2] = await deleteRelationship(pairing.getRelationship());
+	const [f1, f2] = await deleteRelationship(pairing.getRelationship(), true);
 
 	if (f1 !== null && f2 !== null) {
 		return pairing;
