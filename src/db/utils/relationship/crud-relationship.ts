@@ -124,10 +124,10 @@ export async function deleteRelationship(relationship: Relationship, undirectedM
 
 	try {
 		match = await session.run(
-			`MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[r:${relationship.type}]-${
-				undirectedMatch ? '' : '>'
-			}(n2:${relationship.node2.nodeType} {${relationship.node2.getIdString('n2')}}) DELETE r RETURN n1, n2`,
-			relationship.getRelationshipParams('n1', 'n2')
+			`MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[r:${relationship.type} ${
+				relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''
+			}]-${undirectedMatch ? '' : '>'}(n2:${relationship.node2.nodeType} {${relationship.node2.getIdString('n2')}}) DELETE r RETURN n1, n2`,
+			relationship.getRelationshipParams('n1', 'n2', 'r')
 		);
 	} catch (error) {
 		throw new InternalError(Errors.COULD_NOT_DELETE_RELATIONSHIP, { cause: error });
