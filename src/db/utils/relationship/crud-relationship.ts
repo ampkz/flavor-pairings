@@ -16,7 +16,18 @@ export async function createRelationship(relationship: Relationship): Promise<[a
 	const driver: Driver = await connect();
 	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
 
-	let match: RecordShape;
+	let match: RecordShape = await session.run(
+		`MATCH (n1:${relationship.node1.nodeType} { ${relationship.node1.getIdString('n1')} })-[r:${relationship.type} ${
+			relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''
+		}]-(n2:${relationship.node2.nodeType} { ${relationship.node2.getIdString('n2')} }) RETURN n1, n2, r`,
+		relationship.getRelationshipParams('n1', 'n2', 'r')
+	);
+
+	if (match.records.length > 0) {
+		await session.close();
+		await driver.close();
+		return [null, null, null];
+	}
 
 	try {
 		match = await session.run(

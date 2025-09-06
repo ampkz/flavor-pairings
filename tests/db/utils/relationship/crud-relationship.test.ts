@@ -30,6 +30,33 @@ describe('CRUD Relationship', () => {
 		expect(matchedR.type).toEqual(r.type);
 	});
 
+	it('should not create a duplicate relationship', async () => {
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+
+		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
+		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
+
+		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
+		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
+
+		expect(matchedn1.name).toEqual(n1.idValue);
+		expect(matchedn2.name).toEqual(n2.idValue);
+		expect(matchedR.type).toEqual(r.type);
+
+		const [duplicateN1, duplicateN2, duplicateR] = await createRelationship(r);
+		expect(duplicateN1).toBeNull();
+		expect(duplicateN2).toBeNull();
+		expect(duplicateR).toBeNull();
+
+		const reversedR: Relationship = new Relationship(n2, n1, RelationshipType.PAIRS_WITH);
+		const [reversedMatchedN1, reversedMatchedN2, reversedMatchedR] = await createRelationship(reversedR);
+
+		expect(reversedMatchedN1).toBeNull();
+		expect(reversedMatchedN2).toBeNull();
+		expect(reversedMatchedR).toBeNull();
+	});
+
 	it('should get relationships', async () => {
 		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('gr_'));
 		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('gr_'));
@@ -148,9 +175,13 @@ describe('CRUD Relationship', () => {
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
 
+		const mockResult = {
+			records: [],
+		};
+
 		const driverMock = {
 			session: jest.fn().mockReturnValue({
-				run: jest.fn().mockRejectedValue(new InternalError(Errors.COULD_NOT_CREATE_RELATIONSHIP)),
+				run: jest.fn().mockResolvedValueOnce(mockResult).mockRejectedValue(new InternalError(Errors.COULD_NOT_CREATE_RELATIONSHIP)),
 				close: jest.fn(),
 			} as unknown as Session),
 			close: jest.fn(),
