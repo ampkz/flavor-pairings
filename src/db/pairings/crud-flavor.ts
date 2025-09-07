@@ -13,6 +13,16 @@ export async function getFlavor(name: string): Promise<Flavor | null> {
 	return matchedNode ? new Flavor(matchedNode) : null;
 }
 
+export async function setFlavorTips(flavor: Flavor, tips: string | null): Promise<Flavor | null> {
+	const updatedNode = await updateNode(NodeType.FLAVOR, 'f', ['name: $name'], ['f.tips = $tips'], { name: flavor.name, tips });
+	return updatedNode ? new Flavor(updatedNode) : null;
+}
+
+export async function getFlavorTips(name: string): Promise<string | null> {
+	const matchedNode = await getNode(NodeType.FLAVOR, ['name: $name'], { name });
+	return matchedNode ? matchedNode.tips || null : null;
+}
+
 export async function updateFlavor(updatedFlavor: UpdateFlavorInput): Promise<Flavor | null> {
 	const updatedNode = await updateNode(NodeType.FLAVOR, 'f', ['name: $name'], ['f.name = $updatedName'], updatedFlavor);
 	return updatedNode ? new Flavor(updatedNode) : null;

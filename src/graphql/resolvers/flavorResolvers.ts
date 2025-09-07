@@ -1,7 +1,7 @@
 import { Auth } from '@ampkz/auth-neo4j/auth';
 import { isPermitted } from '../../_helpers/auth-helper';
 import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
-import { createFlavor, deleteFlavor, getFlavor, getFlavors, updateFlavor } from '../../db/pairings/crud-flavor';
+import { createFlavor, deleteFlavor, getFlavor, getFlavors, getFlavorTips, setFlavorTips, updateFlavor } from '../../db/pairings/crud-flavor';
 import { createPairing, deletePairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
 import { getTotalNodeCountByType } from '../../db/utils/crud';
 import { getTotalRelationshipsToNodes } from '../../db/utils/relationship/crud-relationship';
@@ -68,6 +68,20 @@ export const resolvers: Resolvers = {
 
 			return deletedFlavor;
 		},
+		flavorTips: async (_root, { name, tips }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update flavor tips');
+			let updatedFlavor: Flavor | null = null;
+
+			try {
+				updatedFlavor = await setFlavorTips(new Flavor({ name }), tips || null);
+			} catch (error) {
+				throw getGraphQLError(`updating flavor tips: ${name}`, error);
+			}
+
+			if (!updatedFlavor) throw internalError(`Failed to update flavor tips: ${name}`);
+
+			return updatedFlavor;
+		},
 		createPairing: async (_root, { input: { flavor1, flavor2, affinity, especially } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a pairing');
 
@@ -108,6 +122,7 @@ export const resolvers: Resolvers = {
 		technique: parent => getFlavorTechniques(parent),
 		weight: parent => getFlavorWeights(parent),
 		volume: parent => getFlavorVolumes(parent),
+		tips: parent => getFlavorTips(parent.name),
 		pairings: async (parent, { limit, cursor }) => {
 			const items = await getFlavorPairings(parent, limit, cursor);
 			const node: Node = new Node(NodeType.FLAVOR, 'name', parent.name);

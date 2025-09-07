@@ -12,6 +12,7 @@ import { NodeType } from '../../../src/_helpers/nodes';
 import { faker } from '@faker-js/faker';
 import neo4j, { Driver, Neo4jError, Record, Session } from 'neo4j-driver';
 import { isSortedAlphabetically } from '../../../src/_helpers/array';
+import { getFlavorTips } from '../../../src/db/pairings/crud-flavor';
 
 describe('Node CRUD Operations', () => {
 	beforeEach(() => {
@@ -95,6 +96,26 @@ describe('Node CRUD Operations', () => {
 		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		const result = await deleteNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
 		expect(result).toHaveProperty('name', flavor);
+	});
+
+	it('should set properties on a node', async () => {
+		const flavor = (global as any).getNextNoun();
+		await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor });
+		const result = await updateNode(NodeType.FLAVOR, 'f', ['name: $name'], ['f.propToSet = $propToSet'], {
+			name: flavor,
+			propToSet: 'setMe',
+		});
+		expect(result).toHaveProperty('name', flavor);
+		expect(result).toHaveProperty('propToSet', 'setMe');
+	});
+
+	it('should return null if no node was updated when setting properties', async () => {
+		const flavor = (global as any).getNextNoun();
+		const result = await updateNode(NodeType.FLAVOR, 'f', ['name: $name'], ['f.propToSet = $propToSet'], {
+			name: flavor,
+			propToSet: 'setMe',
+		});
+		expect(result).toBeNull();
 	});
 
 	it('should remove properties from a node', async () => {

@@ -1,5 +1,5 @@
 import { Flavor } from '../../../src/pairings/flavor';
-import { createFlavor, deleteFlavor, getFlavor, getFlavors, updateFlavor } from '../../../src/db/pairings/crud-flavor';
+import { createFlavor, deleteFlavor, getFlavor, getFlavors, getFlavorTips, setFlavorTips, updateFlavor } from '../../../src/db/pairings/crud-flavor';
 import * as crud from '../../../src/db/utils/crud';
 import { faker } from '@faker-js/faker';
 
@@ -48,6 +48,36 @@ describe('CRUD Flavor', () => {
 	it('should return null if no flavor was found to update', async () => {
 		const updatedFlavor = await updateFlavor({ name: 'non_existing_flavor', updatedName: 'updated_name' });
 		expect(updatedFlavor).toBeNull();
+	});
+
+	it('should set tips of a flavor', async () => {
+		const name = 'stf_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		await createFlavor(flavor);
+		const updatedFlavor = await setFlavorTips(flavor, 'These are some tips');
+		expect(updatedFlavor!.name).toBe(flavor.name);
+		const tips = await getFlavorTips(flavor.name);
+		expect(tips).toBe('These are some tips');
+	});
+
+	it('should return null if no tips where set for a flavor', async () => {
+		const name = 'stf_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		const updatedFlavor = await setFlavorTips(flavor, 'These are some tips');
+		expect(updatedFlavor).toBeNull();
+		const tips = await getFlavorTips(flavor.name);
+		expect(tips).toBeNull();
+	});
+
+	it('should unset tips of a flavor', async () => {
+		const name = 'stf_' + faker.word.noun();
+		const flavor = new Flavor({ name });
+		await createFlavor(flavor);
+		await setFlavorTips(flavor, 'These are some tips');
+		const updatedFlavor = await setFlavorTips(flavor, null);
+		expect(updatedFlavor!.name).toBe(flavor.name);
+		const tips = await getFlavorTips(flavor.name);
+		expect(tips).toBeNull();
 	});
 
 	it('should delete a flavor', async () => {
