@@ -6,7 +6,7 @@ export const resolvers: Resolvers = {
 	Query: {
 		experimentalPairing: async (_root, { input: { flavor1, flavor2, maxLength } }) => {
 			const exPairings = await getExperimentalPairings(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }), maxLength!);
-			return { uniqueFlavors: exPairings.uniqueFlavors, paths: exPairings.pairingPaths };
+			return { uniqueFlavors: exPairings.uniqueFlavors, pairings: exPairings.getGraphQLPairings() };
 		},
 	},
 };

@@ -2,12 +2,8 @@ extend type Query {
 	experimentalPairing(input: ExperimentalPairingInput!): ExperimentalPairing
 }
 
-type Path {
-	flavors: [Flavor!]!
-}
-
 type ExperimentalPairing {
-	paths: [Path!]!
+	pairings: [Pairing!]!
 	uniqueFlavors: [Flavor!]!
 }
 

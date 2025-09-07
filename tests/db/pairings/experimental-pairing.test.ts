@@ -20,6 +20,6 @@ describe('Experimental Pairings', () => {
 
 		const pairings = await getExperimentalPairings(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }), 2);
 		expect(pairings.uniqueFlavors).toEqual(expect.arrayContaining([new Flavor({ name: intermediateFlavor })]));
-		expect(pairings.pairingPaths.length).toBeGreaterThan(0);
+		expect(pairings.pairings.length).toBeGreaterThan(0);
 	});
 });

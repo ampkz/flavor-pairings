@@ -1,44 +1,38 @@
 import { Flavor } from './flavor';
-import { type Path } from '../generated/graphql';
+import { Pairing } from './pairing';
+import { Pairing as GqlPairing } from '../generated/graphql';
 
-export class PairingPath implements Path {
-	private _flavors: Flavor[] = [];
+// export class PairingPath {
+// 	private _pairings: Pairing[] = [];
 
-	constructor() {
-		this._flavors = [];
-	}
+// 	constructor() {
+// 		this._pairings = [];
+// 	}
 
-	public get flavors(): Flavor[] {
-		return [...this._flavors];
-	}
+// 	public get pairings(): Pairing[] {
+// 		return [...this._pairings];
+// 	}
 
-	public addFlavor(flavor: Flavor): void {
-		this._flavors.push(flavor);
-	}
-
-	public hasFlavor(name: string): boolean {
-		return this._flavors.some(f => f.name === name);
-	}
-
-	toString(): string {
-		const pathLength = this._flavors.length;
-		if (pathLength < 2) return '';
-		let path = `${this._flavors[0]!.name}`;
-		for (let i = 1; i < pathLength; i++) {
-			path += ` -> ${this._flavors[i]!.name}`;
-		}
-		return path;
-	}
-}
+// 	public addPairing(pairing: Pairing): void {
+// 		this._pairings.push(pairing);
+// 	}
+// }
 
 export class ExperimentalPairings {
-	private _pairingPaths: PairingPath[] = [];
+	private _pairings: Pairing[] = [];
 	private _flavorSet: Set<string> = new Set();
 
 	constructor() {}
 
-	public get pairingPaths(): PairingPath[] {
-		return [...this._pairingPaths];
+	public get pairings(): Pairing[] {
+		return [...this._pairings];
+	}
+
+	public getGraphQLPairings(): GqlPairing[] {
+		return this._pairings.map(pairing => ({
+			flavor: { name: pairing.flavor1.name },
+			paired: { flavor: { name: pairing.flavor2.name }, affinity: pairing.affinity, especially: pairing.especially },
+		}));
 	}
 
 	public get uniqueFlavors(): Flavor[] {
@@ -47,12 +41,13 @@ export class ExperimentalPairings {
 		return flavors;
 	}
 
-	public getPairingPathsFromFlavorName(flavorName: string): PairingPath[] {
-		return this._pairingPaths.filter(path => path.hasFlavor(flavorName));
-	}
+	// public getPairingPathsFromFlavorName(flavorName: string): PairingPath[] {
+	// 	return this._pairingPaths.filter(path => path.hasFlavor(flavorName));
+	// }
 
-	public addPairingPath(pairingPath: PairingPath): void {
-		pairingPath.flavors.forEach(flavor => this._flavorSet.add(flavor.name));
-		this._pairingPaths.push(pairingPath);
+	public addPairing(pairing: Pairing): void {
+		this._flavorSet.add(pairing.flavor1.name);
+		this._flavorSet.add(pairing.flavor2.name);
+		this._pairings.push(pairing);
 	}
 }

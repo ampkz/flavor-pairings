@@ -6,12 +6,14 @@ export class Pairing {
 	public flavor1: Flavor;
 	public flavor2: Flavor;
 	public affinity: PairingAffinity;
+	public especially: string | null;
 	private _relationship: Relationship;
 
 	constructor(flavor1: Flavor, flavor2: Flavor, affinity: PairingAffinity, especially: string | null = null) {
 		this.flavor1 = flavor1;
 		this.flavor2 = flavor2;
 		this.affinity = affinity;
+		this.especially = especially;
 
 		const idProps = ['affinity'];
 		const idValues: string[] = [affinity];
