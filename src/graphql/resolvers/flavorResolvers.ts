@@ -50,7 +50,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`updating flavor: ${name}`, error);
 			}
 
-			return updatedFlavor;
+			return {
+				success: !!updatedFlavor,
+				flavor: new Flavor({ name: updatedName }),
+				previousFlavor: new Flavor({ name }),
+			};
 		},
 		deleteFlavor: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a flavor');

@@ -5,7 +5,7 @@ extend type Query {
 
 extend type Mutation {
 	createFlavor(input: CreateFlavorInput!): Flavor
-	updateFlavor(input: UpdateFlavorInput!): Flavor
+	updateFlavor(input: UpdateFlavorInput!): UpdateFlavorResult!
 	deleteFlavor(name: ID!): Flavor
 	createPairing(input: CreatePairingInput!): PairingResult!
 	deletePairing(input: DeletePairingInput!): PairingResult!
@@ -37,6 +37,12 @@ input CreateFlavorInput {
 input UpdateFlavorInput {
 	name: ID!
 	updatedName: ID!
+}
+
+type UpdateFlavorResult {
+	success: Boolean!
+	flavor: Flavor!
+	previousFlavor: Flavor!
 }
 
 type Pairing {

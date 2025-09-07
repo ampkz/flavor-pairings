@@ -37,7 +37,10 @@ describe('UpdateFlavor mutations', () => {
 				query: `
                 mutation UpdateFlavor($input: UpdateFlavorInput!) {
                     updateFlavor(input: $input) {
-                        name
+                        success
+						flavor {
+							name
+						}
                     }
                 }
             `,
@@ -46,7 +49,7 @@ describe('UpdateFlavor mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.updateFlavor).toEqual({ name: 'updated_' + flavorName });
+		expect(response.body.data.updateFlavor).toEqual({ success: true, flavor: { name: 'updated_' + flavorName } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -59,7 +62,7 @@ describe('UpdateFlavor mutations', () => {
 				query: `
                 mutation UpdateFlavor($input: UpdateFlavorInput!) {
                     updateFlavor(input: $input) {
-                        name
+                        success
                     }
                 }
             `,
@@ -85,7 +88,7 @@ describe('UpdateFlavor mutations', () => {
 				query: `
                 mutation UpdateFlavor($input: UpdateFlavorInput!) {
                     updateFlavor(input: $input) {
-                        name
+                        success
                     }
                 }
             `,
@@ -104,7 +107,7 @@ describe('UpdateFlavor mutations', () => {
 				query: `
 					mutation UpdateFlavor($input: UpdateFlavorInput!) {
                     updateFlavor(input: $input) {
-                        name
+                        success
                     }
                 }
 				`,
