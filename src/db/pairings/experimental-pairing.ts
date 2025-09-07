@@ -1,10 +1,9 @@
 import { Record } from 'neo4j-driver';
 import { getSessionOptions } from '../../_helpers/db-helper';
 import Config from '../../config/config';
-import { ExperimentalPairings } from '../../pairings/experimental-pairing';
+import { ExperimentalPairings, PairingPath } from '../../pairings/experimental-pairing';
 import { Flavor } from '../../pairings/flavor';
 import { connect } from '../utils/connection';
-import { Pairing } from '../../pairings/pairing';
 
 export async function getExperimentalPairings(flavor1: Flavor, flavor2: Flavor, maxLength: number): Promise<ExperimentalPairings> {
 	const experimentalPairings = new ExperimentalPairings();
@@ -21,18 +20,20 @@ export async function getExperimentalPairings(flavor1: Flavor, flavor2: Flavor, 
 		const length = record.get('p').length;
 
 		const segments = record.get('p').segments;
-
+		let path = new PairingPath();
 		for (let i = 0; i < length; i++) {
 			let segment = segments[i];
-			experimentalPairings.addPairing(
-				new Pairing(
-					new Flavor({ name: segment.start.properties.name }),
-					new Flavor({ name: segment.end.properties.name }),
-					segment.relationship.properties.affinity,
-					segment.relationship.properties.especially || null
-				)
-			);
+
+			path.addPairing({
+				flavor: new Flavor({ name: segment.start.properties.name }),
+				paired: {
+					flavor: new Flavor({ name: segment.end.properties.name }),
+					affinity: segment.relationship.properties.affinity,
+					especially: segment.relationship.properties.especially || null,
+				},
+			});
 		}
+		experimentalPairings.addPath(path);
 	});
 
 	await session.close();
