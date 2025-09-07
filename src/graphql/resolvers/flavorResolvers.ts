@@ -68,20 +68,23 @@ export const resolvers: Resolvers = {
 
 			return deletedFlavor;
 		},
-		createPairing: async (_root, { input: { flavor1, flavor2, affinity } }, { authorizedUser }) => {
+		createPairing: async (_root, { input: { flavor1, flavor2, affinity, especially } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a pairing');
 
 			let createdPair: Pairing | null = null;
 
 			try {
-				createdPair = await createPairing(new Pairing(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }), affinity));
+				createdPair = await createPairing(new Pairing(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }), affinity, especially));
 			} catch (error) {
 				throw getGraphQLError(`creating pairing: ${flavor1}-${affinity}->${flavor2}`, error);
 			}
 
 			return {
 				success: !!createdPair,
-				pairing: { flavor: new Flavor({ name: flavor1 }), paired: { flavor: new Flavor({ name: flavor2 }), affinity } },
+				pairing: {
+					flavor: new Flavor({ name: flavor1 }),
+					paired: { flavor: new Flavor({ name: flavor2 }), affinity, especially: especially || null },
+				},
 			};
 		},
 		deletePairing: async (_root, { input: { flavor1, flavor2, affinity } }, { authorizedUser }) => {

@@ -7,17 +7,28 @@ export class Pairing {
 	public flavor2: Flavor;
 	public affinity: PairingAffinity;
 	private _relationship: Relationship;
+	private _especially: string | null;
 
-	constructor(flavor1: Flavor, flavor2: Flavor, affinity: PairingAffinity) {
+	constructor(flavor1: Flavor, flavor2: Flavor, affinity: PairingAffinity, especially: string | null = null) {
 		this.flavor1 = flavor1;
 		this.flavor2 = flavor2;
 		this.affinity = affinity;
+		this._especially = especially;
+
+		const idProps = ['affinity'];
+		const idValues: string[] = [affinity];
+
+		if (!!especially) {
+			idProps.push('especially');
+			idValues.push(especially);
+		}
+
 		this._relationship = new Relationship(
 			new Node(NodeType.FLAVOR, 'name', this.flavor1.name),
 			new Node(NodeType.FLAVOR, 'name', this.flavor2.name),
 			RelationshipType.PAIRS_WITH,
-			'affinity',
-			affinity
+			idProps,
+			idValues
 		);
 	}
 

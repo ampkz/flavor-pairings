@@ -41,36 +41,42 @@ export class Relationship {
 	public node1: Node;
 	public node2: Node;
 	public type: RelationshipType;
-	public idProp?: string;
-	public idValue?: string;
+	public idProps?: string[];
+	public idValues?: string[];
 
-	constructor(node1: Node, node2: Node, type: RelationshipType, idProp?: string, idValue?: string) {
+	constructor(node1: Node, node2: Node, type: RelationshipType, idProp?: string[], idValue?: string[]) {
 		this.node1 = node1;
 		this.node2 = node2;
 		this.type = type;
 		if (idProp && idValue) {
-			this.idProp = idProp;
-			this.idValue = idValue;
+			this.idProps = idProp;
+			this.idValues = idValue;
 		}
 	}
 
 	hasIdProp(): boolean {
-		return !!this.idProp && !!this.idValue;
+		return !!this.idProps && !!this.idValues;
 	}
 
 	getIdString(prefix: string = ''): string {
-		return `${this.idProp}:$${prefix}${this.idProp}`;
+		return this.idProps?.map(prop => `${prop}:$${prefix}${prop}`).join(', ') || '';
+	}
+
+	getIdParams(prefix: string = '') {
+		const params: any = {};
+
+		if (this.hasIdProp()) {
+			this.idProps!.map((prop, index) => {
+				params[`${prefix}${prop}`] = this.idValues![index];
+			});
+		}
+
+		return params;
 	}
 
 	getRelationshipParams(n1Prefix: string, n2Prefix: string, rPrefix: string = '') {
-		const returnParams: any = {};
-
-		if (this.hasIdProp()) {
-			returnParams[`${rPrefix}${this.idProp}`] = this.idValue;
-		}
-
 		return {
-			...returnParams,
+			...this.getIdParams(rPrefix),
 			...this.node1.getIdParams(n1Prefix),
 			...this.node2.getIdParams(n2Prefix),
 		};

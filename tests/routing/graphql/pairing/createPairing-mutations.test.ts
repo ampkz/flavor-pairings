@@ -25,7 +25,8 @@ describe('CreateFlavor mutations', () => {
 		const flavor1 = faker.word.noun();
 		const flavor2 = faker.word.noun();
 		const affinity = PairingAffinity.Regular;
-		const pairing: Pairing = new Pairing({ name: flavor1 }, { name: flavor2 }, affinity);
+		const especially = faker.lorem.words(3);
+		const pairing: Pairing = new Pairing({ name: flavor1 }, { name: flavor2 }, affinity, especially);
 		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue(pairing);
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
@@ -52,12 +53,13 @@ describe('CreateFlavor mutations', () => {
                                         name
                                     }
                                     affinity
+									especially
                                 }
                             }
                         }
 				}
             `,
-				variables: { input: { flavor1, flavor2, affinity } },
+				variables: { input: { flavor1, flavor2, affinity, especially } },
 			})
 			.set('Cookie', [`token=${token}`])
 			.expect(200);

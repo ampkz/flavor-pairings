@@ -16,8 +16,8 @@ describe('CRUD Relationship', () => {
 	});
 
 	it('should create a relationship', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
 
 		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
@@ -31,8 +31,8 @@ describe('CRUD Relationship', () => {
 	});
 
 	it('should not create a duplicate relationship', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
 
 		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
@@ -102,8 +102,8 @@ describe('CRUD Relationship', () => {
 	});
 
 	it('should return an undirected match', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
 
 		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
@@ -117,8 +117,8 @@ describe('CRUD Relationship', () => {
 	});
 
 	it('should return a null tuple if no relationship was created', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
 		const [matchedn1, matchedn2, matchedR] = await createRelationship(r);
@@ -128,8 +128,8 @@ describe('CRUD Relationship', () => {
 	});
 
 	it('should delete a relationship', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
 
 		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
 		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
@@ -170,8 +170,8 @@ describe('CRUD Relationship', () => {
 	});
 
 	it('should throw an error if there was an internal issue when creating a relationship', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
 
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
 
@@ -233,8 +233,8 @@ describe('CRUD Relationship', () => {
 	});
 
 	it('should throw an error if there was an internal issue when deleting a relationship', async () => {
-		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
-		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('un_'));
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('cr_'));
 		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
 
 		const driverMock = {

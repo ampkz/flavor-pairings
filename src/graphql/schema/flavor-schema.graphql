@@ -53,12 +53,14 @@ type Pairing {
 type Paired {
 	flavor: Flavor!
 	affinity: PairingAffinity!
+	especially: String
 }
 
 input CreatePairingInput {
 	flavor1: ID!
 	flavor2: ID!
 	affinity: PairingAffinity!
+	especially: String
 }
 
 type PairingResult {

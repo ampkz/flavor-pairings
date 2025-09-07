@@ -8,7 +8,7 @@ export async function createPairing(pairing: Pairing): Promise<Pairing | null> {
 	const [f1, f2, r] = await createRelationship(pairing.getRelationship());
 
 	if (f1 !== null && f2 !== null && r !== null) {
-		return new Pairing(new Flavor(f1), new Flavor(f2), r.affinity);
+		return new Pairing(new Flavor(f1), new Flavor(f2), r.affinity, r.especially || null);
 	}
 
 	return null;
@@ -38,7 +38,7 @@ export async function getFlavorPairings(flavor: Flavor, limit?: number | null, c
 	);
 
 	relationships.forEach(([n2, r]) => {
-		pairings.push({ flavor: new Flavor(n2), affinity: r.affinity });
+		pairings.push({ flavor: new Flavor(n2), affinity: r.affinity, especially: r.especially || null });
 	});
 
 	return pairings;

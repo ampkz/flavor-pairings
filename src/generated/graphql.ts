@@ -42,6 +42,7 @@ export type CreateFlavorInput = {
 
 export type CreatePairingInput = {
   affinity: PairingAffinity;
+  especially?: InputMaybe<Scalars['String']['input']>;
   flavor1: Scalars['ID']['input'];
   flavor2: Scalars['ID']['input'];
 };
@@ -207,6 +208,7 @@ export type MutationUpdateWeightArgs = {
 export type Paired = {
   __typename?: 'Paired';
   affinity: PairingAffinity;
+  especially?: Maybe<Scalars['String']['output']>;
   flavor: Flavor;
 };
 
@@ -511,6 +513,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
 
 export type PairedResolvers<ContextType = any, ParentType extends ResolversParentTypes['Paired'] = ResolversParentTypes['Paired']> = {
   affinity?: Resolver<ResolversTypes['PairingAffinity'], ParentType, ContextType>;
+  especially?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   flavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };

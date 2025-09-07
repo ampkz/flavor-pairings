@@ -6,21 +6,21 @@ import { PairingAffinity } from '../../../src/generated/graphql';
 
 describe('CRUD Pairing', () => {
 	it('should create a pairing', async () => {
-		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
-		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
 
 		await createFlavor(flavor1);
 		await createFlavor(flavor2);
 
-		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular);
+		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular, 'especially with desserts');
 		const createdPairing = await createPairing(pairing);
 
 		expect(createdPairing).toEqual(pairing);
 	});
 
 	it('should return null if pairing was not created', async () => {
-		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
-		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
 
 		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Bold);
 
@@ -37,20 +37,20 @@ describe('CRUD Pairing', () => {
 		await Promise.all(
 			flavors.map(async flavor => {
 				const createdFlavor = (await createFlavor(flavor))!;
-				await createPairing(new Pairing(flavor1, createdFlavor, PairingAffinity.Regular));
+				await createPairing(new Pairing(flavor1, createdFlavor, PairingAffinity.Regular, 'especially with desserts'));
 			})
 		);
 
 		const pairings = await getFlavorPairings(flavor1);
 
 		flavors.map(flavor => {
-			expect(pairings).toContainEqual({ flavor, affinity: PairingAffinity.Regular });
+			expect(pairings).toContainEqual({ flavor, affinity: PairingAffinity.Regular, especially: 'especially with desserts' });
 		});
 	});
 
 	it('should delete a pairing', async () => {
-		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
-		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
 
 		await createFlavor(flavor1);
 		await createFlavor(flavor2);
@@ -63,8 +63,8 @@ describe('CRUD Pairing', () => {
 	});
 
 	it('should return null if no pairing was deleted', async () => {
-		const flavor1 = new Flavor({ name: (global as any).getNextNoun() });
-		const flavor2 = new Flavor({ name: (global as any).getNextNoun() });
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
 
 		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular);
 
