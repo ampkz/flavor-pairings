@@ -10,6 +10,7 @@ import { resolvers as tasteResolvers } from '../graphql/resolvers/tasteResolvers
 import { resolvers as volumeResolvers } from '../graphql/resolvers/volumeResolvers';
 import { resolvers as weightResolvers } from '../graphql/resolvers/weightResolvers';
 import { resolvers as techniqueResolvers } from '../graphql/resolvers/techniqueResolvers';
+import { resolvers as experimentalPairingResolvers } from '../graphql/resolvers/experimentalPairingsResolvers';
 import Config from '../config/config';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
@@ -45,10 +46,11 @@ async function startServer() {
 	typeDefs += readFileSync(parentPath + '/graphql/schema/volume-schema.graphql', { encoding: 'utf-8' });
 	typeDefs += readFileSync(parentPath + '/graphql/schema/weight-schema.graphql', { encoding: 'utf-8' });
 	typeDefs += readFileSync(parentPath + '/graphql/schema/technique-schema.graphql', { encoding: 'utf-8' });
+	typeDefs += readFileSync(parentPath + '/graphql/schema/experimental-pairing-schema.graphql', { encoding: 'utf-8' });
 
 	const server = new ApolloServer<MyContext>({
 		typeDefs,
-		resolvers: [flavorResolvers, tasteResolvers, volumeResolvers, weightResolvers, techniqueResolvers],
+		resolvers: [flavorResolvers, tasteResolvers, volumeResolvers, weightResolvers, techniqueResolvers, experimentalPairingResolvers],
 		includeStacktraceInErrorResponses: Config.IS_NOT_PROD,
 		introspection: Config.IS_NOT_PROD,
 		plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],

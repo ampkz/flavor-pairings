@@ -53,6 +53,18 @@ export type DeletePairingInput = {
   flavor2: Scalars['ID']['input'];
 };
 
+export type ExperimentalPairing = {
+  __typename?: 'ExperimentalPairing';
+  paths: Array<Path>;
+  uniqueFlavors: Array<Flavor>;
+};
+
+export type ExperimentalPairingInput = {
+  flavor1: Scalars['ID']['input'];
+  flavor2: Scalars['ID']['input'];
+  maxLength?: Scalars['Int']['input'];
+};
+
 export type Flavor = {
   __typename?: 'Flavor';
   name: Scalars['ID']['output'];
@@ -246,8 +258,14 @@ export type PairingSubList = {
   totalCount: Scalars['Int']['output'];
 };
 
+export type Path = {
+  __typename?: 'Path';
+  flavors: Array<Flavor>;
+};
+
 export type Query = {
   __typename?: 'Query';
+  experimentalPairing?: Maybe<ExperimentalPairing>;
   flavor?: Maybe<Flavor>;
   flavors?: Maybe<FlavorSubList>;
   taste?: Maybe<Taste>;
@@ -258,6 +276,11 @@ export type Query = {
   volumes: Array<Volume>;
   weight?: Maybe<Weight>;
   weights: Array<Weight>;
+};
+
+
+export type QueryExperimentalPairingArgs = {
+  input: ExperimentalPairingInput;
 };
 
 
@@ -422,6 +445,8 @@ export type ResolversTypes = {
   CreateFlavorInput: CreateFlavorInput;
   CreatePairingInput: CreatePairingInput;
   DeletePairingInput: DeletePairingInput;
+  ExperimentalPairing: ResolverTypeWrapper<ExperimentalPairing>;
+  ExperimentalPairingInput: ExperimentalPairingInput;
   Flavor: ResolverTypeWrapper<Flavor>;
   FlavorSubList: ResolverTypeWrapper<FlavorSubList>;
   ID: ResolverTypeWrapper<Scalars['ID']['output']>;
@@ -432,6 +457,7 @@ export type ResolversTypes = {
   PairingAffinity: PairingAffinity;
   PairingResult: ResolverTypeWrapper<PairingResult>;
   PairingSubList: ResolverTypeWrapper<PairingSubList>;
+  Path: ResolverTypeWrapper<Path>;
   Query: ResolverTypeWrapper<{}>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Taste: ResolverTypeWrapper<Taste>;
@@ -456,6 +482,8 @@ export type ResolversParentTypes = {
   CreateFlavorInput: CreateFlavorInput;
   CreatePairingInput: CreatePairingInput;
   DeletePairingInput: DeletePairingInput;
+  ExperimentalPairing: ExperimentalPairing;
+  ExperimentalPairingInput: ExperimentalPairingInput;
   Flavor: Flavor;
   FlavorSubList: FlavorSubList;
   ID: Scalars['ID']['output'];
@@ -465,6 +493,7 @@ export type ResolversParentTypes = {
   Pairing: Pairing;
   PairingResult: PairingResult;
   PairingSubList: PairingSubList;
+  Path: Path;
   Query: {};
   String: Scalars['String']['output'];
   Taste: Taste;
@@ -477,6 +506,12 @@ export type ResolversParentTypes = {
   UpdateWeightInput: UpdateWeightInput;
   Volume: Volume;
   Weight: Weight;
+};
+
+export type ExperimentalPairingResolvers<ContextType = any, ParentType extends ResolversParentTypes['ExperimentalPairing'] = ResolversParentTypes['ExperimentalPairing']> = {
+  paths?: Resolver<Array<ResolversTypes['Path']>, ParentType, ContextType>;
+  uniqueFlavors?: Resolver<Array<ResolversTypes['Flavor']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type FlavorResolvers<ContextType = any, ParentType extends ResolversParentTypes['Flavor'] = ResolversParentTypes['Flavor']> = {
@@ -546,7 +581,13 @@ export type PairingSubListResolvers<ContextType = any, ParentType extends Resolv
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
+export type PathResolvers<ContextType = any, ParentType extends ResolversParentTypes['Path'] = ResolversParentTypes['Path']> = {
+  flavors?: Resolver<Array<ResolversTypes['Flavor']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
 export type QueryResolvers<ContextType = any, ParentType extends ResolversParentTypes['Query'] = ResolversParentTypes['Query']> = {
+  experimentalPairing?: Resolver<Maybe<ResolversTypes['ExperimentalPairing']>, ParentType, ContextType, RequireFields<QueryExperimentalPairingArgs, 'input'>>;
   flavor?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType, RequireFields<QueryFlavorArgs, 'name'>>;
   flavors?: Resolver<Maybe<ResolversTypes['FlavorSubList']>, ParentType, ContextType, Partial<QueryFlavorsArgs>>;
   taste?: Resolver<Maybe<ResolversTypes['Taste']>, ParentType, ContextType, RequireFields<QueryTasteArgs, 'name'>>;
@@ -587,6 +628,7 @@ export type WeightResolvers<ContextType = any, ParentType extends ResolversParen
 };
 
 export type Resolvers<ContextType = any> = {
+  ExperimentalPairing?: ExperimentalPairingResolvers<ContextType>;
   Flavor?: FlavorResolvers<ContextType>;
   FlavorSubList?: FlavorSubListResolvers<ContextType>;
   Mutation?: MutationResolvers<ContextType>;
@@ -594,6 +636,7 @@ export type Resolvers<ContextType = any> = {
   Pairing?: PairingResolvers<ContextType>;
   PairingResult?: PairingResultResolvers<ContextType>;
   PairingSubList?: PairingSubListResolvers<ContextType>;
+  Path?: PathResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
   Taste?: TasteResolvers<ContextType>;
   Technique?: TechniqueResolvers<ContextType>;

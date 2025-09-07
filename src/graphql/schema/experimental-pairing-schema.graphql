@@ -1,0 +1,18 @@
+extend type Query {
+	experimentalPairing(input: ExperimentalPairingInput!): ExperimentalPairing
+}
+
+type Path {
+	flavors: [Flavor!]!
+}
+
+type ExperimentalPairing {
+	paths: [Path!]!
+	uniqueFlavors: [Flavor!]!
+}
+
+input ExperimentalPairingInput {
+	flavor1: ID!
+	flavor2: ID!
+	maxLength: Int! = 2
+}
