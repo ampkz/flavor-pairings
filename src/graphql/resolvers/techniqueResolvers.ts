@@ -15,14 +15,23 @@ export const resolvers: Resolvers = {
 		createTechnique: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a technique');
 			let createdTechnique = null;
-
+			let message: string | null = null;
 			try {
 				createdTechnique = await createTechnique({ name });
 			} catch (error) {
-				throw getGraphQLError(`creating technique: ${name}`, error);
+				const gqlError = getGraphQLError(`creating technique: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Technique with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
-			return createdTechnique;
+			return {
+				success: !!createdTechnique,
+				technique: new Technique({ name }),
+				message,
+			};
 		},
 		updateTechnique: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a technique');
@@ -34,7 +43,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`updating technique: ${name}`, error);
 			}
 
-			return updatedTechnique;
+			return {
+				success: !!updatedTechnique,
+				technique: new Technique({ name: updatedName }),
+				previousTechnique: new Technique({ name }),
+			};
 		},
 		deleteTechnique: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a technique');
@@ -46,7 +59,10 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`deleting technique: ${name}`, error);
 			}
 
-			return deletedTechnique;
+			return {
+				success: !!deletedTechnique,
+				technique: new Technique({ name }),
+			};
 		},
 		addTechnique: async (_root, { input: { flavor, technique } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a technique');
@@ -58,7 +74,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`adding technique: ${technique} to flavor: ${flavor}`, error);
 			}
 
-			return addedTechnique;
+			return {
+				success: !!addedTechnique,
+				flavor: new Flavor({ name: flavor }),
+				technique: new Technique({ name: technique }),
+			};
 		},
 	},
 };

@@ -15,14 +15,23 @@ export const resolvers: Resolvers = {
 		createWeight: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a weight');
 			let createdWeight = null;
-
+			let message: string | null = null;
 			try {
 				createdWeight = await createWeight({ name });
 			} catch (error) {
-				throw getGraphQLError(`creating weight: ${name}`, error);
+				const gqlError = getGraphQLError(`creating weight: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Weight with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
-			return createdWeight;
+			return {
+				success: !!createdWeight,
+				weight: new Weight({ name }),
+				message,
+			};
 		},
 		updateWeight: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a weight');
@@ -34,7 +43,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`updating weight: ${name}`, error);
 			}
 
-			return updatedWeight;
+			return {
+				success: !!updatedWeight,
+				weight: new Weight({ name: updatedName }),
+				previousWeight: new Weight({ name }),
+			};
 		},
 		deleteWeight: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a weight');
@@ -46,7 +59,10 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`deleting weight: ${name}`, error);
 			}
 
-			return deletedWeight;
+			return {
+				success: !!deletedWeight,
+				weight: new Weight({ name }),
+			};
 		},
 		addWeight: async (_root, { input: { flavor, weight } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a weight');
@@ -58,7 +74,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`adding weight: ${weight} to flavor: ${flavor}`, error);
 			}
 
-			return addedWeight;
+			return {
+				success: !!addedWeight,
+				flavor: new Flavor({ name: flavor }),
+				weight: new Weight({ name: weight }),
+			};
 		},
 	},
 };

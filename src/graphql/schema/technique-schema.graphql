@@ -4,14 +4,32 @@ extend type Query {
 }
 
 extend type Mutation {
-	createTechnique(name: ID!): Technique
-	updateTechnique(input: UpdateTechniqueInput!): Technique
-	deleteTechnique(name: ID!): Technique
-	addTechnique(input: AddTechniqueInput!): Technique
+	createTechnique(name: ID!): TechniqueResult!
+	updateTechnique(input: UpdateTechniqueInput!): UpdateTechniqueResult!
+	deleteTechnique(name: ID!): TechniqueResult
+	addTechnique(input: AddTechniqueInput!): AddTechniqueResult!
 }
 
 type Technique {
 	name: ID!
+}
+
+type TechniqueResult {
+	success: Boolean!
+	technique: Technique!
+	message: String
+}
+
+type UpdateTechniqueResult {
+	success: Boolean!
+	technique: Technique!
+	previousTechnique: Technique!
+}
+
+type AddTechniqueResult {
+	success: Boolean!
+	technique: Technique!
+	flavor: Flavor!
 }
 
 input AddTechniqueInput {

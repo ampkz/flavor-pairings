@@ -4,10 +4,10 @@ extend type Query {
 }
 
 extend type Mutation {
-	createFlavor(input: CreateFlavorInput!): Flavor
+	createFlavor(input: CreateFlavorInput!): FlavorResult!
 	updateFlavor(input: UpdateFlavorInput!): UpdateFlavorResult!
-	deleteFlavor(name: ID!): Flavor
-	flavorTips(name: ID!, tips: String): Flavor
+	deleteFlavor(name: ID!): FlavorResult!
+	flavorTips(name: ID!, tips: String): FlavorTipsResult!
 	createPairing(input: CreatePairingInput!): PairingResult!
 	deletePairing(input: DeletePairingInput!): PairingResult!
 }
@@ -20,6 +20,18 @@ type Flavor {
 	technique: [Technique!]
 	tips: String
 	pairings(limit: Int, cursor: ID): PairingSubList
+}
+
+type FlavorResult {
+	success: Boolean!
+	flavor: Flavor!
+	message: String
+}
+
+type FlavorTipsResult {
+	success: Boolean!
+	flavor: Flavor!
+	tips: String
 }
 
 type FlavorSubList {

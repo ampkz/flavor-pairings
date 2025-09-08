@@ -4,14 +4,32 @@ extend type Query {
 }
 
 extend type Mutation {
-	createVolume(name: ID!): Volume
-	updateVolume(input: UpdateVolumeInput!): Volume
-	deleteVolume(name: ID!): Volume
-	addVolume(input: AddVolumeInput!): Volume
+	createVolume(name: ID!): VolumeResult!
+	updateVolume(input: UpdateVolumeInput!): UpdateVolumeResult!
+	deleteVolume(name: ID!): VolumeResult
+	addVolume(input: AddVolumeInput!): AddVolumeResult!
 }
 
 type Volume {
 	name: ID!
+}
+
+type VolumeResult {
+	success: Boolean!
+	volume: Volume!
+	message: String
+}
+
+type UpdateVolumeResult {
+	success: Boolean!
+	volume: Volume!
+	previousVolume: Volume!
+}
+
+type AddVolumeResult {
+	success: Boolean!
+	volume: Volume!
+	flavor: Flavor!
 }
 
 input AddVolumeInput {

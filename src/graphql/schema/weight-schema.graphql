@@ -4,14 +4,32 @@ extend type Query {
 }
 
 extend type Mutation {
-	createWeight(name: ID!): Weight
-	updateWeight(input: UpdateWeightInput!): Weight
-	deleteWeight(name: ID!): Weight
-	addWeight(input: AddWeightInput!): Weight
+	createWeight(name: ID!): WeightResult!
+	updateWeight(input: UpdateWeightInput!): UpdateWeightResult!
+	deleteWeight(name: ID!): WeightResult
+	addWeight(input: AddWeightInput!): AddWeightResult!
 }
 
 type Weight {
 	name: ID!
+}
+
+type WeightResult {
+	success: Boolean!
+	weight: Weight!
+	message: String
+}
+
+type UpdateWeightResult {
+	success: Boolean!
+	weight: Weight!
+	previousWeight: Weight!
+}
+
+type AddWeightResult {
+	success: Boolean!
+	weight: Weight!
+	flavor: Flavor!
 }
 
 input AddWeightInput {

@@ -31,14 +31,24 @@ export const resolvers: Resolvers = {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a flavor');
 
 			let createdFlavor: Flavor | null = null;
+			let message: string | null = null;
 
 			try {
 				createdFlavor = await createFlavor({ name });
 			} catch (error) {
-				throw getGraphQLError(`creating flavor: ${name}`, error);
+				const gqlError = getGraphQLError(`creating flavor: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Flavor with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
-			return createdFlavor;
+			return {
+				success: !!createdFlavor,
+				flavor: new Flavor({ name }),
+				message,
+			};
 		},
 		updateFlavor: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a flavor');
@@ -66,7 +76,10 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`deleting flavor: ${name}`, error);
 			}
 
-			return deletedFlavor;
+			return {
+				success: !!deletedFlavor,
+				flavor: new Flavor({ name }),
+			};
 		},
 		flavorTips: async (_root, { name, tips }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update flavor tips');
@@ -78,9 +91,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`updating flavor tips: ${name}`, error);
 			}
 
-			if (!updatedFlavor) throw internalError(`Failed to update flavor tips: ${name}`);
-
-			return updatedFlavor;
+			return {
+				success: !!updatedFlavor,
+				flavor: new Flavor({ name }),
+				tips: tips || null,
+			};
 		},
 		createPairing: async (_root, { input: { flavor1, flavor2, affinity, especially } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a pairing');

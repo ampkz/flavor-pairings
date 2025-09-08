@@ -4,10 +4,28 @@ extend type Query {
 }
 
 extend type Mutation {
-	createTaste(name: ID!): Taste
-	updateTaste(input: UpdateTasteInput!): Taste
-	deleteTaste(name: ID!): Taste
-	addTaste(input: AddTasteInput!): Taste
+	createTaste(name: ID!): TasteResult!
+	updateTaste(input: UpdateTasteInput!): UpdateTasteResult!
+	deleteTaste(name: ID!): TasteResult!
+	addTaste(input: AddTasteInput!): AddTasteResult!
+}
+
+type TasteResult {
+	success: Boolean!
+	taste: Taste!
+	message: String
+}
+
+type AddTasteResult {
+	success: Boolean!
+	taste: Taste!
+	flavor: Flavor!
+}
+
+type UpdateTasteResult {
+	success: Boolean!
+	taste: Taste!
+	previousTaste: Taste!
 }
 
 type Taste {

@@ -15,14 +15,24 @@ export const resolvers: Resolvers = {
 		createVolume: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a volume');
 			let createdVolume = null;
+			let message: string | null = null;
 
 			try {
 				createdVolume = await createVolume({ name });
 			} catch (error) {
-				throw getGraphQLError(`creating volume: ${name}`, error);
+				const gqlError = getGraphQLError(`creating volume: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Volume with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
-			return createdVolume;
+			return {
+				success: !!createdVolume,
+				volume: new Volume({ name }),
+				message,
+			};
 		},
 		updateVolume: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a volume');
@@ -34,7 +44,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`updating volume: ${name}`, error);
 			}
 
-			return updatedVolume;
+			return {
+				success: !!updatedVolume,
+				volume: new Volume({ name: updatedName }),
+				previousVolume: new Volume({ name }),
+			};
 		},
 		deleteVolume: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a volume');
@@ -46,7 +60,10 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`deleting volume: ${name}`, error);
 			}
 
-			return deletedVolume;
+			return {
+				success: !!deletedVolume,
+				volume: new Volume({ name }),
+			};
 		},
 		addVolume: async (_root, { input: { flavor, volume } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a volume');
@@ -58,7 +75,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`adding volume: ${volume} to flavor: ${flavor}`, error);
 			}
 
-			return addedVolume;
+			return {
+				success: !!addedVolume,
+				flavor: new Flavor({ name: flavor }),
+				volume: new Volume({ name: volume }),
+			};
 		},
 	},
 };

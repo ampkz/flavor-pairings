@@ -15,14 +15,24 @@ export const resolvers: Resolvers = {
 		createTaste: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to create a taste');
 			let createdTaste = null;
+			let message: string | null = null;
 
 			try {
 				createdTaste = await createTaste({ name });
 			} catch (error) {
-				throw getGraphQLError(`creating taste: ${name}`, error);
+				const gqlError = getGraphQLError(`creating taste: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Taste with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
-			return createdTaste;
+			return {
+				success: !!createdTaste,
+				taste: new Taste({ name }),
+				message,
+			};
 		},
 		updateTaste: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a taste');
@@ -34,7 +44,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`updating taste: ${name}`, error);
 			}
 
-			return updatedTaste;
+			return {
+				success: !!updatedTaste,
+				taste: new Taste({ name: updatedName }),
+				previousTaste: new Taste({ name }),
+			};
 		},
 		deleteTaste: async (_root, { name }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to delete a taste');
@@ -46,7 +60,10 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`deleting taste: ${name}`, error);
 			}
 
-			return deletedTaste;
+			return {
+				success: !!deletedTaste,
+				taste: new Taste({ name }),
+			};
 		},
 		addTaste: async (_root, { input: { flavor, taste } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a taste');
@@ -58,7 +75,11 @@ export const resolvers: Resolvers = {
 				throw getGraphQLError(`adding taste: ${taste} to flavor: ${flavor}`, error);
 			}
 
-			return addedTaste;
+			return {
+				success: !!addedTaste,
+				flavor: new Flavor({ name: flavor }),
+				taste: new Taste({ name: taste }),
+			};
 		},
 	},
 };
