@@ -36,7 +36,10 @@ describe('DeleteVolume mutations', () => {
 				query: `
                 mutation DeleteVolume($name: ID!) {
                     deleteVolume(name: $name) {
-                        name
+                        success
+						volume {
+							name
+						}
                     }
                 }
             `,
@@ -45,10 +48,10 @@ describe('DeleteVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deleteVolume).toEqual({ name: volumeName });
+		expect(response.body.data.deleteVolume).toEqual({ success: true, volume: { name: volumeName } });
 	});
 
-	it('should return null if no volume found', async () => {
+	it('should return unsuccessful if no volume was deleted', async () => {
 		jest.spyOn(crudVolume, 'deleteVolume').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -63,7 +66,10 @@ describe('DeleteVolume mutations', () => {
 				query: `
                 mutation DeleteVolume($name: ID!) {
                     deleteVolume(name: $name) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,
@@ -72,7 +78,7 @@ describe('DeleteVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deleteVolume).toBeNull();
+		expect(response.body.data.deleteVolume).toEqual({ success: false, volume: { name: 'not_found' } });
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {
@@ -82,7 +88,10 @@ describe('DeleteVolume mutations', () => {
 				query: `
                 mutation DeleteVolume($name: ID!) {
                     deleteVolume(name: $name) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,
@@ -108,7 +117,10 @@ describe('DeleteVolume mutations', () => {
 				query: `
                 mutation DeleteVolume($name: ID!) {
                     deleteVolume(name: $name) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,

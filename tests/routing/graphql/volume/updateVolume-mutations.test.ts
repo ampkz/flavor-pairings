@@ -36,7 +36,10 @@ describe('UpdateVolume mutations', () => {
 				query: `
                 mutation UpdateVolume($input: UpdateVolumeInput!) {
                     updateVolume(input: $input) {
-                        name
+                        success
+						volume {
+							name
+						}
                     }
                 }
             `,
@@ -45,10 +48,10 @@ describe('UpdateVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.updateVolume).toEqual({ name: 'updated_' + volumeName });
+		expect(response.body.data.updateVolume).toEqual({ success: true, volume: { name: 'updated_' + volumeName } });
 	});
 
-	it('should return null if no volume was found to update', async () => {
+	it('should return unsuccessful if no volume was updated', async () => {
 		jest.spyOn(crudVolume, 'updateVolume').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -63,7 +66,10 @@ describe('UpdateVolume mutations', () => {
 				query: `
                 mutation UpdateVolume($input: UpdateVolumeInput!) {
                     updateVolume(input: $input) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,
@@ -72,7 +78,7 @@ describe('UpdateVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.updateVolume).toBeNull();
+		expect(response.body.data.updateVolume).toEqual({ success: false, volume: { name: 'updated_name' } });
 	});
 
 	it('should throw an error if there was an issue with the server', async () => {
@@ -90,7 +96,10 @@ describe('UpdateVolume mutations', () => {
 				query: `
                 mutation UpdateVolume($input: UpdateVolumeInput!) {
                     updateVolume(input: $input) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,
@@ -109,7 +118,10 @@ describe('UpdateVolume mutations', () => {
 				query: `
                 mutation UpdateVolume($input: UpdateVolumeInput!) {
                     updateVolume(input: $input) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,

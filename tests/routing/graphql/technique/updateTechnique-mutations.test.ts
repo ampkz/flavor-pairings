@@ -36,7 +36,10 @@ describe('UpdateTechnique mutations', () => {
 				query: `
                 mutation UpdateTechnique($input: UpdateTechniqueInput!) {
                     updateTechnique(input: $input) {
-                        name
+                        success
+						technique {
+							name
+						}
                     }
                 }
             `,
@@ -45,10 +48,10 @@ describe('UpdateTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.updateTechnique).toEqual({ name: 'updated_' + techniqueName });
+		expect(response.body.data.updateTechnique).toEqual({ success: true, technique: { name: 'updated_' + techniqueName } });
 	});
 
-	it('should return null if no technique was found to update', async () => {
+	it('should return unsuccessful if no technique was updated', async () => {
 		jest.spyOn(crudTechnique, 'updateTechnique').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -63,7 +66,10 @@ describe('UpdateTechnique mutations', () => {
 				query: `
                 mutation UpdateTechnique($input: UpdateTechniqueInput!) {
                     updateTechnique(input: $input) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -72,7 +78,7 @@ describe('UpdateTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.updateTechnique).toBeNull();
+		expect(response.body.data.updateTechnique).toEqual({ success: false, technique: { name: 'updated_name' } });
 	});
 
 	it('should throw an error if the user is not authorized', async () => {
@@ -82,7 +88,10 @@ describe('UpdateTechnique mutations', () => {
 				query: `
                 mutation UpdateTechnique($input: UpdateTechniqueInput!) {
                     updateTechnique(input: $input) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -90,7 +99,7 @@ describe('UpdateTechnique mutations', () => {
 			})
 			.expect(401);
 
-		expect(response.body.data.updateTechnique).toBeNull();
+		expect(response.body.errors).toBeDefined();
 	});
 
 	it('should throw an error if there was an issue with the server', async () => {
@@ -110,7 +119,10 @@ describe('UpdateTechnique mutations', () => {
 				query: `
                 mutation UpdateTechnique($input: UpdateTechniqueInput!) {
                     updateTechnique(input: $input) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,

@@ -37,7 +37,10 @@ describe('CreateWeight mutations', () => {
 				query: `
                 mutation CreateWeight($name: ID!) {
                     createWeight(name: $name) {
-                        name
+                        success
+						weight {
+							name
+						}
                     }
                 }
             `,
@@ -46,7 +49,7 @@ describe('CreateWeight mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.createWeight).toEqual({ name: weightName });
+		expect(response.body.data.createWeight).toEqual({ success: true, weight: { name: weightName } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -59,7 +62,10 @@ describe('CreateWeight mutations', () => {
 				query: `
                 mutation CreateWeight($name: ID!) {
                     createWeight(name: $name) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,
@@ -85,7 +91,10 @@ describe('CreateWeight mutations', () => {
 				query: `
                 mutation CreateWeight($name: ID!) {
                     createWeight(name: $name) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,
@@ -104,7 +113,10 @@ describe('CreateWeight mutations', () => {
 				query: `
                 mutation CreateWeight($name: ID!) {
                     createWeight(name: $name) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,

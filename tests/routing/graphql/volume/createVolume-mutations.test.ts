@@ -37,7 +37,10 @@ describe('CreateVolume mutations', () => {
 				query: `
                 mutation CreateVolume($name: ID!) {
                     createVolume(name: $name) {
-                        name
+                        success
+						volume {
+							name
+						}
                     }
                 }
             `,
@@ -46,7 +49,7 @@ describe('CreateVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.createVolume).toEqual({ name: volumeName });
+		expect(response.body.data.createVolume).toEqual({ success: true, volume: { name: volumeName } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -65,7 +68,10 @@ describe('CreateVolume mutations', () => {
 				query: `
                 mutation CreateVolume($name: ID!) {
                     createVolume(name: $name) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,
@@ -92,7 +98,10 @@ describe('CreateVolume mutations', () => {
 				query: `
                 mutation CreateVolume($name: ID!) {
                     createVolume(name: $name) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,
@@ -111,7 +120,10 @@ describe('CreateVolume mutations', () => {
 				query: `
                 mutation CreateVolume($name: ID!) {
                     createVolume(name: $name) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,

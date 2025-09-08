@@ -38,7 +38,8 @@ describe('AddTaste mutations', () => {
 				query: `
                 mutation AddTaste($input: AddTasteInput!) {
                     addTaste(input: $input) {
-                        name
+                        success
+						taste { name }
                     }
                 }
             `,
@@ -47,7 +48,7 @@ describe('AddTaste mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addTaste).toEqual({ name: taste });
+		expect(response.body.data.addTaste).toEqual({ success: true, taste: { name: taste } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -60,7 +61,10 @@ describe('AddTaste mutations', () => {
 				query: `
                 mutation AddTaste($input: AddTasteInput!) {
                     addTaste(input: $input) {
-                        name
+                        success
+                        taste {
+                            name
+                        }
                     }
                 }
             `,
@@ -86,7 +90,10 @@ describe('AddTaste mutations', () => {
 				query: `
                 mutation AddTaste($input: AddTasteInput!) {
                     addTaste(input: $input) {
-                        name
+                        success
+                        taste {
+                            name
+                        }
                     }
                 }
             `,
@@ -105,7 +112,10 @@ describe('AddTaste mutations', () => {
 				query: `
                 mutation AddTaste($input: AddTasteInput!) {
                     addTaste(input: $input) {
-                        name
+                        success
+                        taste {
+                            name
+                        }
                     }
                 }
             `,

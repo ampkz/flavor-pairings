@@ -37,7 +37,10 @@ describe('CreateTaste mutations', () => {
 				query: `
                 mutation CreateTaste($name: ID!) {
                     createTaste(name: $name) {
-                        name
+                        success
+						taste {
+							name
+						}
                     }
                 }
             `,
@@ -46,7 +49,7 @@ describe('CreateTaste mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.createTaste).toEqual({ name: tasteName });
+		expect(response.body.data.createTaste).toEqual({ success: true, taste: { name: tasteName } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -59,7 +62,10 @@ describe('CreateTaste mutations', () => {
 				query: `
                 mutation CreateTaste($name: ID!) {
                     createTaste(name: $name) {
-                        name
+                        success
+                        taste {
+                            name
+                        }
                     }
                 }
             `,
@@ -85,7 +91,10 @@ describe('CreateTaste mutations', () => {
 				query: `
                 mutation CreateTaste($name: ID!) {
                     createTaste(name: $name) {
-                        name
+                        success
+                        taste {
+                            name
+                        }
                     }
                 }
             `,
@@ -104,7 +113,10 @@ describe('CreateTaste mutations', () => {
 				query: `
                 mutation CreateTaste($name: ID!) {
                     createTaste(name: $name) {
-                        name
+                        success
+                        taste {
+                            name
+                        }
                     }
                 }
             `,

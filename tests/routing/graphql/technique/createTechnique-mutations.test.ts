@@ -37,7 +37,10 @@ describe('CreateTechnique mutations', () => {
 				query: `
                 mutation CreateTechnique($name: ID!) {
                     createTechnique(name: $name) {
-                        name
+                        success
+						technique {
+							name
+						}
                     }
                 }
             `,
@@ -46,7 +49,7 @@ describe('CreateTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.createTechnique).toEqual({ name: techniqueName });
+		expect(response.body.data.createTechnique).toEqual({ success: true, technique: { name: techniqueName } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -59,7 +62,10 @@ describe('CreateTechnique mutations', () => {
 				query: `
                 mutation CreateTechnique($name: ID!) {
                     createTechnique(name: $name) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -85,7 +91,10 @@ describe('CreateTechnique mutations', () => {
 				query: `
                 mutation CreateTechnique($name: ID!) {
                     createTechnique(name: $name) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -104,7 +113,10 @@ describe('CreateTechnique mutations', () => {
 				query: `
                 mutation CreateTechnique($name: ID!) {
                     createTechnique(name: $name) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,

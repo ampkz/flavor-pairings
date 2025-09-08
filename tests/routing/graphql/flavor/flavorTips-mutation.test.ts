@@ -39,17 +39,20 @@ describe('FlavorTips mutations', () => {
 				query: `
                 mutation FlavorTips($name: ID!, $tips: String!) {
                     flavorTips(name: $name, tips: $tips) {
-                        name
-                        tips
-                    }
-                }
-            `,
+                       success
+					   flavor {
+						   name
+						   tips
+					   }
+                   }
+               }
+           `,
 				variables: { name: flavorName, tips },
 			})
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.flavorTips).toEqual({ name: flavorName, tips });
+		expect(response.body.data.flavorTips).toEqual({ success: true, flavor: { name: flavorName, tips } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -63,8 +66,11 @@ describe('FlavorTips mutations', () => {
 				query: `
                 mutation FlavorTips($name: ID!, $tips: String!) {
                     flavorTips(name: $name, tips: $tips) {
-                        name
-                        tips
+                        success
+                        flavor {
+                            name
+                            tips
+                        }
                     }
                 }
             `,
@@ -90,8 +96,11 @@ describe('FlavorTips mutations', () => {
 				query: `
                 mutation FlavorTips($name: ID!, $tips: String!) {
                     flavorTips(name: $name, tips: $tips) {
-                        name
-                        tips
+                        success
+                        flavor {
+                            name
+                            tips
+                        }
                     }
                 }
             `,
@@ -110,8 +119,11 @@ describe('FlavorTips mutations', () => {
 				query: `
                 mutation FlavorTips($name: ID!, $tips: String!) {
                     flavorTips(name: $name, tips: $tips) {
-                        name
-                        tips
+                        success
+                        flavor {
+                            name
+                            tips
+                        }
                     }
                 }
             `,

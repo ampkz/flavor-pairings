@@ -36,7 +36,10 @@ describe('DeleteWeight mutations', () => {
 				query: `
                 mutation DeleteWeight($name: ID!) {
                     deleteWeight(name: $name) {
-                        name
+                        success
+						weight {
+							name
+						}
                     }
                 }
             `,
@@ -45,10 +48,10 @@ describe('DeleteWeight mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deleteWeight).toEqual({ name: weightName });
+		expect(response.body.data.deleteWeight).toEqual({ success: true, weight: { name: weightName } });
 	});
 
-	it('should return null if no weight found', async () => {
+	it('should return unsuccessful if no weight was deleted', async () => {
 		jest.spyOn(crudWeight, 'deleteWeight').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -63,7 +66,10 @@ describe('DeleteWeight mutations', () => {
 				query: `
                 mutation DeleteWeight($name: ID!) {
                     deleteWeight(name: $name) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,
@@ -72,7 +78,7 @@ describe('DeleteWeight mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deleteWeight).toBeNull();
+		expect(response.body.data.deleteWeight).toEqual({ success: false, weight: { name: 'not_found' } });
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {
@@ -82,7 +88,10 @@ describe('DeleteWeight mutations', () => {
 				query: `
                 mutation DeleteWeight($name: ID!) {
                     deleteWeight(name: $name) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,
@@ -108,7 +117,10 @@ describe('DeleteWeight mutations', () => {
 				query: `
                 mutation DeleteWeight($name: ID!) {
                     deleteWeight(name: $name) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,

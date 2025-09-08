@@ -37,7 +37,10 @@ describe('AddTechnique mutations', () => {
 				query: `
                 mutation AddTechnique($input: AddTechniqueInput!) {
                     addTechnique(input: $input) {
-                        name
+                        success
+						technique {
+							name
+						}
                     }
                 }
             `,
@@ -46,10 +49,10 @@ describe('AddTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addTechnique).toEqual({ name: techniqueName });
+		expect(response.body.data.addTechnique).toEqual({ success: true, technique: { name: techniqueName } });
 	});
 
-	it('should return null if addTechnique returns null', async () => {
+	it('should return unsuccessful if no technique was added', async () => {
 		const flavorName = faker.word.noun();
 		const techniqueName = faker.word.noun();
 		jest.spyOn(crudTechnique, 'addTechnique').mockResolvedValue(null);
@@ -66,7 +69,10 @@ describe('AddTechnique mutations', () => {
 				query: `
                 mutation AddTechnique($input: AddTechniqueInput!) {
                     addTechnique(input: $input) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -75,7 +81,7 @@ describe('AddTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addTechnique).toBeNull();
+		expect(response.body.data.addTechnique).toEqual({ success: false, technique: { name: techniqueName } });
 	});
 
 	it('should throw an error if there was an issue with the server', async () => {
@@ -95,7 +101,10 @@ describe('AddTechnique mutations', () => {
 				query: `
                 mutation AddTechnique($input: AddTechniqueInput!) {
                     addTechnique(input: $input) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -114,7 +123,10 @@ describe('AddTechnique mutations', () => {
 				query: `
                 mutation AddTechnique($input: AddTechniqueInput!) {
                     addTechnique(input: $input) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,

@@ -37,7 +37,10 @@ describe('DeleteFlavor mutations', () => {
 				query: `
                 mutation DeleteFlavor($name: ID!) {
                     deleteFlavor(name: $name) {
-                        name
+                        success
+						flavor {
+							name
+						}
                     }
                 }
             `,
@@ -46,7 +49,7 @@ describe('DeleteFlavor mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deleteFlavor).toEqual({ name: flavorName });
+		expect(response.body.data.deleteFlavor).toEqual({ success: true, flavor: { name: flavorName } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -59,7 +62,10 @@ describe('DeleteFlavor mutations', () => {
 				query: `
                 mutation DeleteFlavor($name: ID!) {
                     deleteFlavor(name: $name) {
-                        name
+                        success
+                        flavor {
+                            name
+                        }
                     }
                 }
             `,
@@ -85,7 +91,10 @@ describe('DeleteFlavor mutations', () => {
 				query: `
                 mutation DeleteFlavor($name: ID!) {
                     deleteFlavor(name: $name) {
-                        name
+                        success
+                        flavor {
+                            name
+                        }
                     }
                 }
             `,
@@ -104,7 +113,10 @@ describe('DeleteFlavor mutations', () => {
 				query: `
 					mutation DeleteFlavor($name: ID!) {
                     deleteFlavor(name: $name) {
-                        name
+                        success
+                        flavor {
+                            name
+                        }
                     }
                 }
 				`,

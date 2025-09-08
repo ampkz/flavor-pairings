@@ -37,7 +37,10 @@ describe('AddVolume mutations', () => {
 				query: `
                 mutation AddVolume($input: AddVolumeInput!) {
                     addVolume(input: $input) {
-                        name
+                        success
+						volume {
+							name
+						}
                     }
                 }
             `,
@@ -46,10 +49,10 @@ describe('AddVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addVolume).toEqual({ name: volumeName });
+		expect(response.body.data.addVolume).toEqual({ success: true, volume: { name: volumeName } });
 	});
 
-	it('should return null if addVolume returns null', async () => {
+	it('should return unsuccessful if no volume was added', async () => {
 		const flavorName = faker.word.noun();
 		const volumeName = faker.word.noun();
 		jest.spyOn(crudVolume, 'addVolume').mockResolvedValue(null);
@@ -66,7 +69,10 @@ describe('AddVolume mutations', () => {
 				query: `
                 mutation AddVolume($input: AddVolumeInput!) {
                     addVolume(input: $input) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,
@@ -75,7 +81,7 @@ describe('AddVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addVolume).toBeNull();
+		expect(response.body.data.addVolume).toEqual({ success: false, volume: { name: volumeName } });
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {
@@ -85,7 +91,10 @@ describe('AddVolume mutations', () => {
 				query: `
                 mutation AddVolume($input: AddVolumeInput!) {
                     addVolume(input: $input) {
-                        name
+                        success
+						volume {
+							name
+						}
                     }
                 }
             `,
@@ -111,7 +120,10 @@ describe('AddVolume mutations', () => {
 				query: `
                 mutation AddVolume($input: AddVolumeInput!) {
                     addVolume(input: $input) {
-                        name
+                        success
+                        volume {
+                            name
+                        }
                     }
                 }
             `,

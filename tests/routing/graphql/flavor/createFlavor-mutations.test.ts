@@ -37,7 +37,10 @@ describe('CreateFlavor mutations', () => {
 				query: `
                 mutation CreateFlavor($input: CreateFlavorInput!) {
                     createFlavor(input: $input) {
-                        name
+                        success
+                        flavor {
+                            name
+                        }
                     }
                 }
             `,
@@ -46,7 +49,7 @@ describe('CreateFlavor mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.createFlavor).toEqual({ name: flavorName });
+		expect(response.body.data.createFlavor).toEqual({ success: true, flavor: { name: flavorName } });
 	});
 
 	it('should throw an error with a bad input', async () => {
@@ -59,7 +62,10 @@ describe('CreateFlavor mutations', () => {
 				query: `
                 mutation CreateFlavor($input: CreateFlavorInput!) {
                     createFlavor(input: $input) {
-                        name
+                        success
+                        flavor {
+                            name
+                        }
                     }
                 }
             `,
@@ -85,7 +91,10 @@ describe('CreateFlavor mutations', () => {
 				query: `
                 mutation CreateFlavor($input: CreateFlavorInput!) {
                     createFlavor(input: $input) {
-                        name
+                        success
+                        flavor {
+                            name
+                        }
                     }
                 }
             `,
@@ -103,10 +112,13 @@ describe('CreateFlavor mutations', () => {
 			.send({
 				query: `
 					mutation CreateFlavor($input: CreateFlavorInput!) {
-                    createFlavor(input: $input) {
-                        name
+                        createFlavor(input: $input) {
+                            success
+                            flavor {
+                                name
+                            }
+                        }
                     }
-                }
 				`,
 				variables: { input: { name: 'test' } },
 			})

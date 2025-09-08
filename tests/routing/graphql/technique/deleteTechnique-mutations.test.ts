@@ -36,7 +36,10 @@ describe('DeleteTechnique mutations', () => {
 				query: `
                 mutation DeleteTechnique($name: ID!) {
                     deleteTechnique(name: $name) {
-                        name
+                        success
+						technique {
+							name
+						}
                     }
                 }
             `,
@@ -45,10 +48,10 @@ describe('DeleteTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deleteTechnique).toEqual({ name: techniqueName });
+		expect(response.body.data.deleteTechnique).toEqual({ success: true, technique: { name: techniqueName } });
 	});
 
-	it('should return null if no technique found', async () => {
+	it('should return unsuccessful if no technique was deleted', async () => {
 		jest.spyOn(crudTechnique, 'deleteTechnique').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -63,7 +66,10 @@ describe('DeleteTechnique mutations', () => {
 				query: `
                 mutation DeleteTechnique($name: ID!) {
                     deleteTechnique(name: $name) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -72,7 +78,7 @@ describe('DeleteTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.deleteTechnique).toBeNull();
+		expect(response.body.data.deleteTechnique).toEqual({ success: false, technique: { name: 'not_found' } });
 	});
 
 	it('should throw an error if there was an issue with the server', async () => {
@@ -92,7 +98,10 @@ describe('DeleteTechnique mutations', () => {
 				query: `
                 mutation DeleteTechnique($name: ID!) {
                     deleteTechnique(name: $name) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,
@@ -111,7 +120,10 @@ describe('DeleteTechnique mutations', () => {
 				query: `
                 mutation DeleteTechnique($name: ID!) {
                     deleteTechnique(name: $name) {
-                        name
+                        success
+                        technique {
+                            name
+                        }
                     }
                 }
             `,

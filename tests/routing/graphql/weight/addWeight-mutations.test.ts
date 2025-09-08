@@ -37,7 +37,10 @@ describe('AddWeight mutations', () => {
 				query: `
                 mutation AddWeight($input: AddWeightInput!) {
                     addWeight(input: $input) {
-                        name
+                        success
+						weight {
+							name
+						}
                     }
                 }
             `,
@@ -46,10 +49,10 @@ describe('AddWeight mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addWeight).toEqual({ name: weightName });
+		expect(response.body.data.addWeight).toEqual({ success: true, weight: { name: weightName } });
 	});
 
-	it('should return null if addWeight returns null', async () => {
+	it('should return unsuccessful if no weight was added', async () => {
 		const flavorName = faker.word.noun();
 		const weightName = faker.word.noun();
 		jest.spyOn(crudWeight, 'addWeight').mockResolvedValue(null);
@@ -66,7 +69,10 @@ describe('AddWeight mutations', () => {
 				query: `
                 mutation AddWeight($input: AddWeightInput!) {
                     addWeight(input: $input) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,
@@ -75,7 +81,7 @@ describe('AddWeight mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addWeight).toBeNull();
+		expect(response.body.data.addWeight).toEqual({ success: false, weight: { name: weightName } });
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {
@@ -85,7 +91,10 @@ describe('AddWeight mutations', () => {
 				query: `
                 mutation AddWeight($input: AddWeightInput!) {
                     addWeight(input: $input) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,
@@ -111,7 +120,10 @@ describe('AddWeight mutations', () => {
 				query: `
                 mutation AddWeight($input: AddWeightInput!) {
                     addWeight(input: $input) {
-                        name
+                        success
+                        weight {
+                            name
+                        }
                     }
                 }
             `,
