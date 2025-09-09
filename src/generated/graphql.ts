@@ -68,11 +68,6 @@ export type CreateFlavorInput = {
   name: Scalars['ID']['input'];
 };
 
-export type CreateFlavorReferenceInput = {
-  flavor: Scalars['ID']['input'];
-  reference: Scalars['ID']['input'];
-};
-
 export type CreatePairingInput = {
   affinity: PairingAffinity;
   especially?: InputMaybe<Scalars['String']['input']>;
@@ -102,7 +97,7 @@ export type Flavor = {
   __typename?: 'Flavor';
   name: Scalars['ID']['output'];
   pairings?: Maybe<PairingSubList>;
-  references?: Maybe<Flavor>;
+  see?: Maybe<Flavor>;
   taste?: Maybe<Array<Taste>>;
   technique?: Maybe<Array<Technique>>;
   tips?: Maybe<Scalars['String']['output']>;
@@ -114,6 +109,19 @@ export type Flavor = {
 export type FlavorPairingsArgs = {
   cursor?: InputMaybe<Scalars['ID']['input']>;
   limit?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type FlavorReferenceInput = {
+  from: Scalars['ID']['input'];
+  to: Scalars['ID']['input'];
+};
+
+export type FlavorReferenceResult = {
+  __typename?: 'FlavorReferenceResult';
+  from: Flavor;
+  message?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+  to: Flavor;
 };
 
 export type FlavorResult = {
@@ -143,13 +151,14 @@ export type Mutation = {
   addVolume: AddVolumeResult;
   addWeight: AddWeightResult;
   createFlavor: FlavorResult;
-  createFlavorReference: ReferenceResult;
+  createFlavorReference: FlavorReferenceResult;
   createPairing: PairingResult;
   createTaste: TasteResult;
   createTechnique: TechniqueResult;
   createVolume: VolumeResult;
   createWeight: WeightResult;
   deleteFlavor: FlavorResult;
+  deleteFlavorReference: FlavorReferenceResult;
   deletePairing: PairingResult;
   deleteTaste: TasteResult;
   deleteTechnique?: Maybe<TechniqueResult>;
@@ -190,7 +199,7 @@ export type MutationCreateFlavorArgs = {
 
 
 export type MutationCreateFlavorReferenceArgs = {
-  input: CreateFlavorReferenceInput;
+  input: FlavorReferenceInput;
 };
 
 
@@ -221,6 +230,11 @@ export type MutationCreateWeightArgs = {
 
 export type MutationDeleteFlavorArgs = {
   name: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteFlavorReferenceArgs = {
+  input: FlavorReferenceInput;
 };
 
 
@@ -366,14 +380,6 @@ export type QueryVolumeArgs = {
 
 export type QueryWeightArgs = {
   name: Scalars['ID']['input'];
-};
-
-export type ReferenceResult = {
-  __typename?: 'ReferenceResult';
-  flavor: Flavor;
-  message?: Maybe<Scalars['String']['output']>;
-  reference: Flavor;
-  success: Scalars['Boolean']['output'];
 };
 
 export type Taste = {
@@ -565,12 +571,13 @@ export type ResolversTypes = {
   AddWeightResult: ResolverTypeWrapper<AddWeightResult>;
   Boolean: ResolverTypeWrapper<Scalars['Boolean']['output']>;
   CreateFlavorInput: CreateFlavorInput;
-  CreateFlavorReferenceInput: CreateFlavorReferenceInput;
   CreatePairingInput: CreatePairingInput;
   DeletePairingInput: DeletePairingInput;
   ExperimentalPairing: ResolverTypeWrapper<ExperimentalPairing>;
   ExperimentalPairingInput: ExperimentalPairingInput;
   Flavor: ResolverTypeWrapper<Flavor>;
+  FlavorReferenceInput: FlavorReferenceInput;
+  FlavorReferenceResult: ResolverTypeWrapper<FlavorReferenceResult>;
   FlavorResult: ResolverTypeWrapper<FlavorResult>;
   FlavorSubList: ResolverTypeWrapper<FlavorSubList>;
   FlavorTipsResult: ResolverTypeWrapper<FlavorTipsResult>;
@@ -584,7 +591,6 @@ export type ResolversTypes = {
   PairingSubList: ResolverTypeWrapper<PairingSubList>;
   Path: ResolverTypeWrapper<Path>;
   Query: ResolverTypeWrapper<{}>;
-  ReferenceResult: ResolverTypeWrapper<ReferenceResult>;
   String: ResolverTypeWrapper<Scalars['String']['output']>;
   Taste: ResolverTypeWrapper<Taste>;
   TasteResult: ResolverTypeWrapper<TasteResult>;
@@ -618,12 +624,13 @@ export type ResolversParentTypes = {
   AddWeightResult: AddWeightResult;
   Boolean: Scalars['Boolean']['output'];
   CreateFlavorInput: CreateFlavorInput;
-  CreateFlavorReferenceInput: CreateFlavorReferenceInput;
   CreatePairingInput: CreatePairingInput;
   DeletePairingInput: DeletePairingInput;
   ExperimentalPairing: ExperimentalPairing;
   ExperimentalPairingInput: ExperimentalPairingInput;
   Flavor: Flavor;
+  FlavorReferenceInput: FlavorReferenceInput;
+  FlavorReferenceResult: FlavorReferenceResult;
   FlavorResult: FlavorResult;
   FlavorSubList: FlavorSubList;
   FlavorTipsResult: FlavorTipsResult;
@@ -636,7 +643,6 @@ export type ResolversParentTypes = {
   PairingSubList: PairingSubList;
   Path: Path;
   Query: {};
-  ReferenceResult: ReferenceResult;
   String: Scalars['String']['output'];
   Taste: Taste;
   TasteResult: TasteResult;
@@ -695,12 +701,20 @@ export type ExperimentalPairingResolvers<ContextType = any, ParentType extends R
 export type FlavorResolvers<ContextType = any, ParentType extends ResolversParentTypes['Flavor'] = ResolversParentTypes['Flavor']> = {
   name?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   pairings?: Resolver<Maybe<ResolversTypes['PairingSubList']>, ParentType, ContextType, Partial<FlavorPairingsArgs>>;
-  references?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType>;
+  see?: Resolver<Maybe<ResolversTypes['Flavor']>, ParentType, ContextType>;
   taste?: Resolver<Maybe<Array<ResolversTypes['Taste']>>, ParentType, ContextType>;
   technique?: Resolver<Maybe<Array<ResolversTypes['Technique']>>, ParentType, ContextType>;
   tips?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   volume?: Resolver<Maybe<Array<ResolversTypes['Volume']>>, ParentType, ContextType>;
   weight?: Resolver<Maybe<Array<ResolversTypes['Weight']>>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type FlavorReferenceResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['FlavorReferenceResult'] = ResolversParentTypes['FlavorReferenceResult']> = {
+  from?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  to?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -730,13 +744,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   addVolume?: Resolver<ResolversTypes['AddVolumeResult'], ParentType, ContextType, RequireFields<MutationAddVolumeArgs, 'input'>>;
   addWeight?: Resolver<ResolversTypes['AddWeightResult'], ParentType, ContextType, RequireFields<MutationAddWeightArgs, 'input'>>;
   createFlavor?: Resolver<ResolversTypes['FlavorResult'], ParentType, ContextType, RequireFields<MutationCreateFlavorArgs, 'input'>>;
-  createFlavorReference?: Resolver<ResolversTypes['ReferenceResult'], ParentType, ContextType, RequireFields<MutationCreateFlavorReferenceArgs, 'input'>>;
+  createFlavorReference?: Resolver<ResolversTypes['FlavorReferenceResult'], ParentType, ContextType, RequireFields<MutationCreateFlavorReferenceArgs, 'input'>>;
   createPairing?: Resolver<ResolversTypes['PairingResult'], ParentType, ContextType, RequireFields<MutationCreatePairingArgs, 'input'>>;
   createTaste?: Resolver<ResolversTypes['TasteResult'], ParentType, ContextType, RequireFields<MutationCreateTasteArgs, 'name'>>;
   createTechnique?: Resolver<ResolversTypes['TechniqueResult'], ParentType, ContextType, RequireFields<MutationCreateTechniqueArgs, 'name'>>;
   createVolume?: Resolver<ResolversTypes['VolumeResult'], ParentType, ContextType, RequireFields<MutationCreateVolumeArgs, 'name'>>;
   createWeight?: Resolver<ResolversTypes['WeightResult'], ParentType, ContextType, RequireFields<MutationCreateWeightArgs, 'name'>>;
   deleteFlavor?: Resolver<ResolversTypes['FlavorResult'], ParentType, ContextType, RequireFields<MutationDeleteFlavorArgs, 'name'>>;
+  deleteFlavorReference?: Resolver<ResolversTypes['FlavorReferenceResult'], ParentType, ContextType, RequireFields<MutationDeleteFlavorReferenceArgs, 'input'>>;
   deletePairing?: Resolver<ResolversTypes['PairingResult'], ParentType, ContextType, RequireFields<MutationDeletePairingArgs, 'input'>>;
   deleteTaste?: Resolver<ResolversTypes['TasteResult'], ParentType, ContextType, RequireFields<MutationDeleteTasteArgs, 'name'>>;
   deleteTechnique?: Resolver<Maybe<ResolversTypes['TechniqueResult']>, ParentType, ContextType, RequireFields<MutationDeleteTechniqueArgs, 'name'>>;
@@ -792,14 +807,6 @@ export type QueryResolvers<ContextType = any, ParentType extends ResolversParent
   volumes?: Resolver<Array<ResolversTypes['Volume']>, ParentType, ContextType>;
   weight?: Resolver<Maybe<ResolversTypes['Weight']>, ParentType, ContextType, RequireFields<QueryWeightArgs, 'name'>>;
   weights?: Resolver<Array<ResolversTypes['Weight']>, ParentType, ContextType>;
-};
-
-export type ReferenceResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['ReferenceResult'] = ResolversParentTypes['ReferenceResult']> = {
-  flavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
-  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
-  reference?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
-  success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
-  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type TasteResolvers<ContextType = any, ParentType extends ResolversParentTypes['Taste'] = ResolversParentTypes['Taste']> = {
@@ -892,6 +899,7 @@ export type Resolvers<ContextType = any> = {
   AddWeightResult?: AddWeightResultResolvers<ContextType>;
   ExperimentalPairing?: ExperimentalPairingResolvers<ContextType>;
   Flavor?: FlavorResolvers<ContextType>;
+  FlavorReferenceResult?: FlavorReferenceResultResolvers<ContextType>;
   FlavorResult?: FlavorResultResolvers<ContextType>;
   FlavorSubList?: FlavorSubListResolvers<ContextType>;
   FlavorTipsResult?: FlavorTipsResultResolvers<ContextType>;
@@ -902,7 +910,6 @@ export type Resolvers<ContextType = any> = {
   PairingSubList?: PairingSubListResolvers<ContextType>;
   Path?: PathResolvers<ContextType>;
   Query?: QueryResolvers<ContextType>;
-  ReferenceResult?: ReferenceResultResolvers<ContextType>;
   Taste?: TasteResolvers<ContextType>;
   TasteResult?: TasteResultResolvers<ContextType>;
   Technique?: TechniqueResolvers<ContextType>;

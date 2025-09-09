@@ -3,7 +3,9 @@ import { isPermitted } from '../../_helpers/auth-helper';
 import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import {
 	createFlavor,
+	createFlavorReference,
 	deleteFlavor,
+	deleteFlavorReference,
 	getFlavor,
 	getFlavorReference,
 	getFlavors,
@@ -140,6 +142,51 @@ export const resolvers: Resolvers = {
 				pairing: { flavor: new Flavor({ name: flavor1 }), paired: { flavor: new Flavor({ name: flavor2 }), affinity } },
 			};
 		},
+		createFlavorReference: async (_root, { input: { from, to } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR))
+				throw unauthorizedError('You are not authorized to create a flavor reference');
+
+			let fromFlavor: Flavor | null = null;
+			let toFlavor: Flavor | null = null;
+			let message: string | null = null;
+
+			try {
+				[fromFlavor, toFlavor] = await createFlavorReference(new Flavor({ name: from }), new Flavor({ name: to }));
+				if (!fromFlavor || !toFlavor) {
+					message = `Reference from '${fromFlavor}' to '${toFlavor}' could not be created (it may already exist or one of the flavors does not exist)`;
+				}
+			} catch (error) {
+				throw getGraphQLError(`creating flavor reference from: ${fromFlavor} to: ${toFlavor}`, error);
+			}
+
+			return {
+				success: !!fromFlavor && !!toFlavor,
+				from: new Flavor({ name: from }),
+				to: new Flavor({ name: to }),
+				message,
+			};
+		},
+		deleteFlavorReference: async (_root, { input: { from, to } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR))
+				throw unauthorizedError('You are not authorized to delete a flavor reference');
+
+			let fromFlavor: Flavor | null = null;
+			let toFlavor: Flavor | null = null;
+			let message: string | null = null;
+
+			try {
+				[fromFlavor, toFlavor] = await deleteFlavorReference(new Flavor({ name: from }), new Flavor({ name: to }));
+			} catch (error) {
+				throw getGraphQLError(`deleting flavor reference from: ${fromFlavor} to: ${toFlavor}`, error);
+			}
+
+			return {
+				success: !!fromFlavor && !!toFlavor,
+				from: new Flavor({ name: from }),
+				to: new Flavor({ name: to }),
+				message,
+			};
+		},
 	},
 	Flavor: {
 		taste: parent => getFlavorTastes(parent),
@@ -147,7 +194,7 @@ export const resolvers: Resolvers = {
 		weight: parent => getFlavorWeights(parent),
 		volume: parent => getFlavorVolumes(parent),
 		tips: parent => getFlavorTips(parent),
-		references: parent => getFlavorReference(parent),
+		see: parent => getFlavorReference(parent),
 		pairings: async (parent, { limit, cursor }) => {
 			const items = await getFlavorPairings(parent, limit, cursor);
 			const node: Node = new Node(NodeType.FLAVOR, 'name', parent.name);
