@@ -35,6 +35,7 @@ export enum RelationshipType {
 	HAS = 'HAS',
 	IS = 'IS',
 	PREPARE_AS = 'PREPARE_AS',
+	REFERENCES = 'REFERENCES',
 }
 
 export class Relationship {

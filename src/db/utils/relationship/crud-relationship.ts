@@ -16,12 +16,23 @@ export async function createRelationship(relationship: Relationship): Promise<[a
 	const driver: Driver = await connect();
 	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
 
-	let match: RecordShape = await session.run(
-		`MATCH (n1:${relationship.node1.nodeType} { ${relationship.node1.getIdString('n1')} })-[r:${relationship.type} ${
-			relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''
-		}]-(n2:${relationship.node2.nodeType} { ${relationship.node2.getIdString('n2')} }) RETURN n1, n2, r`,
-		relationship.getRelationshipParams('n1', 'n2', 'r')
-	);
+	let query = `
+		CALL () {
+			MATCH (n:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[:${RelationshipType.REFERENCES}]->(n1:${
+		relationship.node1.nodeType
+	})
+			RETURN n1
+		UNION
+			MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})
+			RETURN n1
+		}
+		MATCH (n1)-[r:${relationship.type} {${relationship.hasIdProp() ? relationship.getIdString('r') : ''}}]-(n2:${
+		relationship.node2.nodeType
+	} {${relationship.node2.getIdString('n2')}})
+		RETURN n1, n2, r
+	`;
+
+	let match: RecordShape = await session.run(query, relationship.getRelationshipParams('n1', 'n2', 'r'));
 
 	if (match.records.length > 0) {
 		await session.close();
@@ -29,15 +40,26 @@ export async function createRelationship(relationship: Relationship): Promise<[a
 		return [null, null, null];
 	}
 
+	query = `
+		CYPHER 25
+		MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}}),
+		(n2:${relationship.node2.nodeType} {${relationship.node2.getIdString('n2')}})
+		OPTIONAL MATCH (n1)-[:${RelationshipType.REFERENCES}]->(n1ref:${relationship.node1.nodeType})
+		RETURN n1ref, n1, n2
+
+		NEXT
+
+		WHEN n1ref IS NOT NULL THEN {
+			CREATE (n1ref)-[r:${relationship.type} ${relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''}]->(n2)
+			RETURN n1ref AS n1, n2, r
+		} ELSE {
+			CREATE (n1)-[r:${relationship.type} ${relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''}]->(n2)
+			RETURN n1, n2, r
+		}
+	`;
+
 	try {
-		match = await session.run(
-			`MATCH (n1:${relationship.node1.nodeType} { ${relationship.node1.getIdString('n1')} }), (n2:${
-				relationship.node2.nodeType
-			} { ${relationship.node2.getIdString('n2')} }) CREATE (n1)-[r:${relationship.type} ${
-				relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''
-			}]->(n2) RETURN n1, n2, r`,
-			relationship.getRelationshipParams('n1', 'n2', 'r')
-		);
+		match = await session.run(query, relationship.getRelationshipParams('n1', 'n2', 'r'));
 	} catch (error) {
 		throw new InternalError(Errors.COULD_NOT_CREATE_RELATIONSHIP, { cause: error });
 	} finally {
@@ -70,13 +92,23 @@ export async function getRelationshipsToNode(
 
 	let match: RecordShape;
 
+	const query = `
+		CALL () {
+			MATCH (n:${node.nodeType} { ${node.getIdString()} })-[:${RelationshipType.REFERENCES}]->(n1:${node.nodeType})-[r:${relationshipType}]-${
+		undirectedMatch ? '' : '>'
+	}(n2:${secondNodeType}) ${whereClause ? `WHERE ${whereClause}` : ''}
+			RETURN r, n2
+		UNION
+			MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[r:${relationshipType}]-${undirectedMatch ? '' : '>'}(n2:${secondNodeType}) ${
+		whereClause ? `WHERE ${whereClause}` : ''
+	}
+			RETURN r, n2
+		}
+		RETURN r, n2 ${orderByClause ? `ORDER BY ${orderByClause}` : ''} ${limit ? `LIMIT ${limit}` : ''}
+	`;
+
 	try {
-		match = await session.run(
-			`MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[r:${relationshipType}]-${undirectedMatch ? '' : '>'}(n2:${secondNodeType}) ${
-				whereClause ? `WHERE ${whereClause}` : ''
-			} RETURN r, n2 ${orderByClause ? `ORDER BY ${orderByClause}` : ''} ${limit ? `LIMIT ${limit}` : ''}`,
-			node.getIdParams()
-		);
+		match = await session.run(query, node.getIdParams());
 	} catch (error) {
 		throw new InternalError(Errors.COULD_NOT_GET_RELATIONSHIPS, { cause: error });
 	} finally {
@@ -98,13 +130,21 @@ export async function getTotalRelationshipsToNodes(
 
 	let count = 0;
 
+	const query = `
+		CALL () {
+			MATCH (n:${node.nodeType} { ${node.getIdString()} })-[:${RelationshipType.REFERENCES}]->(n1:${node.nodeType})-[r:${relationshipType}]-${
+		undirectedMatch ? '' : '>'
+	}(n2:${secondNodeType})
+			RETURN count(r) AS totalNodes
+		UNION
+			MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[r:${relationshipType}]-${undirectedMatch ? '' : '>'}(n2:${secondNodeType})
+			RETURN count(r) AS totalNodes
+		}
+		RETURN sum(totalNodes) AS totalNodes
+	`;
+
 	try {
-		const match = await session.run(
-			`MATCH (n1:${node.nodeType} { ${node.getIdString()} })-[r:${relationshipType}]-${
-				undirectedMatch ? '' : '>'
-			}(n2:${secondNodeType}) RETURN count(r) AS totalNodes`,
-			node.getIdParams()
-		);
+		const match = await session.run(query, node.getIdParams());
 		count = match.records[0]!.get('totalNodes').toNumber();
 	} catch (error) {
 		throw new InternalError(CRUDErrors.CANNOT_GET_TOTAL_NODES, { cause: error });
@@ -122,13 +162,26 @@ export async function deleteRelationship(relationship: Relationship, undirectedM
 
 	let match: RecordShape;
 
+	const query = `
+		CALL () {
+			MATCH (n:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[:${RelationshipType.REFERENCES}]->(n1:${
+		relationship.node1.nodeType
+	})-[r:${relationship.type} {${relationship.hasIdProp() ? relationship.getIdString('r') : ''}}]-${undirectedMatch ? '' : '>'}(n2:${
+		relationship.node2.nodeType
+	} {${relationship.node2.getIdString('n2')}})
+			RETURN n1, n2, r
+		UNION
+			MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[r:${relationship.type} {${
+		relationship.hasIdProp() ? relationship.getIdString('r') : ''
+	}}]-${undirectedMatch ? '' : '>'}(n2:${relationship.node2.nodeType} {${relationship.node2.getIdString('n2')}})
+			RETURN n1, n2, r
+		}
+		DELETE r
+		RETURN n1, n2
+	`;
+
 	try {
-		match = await session.run(
-			`MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[r:${relationship.type} ${
-				relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''
-			}]-${undirectedMatch ? '' : '>'}(n2:${relationship.node2.nodeType} {${relationship.node2.getIdString('n2')}}) DELETE r RETURN n1, n2`,
-			relationship.getRelationshipParams('n1', 'n2', 'r')
-		);
+		match = await session.run(query, relationship.getRelationshipParams('n1', 'n2', 'r'));
 	} catch (error) {
 		throw new InternalError(Errors.COULD_NOT_DELETE_RELATIONSHIP, { cause: error });
 	} finally {
