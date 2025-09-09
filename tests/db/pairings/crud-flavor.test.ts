@@ -56,7 +56,7 @@ describe('CRUD Flavor', () => {
 		await createFlavor(flavor);
 		const updatedFlavor = await setFlavorTips(flavor, 'These are some tips');
 		expect(updatedFlavor!.name).toBe(flavor.name);
-		const tips = await getFlavorTips(flavor.name);
+		const tips = await getFlavorTips(flavor);
 		expect(tips).toBe('These are some tips');
 	});
 
@@ -65,7 +65,7 @@ describe('CRUD Flavor', () => {
 		const flavor = new Flavor({ name });
 		const updatedFlavor = await setFlavorTips(flavor, 'These are some tips');
 		expect(updatedFlavor).toBeNull();
-		const tips = await getFlavorTips(flavor.name);
+		const tips = await getFlavorTips(flavor);
 		expect(tips).toBeNull();
 	});
 
@@ -76,7 +76,7 @@ describe('CRUD Flavor', () => {
 		await setFlavorTips(flavor, 'These are some tips');
 		const updatedFlavor = await setFlavorTips(flavor, null);
 		expect(updatedFlavor!.name).toBe(flavor.name);
-		const tips = await getFlavorTips(flavor.name);
+		const tips = await getFlavorTips(flavor);
 		expect(tips).toBeNull();
 	});
 

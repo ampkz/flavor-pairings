@@ -18,8 +18,8 @@ export async function setFlavorTips(flavor: Flavor, tips: string | null): Promis
 	return updatedNode ? new Flavor(updatedNode) : null;
 }
 
-export async function getFlavorTips(name: string): Promise<string | null> {
-	const matchedNode = await getNode(NodeType.FLAVOR, ['name: $name'], { name });
+export async function getFlavorTips(flavor: Flavor): Promise<string | null> {
+	const matchedNode = await getNode(NodeType.FLAVOR, ['name: $name'], { name: flavor.name });
 	return matchedNode ? matchedNode.tips || null : null;
 }
 
