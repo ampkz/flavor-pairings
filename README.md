@@ -80,7 +80,7 @@ Follow the instructions below to install Neo4j, being sure to install the correc
     If it failed to start, saying that the configuration file validation failed, you may need to change ownership of the folder where the logs are kept:
 
     ```bash
-    sudo chown neo4j:adm -R /var/log/neo4j
+    sudo chown neo4j -R /var/log/neo4j
     ```
 
     After changing the folder's owner, try to start the neo4j service and check its status again. If successful, enable neo4j to start on startup:
@@ -89,7 +89,7 @@ Follow the instructions below to install Neo4j, being sure to install the correc
     sudo systemctl enable neo4j
     ```
 
-    If unsuccessful, make sure `/etc/neo4j` and `/var/lib/neo4j` are owned by `neo4j:adm`.
+    If unsuccessful, make sure `/etc/neo4j` and `/var/lib/neo4j` are owned by `neo4j`.
 
 #### Initialize Server
 
