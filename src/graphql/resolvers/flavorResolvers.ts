@@ -1,7 +1,16 @@
 import { Auth } from '@ampkz/auth-neo4j/auth';
 import { isPermitted } from '../../_helpers/auth-helper';
 import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
-import { createFlavor, deleteFlavor, getFlavor, getFlavors, getFlavorTips, setFlavorTips, updateFlavor } from '../../db/pairings/crud-flavor';
+import {
+	createFlavor,
+	deleteFlavor,
+	getFlavor,
+	getFlavorReference,
+	getFlavors,
+	getFlavorTips,
+	setFlavorTips,
+	updateFlavor,
+} from '../../db/pairings/crud-flavor';
 import { createPairing, deletePairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
 import { getTotalNodeCountByType } from '../../db/utils/crud';
 import { getTotalRelationshipsToNodes } from '../../db/utils/relationship/crud-relationship';
@@ -138,6 +147,7 @@ export const resolvers: Resolvers = {
 		weight: parent => getFlavorWeights(parent),
 		volume: parent => getFlavorVolumes(parent),
 		tips: parent => getFlavorTips(parent),
+		references: parent => getFlavorReference(parent),
 		pairings: async (parent, { limit, cursor }) => {
 			const items = await getFlavorPairings(parent, limit, cursor);
 			const node: Node = new Node(NodeType.FLAVOR, 'name', parent.name);

@@ -10,6 +10,7 @@ extend type Mutation {
 	flavorTips(name: ID!, tips: String): FlavorTipsResult!
 	createPairing(input: CreatePairingInput!): PairingResult!
 	deletePairing(input: DeletePairingInput!): PairingResult!
+	createFlavorReference(input: CreateFlavorReferenceInput!): ReferenceResult!
 }
 
 type Flavor {
@@ -19,7 +20,20 @@ type Flavor {
 	weight: [Weight!]
 	technique: [Technique!]
 	tips: String
+	references: Flavor
 	pairings(limit: Int, cursor: ID): PairingSubList
+}
+
+input CreateFlavorReferenceInput {
+	reference: ID!
+	flavor: ID!
+}
+
+type ReferenceResult {
+	success: Boolean!
+	reference: Flavor!
+	flavor: Flavor!
+	message: String
 }
 
 type FlavorResult {

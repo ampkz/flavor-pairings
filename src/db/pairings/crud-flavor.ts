@@ -1,7 +1,9 @@
-import { NodeType } from '../../_helpers/nodes';
+import { create } from 'domain';
+import { Node, NodeType, Relationship, RelationshipType } from '../../_helpers/nodes';
 import { UpdateFlavorInput } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
+import { createRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
 export async function createFlavor(flavor: Flavor): Promise<Flavor | null> {
 	const createdNode = await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor.name });
@@ -41,4 +43,25 @@ export async function getFlavors(limit?: number | null, cursor?: string | null):
 	flavors.push(...nodes.map(node => new Flavor(node)));
 
 	return flavors;
+}
+
+export async function getFlavorReference(flavor: Flavor): Promise<Flavor | null> {
+	const reference = await getRelationshipsToNode(
+		new Node(NodeType.FLAVOR, 'name', flavor.name),
+		NodeType.FLAVOR,
+		RelationshipType.REFERENCES,
+		false
+	);
+	if (reference.length === 0) return null;
+	return new Flavor(reference[0][0]);
+}
+
+export async function createFlavorReference(reference: Flavor, flavor: Flavor): Promise<[Flavor | null, Flavor | null]> {
+	const relationship = new Relationship(
+		new Node(NodeType.FLAVOR, 'name', reference.name),
+		new Node(NodeType.FLAVOR, 'name', flavor.name),
+		RelationshipType.REFERENCES
+	);
+	const result = await createRelationship(relationship);
+	return [result[0] ? new Flavor(result[0]) : null, result[1] ? new Flavor(result[1]) : null];
 }

@@ -1,5 +1,15 @@
 import { Flavor } from '../../../src/pairings/flavor';
-import { createFlavor, deleteFlavor, getFlavor, getFlavors, getFlavorTips, setFlavorTips, updateFlavor } from '../../../src/db/pairings/crud-flavor';
+import {
+	createFlavor,
+	createFlavorReference,
+	deleteFlavor,
+	getFlavor,
+	getFlavorReference,
+	getFlavors,
+	getFlavorTips,
+	setFlavorTips,
+	updateFlavor,
+} from '../../../src/db/pairings/crud-flavor';
 import * as crud from '../../../src/db/utils/crud';
 import { faker } from '@faker-js/faker';
 
@@ -78,6 +88,34 @@ describe('CRUD Flavor', () => {
 		expect(updatedFlavor!.name).toBe(flavor.name);
 		const tips = await getFlavorTips(flavor);
 		expect(tips).toBeNull();
+	});
+
+	it('should create a reference from one flavor to another', async () => {
+		const name1 = 'ref_flavor1_' + faker.word.noun();
+		const name2 = 'ref_flavor2_' + faker.word.noun();
+		const flavor1 = new Flavor({ name: name1 });
+		const flavor2 = new Flavor({ name: name2 });
+		await createFlavor(flavor1);
+		await createFlavor(flavor2);
+		const [from, to] = await createFlavorReference(flavor1, flavor2);
+		expect(from!.name).toBe(flavor1.name);
+		expect(to!.name).toBe(flavor2.name);
+
+		const reference = await getFlavorReference(flavor1);
+		expect(reference!.name).toBe(flavor2.name);
+	});
+
+	it('should return null if no reference was created', async () => {
+		const name1 = 'ref_flavor1_' + faker.word.noun();
+		const name2 = 'ref_flavor2_' + faker.word.noun();
+		const flavor1 = new Flavor({ name: name1 });
+		const flavor2 = new Flavor({ name: name2 });
+		const [from, to] = await createFlavorReference(flavor1, flavor2);
+		expect(from).toBeNull();
+		expect(to).toBeNull();
+
+		const reference = await getFlavorReference(flavor1);
+		expect(reference).toBeNull();
 	});
 
 	it('should delete a flavor', async () => {
