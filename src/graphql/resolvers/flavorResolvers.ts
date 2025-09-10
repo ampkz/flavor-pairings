@@ -148,13 +148,9 @@ export const resolvers: Resolvers = {
 
 			let fromFlavor: Flavor | null = null;
 			let toFlavor: Flavor | null = null;
-			let message: string | null = null;
 
 			try {
 				[fromFlavor, toFlavor] = await createFlavorReference(new Flavor({ name: from }), new Flavor({ name: to }));
-				if (!fromFlavor || !toFlavor) {
-					message = `Reference from '${fromFlavor}' to '${toFlavor}' could not be created (it may already exist or one of the flavors does not exist)`;
-				}
 			} catch (error) {
 				throw getGraphQLError(`creating flavor reference from: ${fromFlavor} to: ${toFlavor}`, error);
 			}
@@ -163,7 +159,6 @@ export const resolvers: Resolvers = {
 				success: !!fromFlavor && !!toFlavor,
 				from: new Flavor({ name: from }),
 				to: new Flavor({ name: to }),
-				message,
 			};
 		},
 		deleteFlavorReference: async (_root, { input: { from, to } }, { authorizedUser }) => {
@@ -172,7 +167,6 @@ export const resolvers: Resolvers = {
 
 			let fromFlavor: Flavor | null = null;
 			let toFlavor: Flavor | null = null;
-			let message: string | null = null;
 
 			try {
 				[fromFlavor, toFlavor] = await deleteFlavorReference(new Flavor({ name: from }), new Flavor({ name: to }));
@@ -184,7 +178,6 @@ export const resolvers: Resolvers = {
 				success: !!fromFlavor && !!toFlavor,
 				from: new Flavor({ name: from }),
 				to: new Flavor({ name: to }),
-				message,
 			};
 		},
 	},
