@@ -37,7 +37,7 @@ describe('FlavorTips mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation FlavorTips($name: ID!, $tips: String!) {
+                mutation FlavorTips($name: ID!, $tips: String) {
                     flavorTips(name: $name, tips: $tips) {
                        success
 					   flavor {
@@ -53,6 +53,41 @@ describe('FlavorTips mutations', () => {
 			.expect(200);
 
 		expect(response.body.data.flavorTips).toEqual({ success: true, flavor: { name: flavorName, tips } });
+	});
+
+	it('should remove tips on a flavor', async () => {
+		const flavorName = faker.word.noun();
+		jest.spyOn(crudFlavor, 'setFlavorTips').mockResolvedValue({ name: flavorName });
+		jest.spyOn(crudFlavor, 'getFlavorTips').mockResolvedValue(null);
+
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+				mutation FlavorTips($name: ID!, $tips: String) {
+					flavorTips(name: $name, tips: $tips) {
+						success
+						flavor {
+							name
+							tips
+						}
+					}
+				}
+			`,
+				variables: { name: flavorName, tips: null },
+			})
+			.set('Cookie', [`token=${token}`])
+			.expect(200);
+
+		expect(response.body.data.flavorTips).toEqual({ success: true, flavor: { name: flavorName, tips: null } });
 	});
 
 	it('should throw an error with a bad input', async () => {

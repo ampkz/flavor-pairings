@@ -212,4 +212,29 @@ describe('Flavor Queries', () => {
 		expect(response.body.data.flavors.items).toEqual(flavors);
 		expect(response.body.data.flavors.totalCount).toEqual(flavors.length);
 	});
+
+	it('should return a reference to another flavor', async () => {
+		const flavorName = faker.word.noun();
+		const referenceName = faker.word.noun();
+		jest.spyOn(crudFlavor, 'getFlavor').mockResolvedValue({ name: flavorName });
+		jest.spyOn(crudFlavor, 'getFlavorReference').mockResolvedValue({ name: referenceName });
+
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+				query GetFlavorReference($name: ID!) {
+					flavor(name: $name) {
+						see {
+							name
+						}
+					}
+				}
+			`,
+				variables: { name: flavorName },
+			})
+			.expect(200);
+
+		expect(response.body.data.flavor.see).toEqual({ name: referenceName });
+	});
 });
