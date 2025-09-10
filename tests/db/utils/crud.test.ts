@@ -11,8 +11,6 @@ import {
 import { NodeType } from '../../../src/_helpers/nodes';
 import { faker } from '@faker-js/faker';
 import neo4j, { Driver, Neo4jError, Record, Session } from 'neo4j-driver';
-import { isSortedAlphabetically } from '../../../src/_helpers/array';
-import { getFlavorTips } from '../../../src/db/pairings/crud-flavor';
 
 describe('Node CRUD Operations', () => {
 	beforeEach(() => {
@@ -45,7 +43,8 @@ describe('Node CRUD Operations', () => {
 		const flavors = Array.from({ length: 5 }, () => (global as any).getNextNoun('goa_'));
 		await Promise.all(flavors.map(flavor => createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor })));
 		const result = await getNodes(NodeType.FLAVOR, 'n.name ASC');
-		expect(isSortedAlphabetically(result)).toBe(true);
+		const sortedResult = result.sort((a, b) => a.name.localeCompare(b.name));
+		expect(result).toEqual(sortedResult);
 	});
 
 	test('getNodes should return a list of limited nodes', async () => {
