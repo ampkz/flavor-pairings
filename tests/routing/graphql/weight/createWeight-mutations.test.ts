@@ -7,6 +7,7 @@ import { InternalError } from '@ampkz/auth-neo4j/errors';
 import sessions from '@ampkz/auth-neo4j/token';
 import { User } from '@ampkz/auth-neo4j/user';
 import { Auth } from '@ampkz/auth-neo4j/auth';
+import { Neo4jError } from 'neo4j-driver';
 
 describe('CreateWeight mutations', () => {
 	let app: Express;
@@ -104,6 +105,43 @@ describe('CreateWeight mutations', () => {
 			.expect(500);
 
 		expect(response.body.errors).toBeDefined();
+	});
+
+	it('should return unsuccessful if weight already exists', async () => {
+		jest.spyOn(crudWeight, 'createWeight').mockRejectedValue(
+			new InternalError('Server error', {
+				cause: new Neo4jError('Weight already exists', 'Neo.ClientError.Schema.ConstraintValidationFailed', '', ''),
+			})
+		);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation CreateWeight($name: ID!) {
+                    createWeight(name: $name) {
+                        success
+						message
+                        weight {
+                            name
+                        }
+                    }
+                }
+            `,
+				variables: { name: 'test' },
+			})
+			.set('Cookie', [`token=${token}`])
+			.expect(200);
+
+		expect(response.body.data.createWeight.success).toBe(false);
+		expect(response.body.data.createWeight.weight).toEqual({ name: 'test' });
+		expect(response.body.data.createWeight.message).toBeDefined();
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {

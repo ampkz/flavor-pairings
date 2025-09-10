@@ -7,6 +7,7 @@ import { InternalError } from '@ampkz/auth-neo4j/errors';
 import sessions from '@ampkz/auth-neo4j/token';
 import { User } from '@ampkz/auth-neo4j/user';
 import { Auth } from '@ampkz/auth-neo4j/auth';
+import { Neo4jError } from 'neo4j-driver';
 
 describe('CreateTaste mutations', () => {
 	let app: Express;
@@ -74,6 +75,43 @@ describe('CreateTaste mutations', () => {
 			.expect(400);
 
 		expect(response.body.errors).toBeDefined();
+	});
+
+	it('should return unsuccessful if taste already exists', async () => {
+		jest.spyOn(crudTaste, 'createTaste').mockRejectedValue(
+			new InternalError('Server error', {
+				cause: new Neo4jError('Taste already exists', 'Neo.ClientError.Schema.ConstraintValidationFailed', '', ''),
+			})
+		);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation CreateTaste($name: ID!) {
+                    createTaste(name: $name) {
+                        success
+						message
+                        taste {
+                            name
+                        }
+                    }
+                }
+            `,
+				variables: { name: 'test' },
+			})
+			.set('Cookie', [`token=${token}`])
+			.expect(200);
+
+		expect(response.body.data.createTaste.success).toBe(false);
+		expect(response.body.data.createTaste.taste).toEqual({ name: 'test' });
+		expect(response.body.data.createTaste.message).toBeDefined();
 	});
 
 	it('should throw an error if there was issue with the server', async () => {

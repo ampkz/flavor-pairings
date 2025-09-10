@@ -7,6 +7,7 @@ import { InternalError } from '@ampkz/auth-neo4j/errors';
 import sessions from '@ampkz/auth-neo4j/token';
 import { User } from '@ampkz/auth-neo4j/user';
 import { Auth } from '@ampkz/auth-neo4j/auth';
+import { Neo4jError } from 'neo4j-driver';
 
 describe('CreateTechnique mutations', () => {
 	let app: Express;
@@ -104,6 +105,43 @@ describe('CreateTechnique mutations', () => {
 			.expect(500);
 
 		expect(response.body.errors).toBeDefined();
+	});
+
+	it('should return unsuccessful if technique already exists', async () => {
+		jest.spyOn(crudTechnique, 'createTechnique').mockRejectedValue(
+			new InternalError('Server error', {
+				cause: new Neo4jError('Technique already exists', 'Neo.ClientError.Schema.ConstraintValidationFailed', '', ''),
+			})
+		);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation CreateTechnique($name: ID!) {
+                    createTechnique(name: $name) {
+                        success
+						message
+                        technique {
+                            name
+                        }
+                    }
+                }
+            `,
+				variables: { name: 'test' },
+			})
+			.set('Cookie', [`token=${token}`])
+			.expect(200);
+
+		expect(response.body.data.createTechnique.success).toBe(false);
+		expect(response.body.data.createTechnique.technique).toEqual({ name: 'test' });
+		expect(response.body.data.createTechnique.message).toBeDefined();
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {

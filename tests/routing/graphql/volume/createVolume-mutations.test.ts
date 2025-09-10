@@ -7,6 +7,7 @@ import { InternalError } from '@ampkz/auth-neo4j/errors';
 import sessions from '@ampkz/auth-neo4j/token';
 import { User } from '@ampkz/auth-neo4j/user';
 import { Auth } from '@ampkz/auth-neo4j/auth';
+import { Neo4jError } from 'neo4j-driver';
 
 describe('CreateVolume mutations', () => {
 	let app: Express;
@@ -111,6 +112,43 @@ describe('CreateVolume mutations', () => {
 			.expect(500);
 
 		expect(response.body.errors).toBeDefined();
+	});
+
+	it('should return unsuccessful if volume already exists', async () => {
+		jest.spyOn(crudVolume, 'createVolume').mockRejectedValue(
+			new InternalError('Server error', {
+				cause: new Neo4jError('Volume already exists', 'Neo.ClientError.Schema.ConstraintValidationFailed', '', ''),
+			})
+		);
+		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
+		validateSessionTokenSpy.mockResolvedValueOnce({
+			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
+		});
+
+		const token = sessions.generateSessionToken();
+		const response = await request(app)
+			.post('/graphql')
+			.send({
+				query: `
+                mutation CreateVolume($name: ID!) {
+                    createVolume(name: $name) {
+                        success
+						message
+                        volume {
+                            name
+                        }
+                    }
+                }
+            `,
+				variables: { name: 'test' },
+			})
+			.set('Cookie', [`token=${token}`])
+			.expect(200);
+
+		expect(response.body.data.createVolume.success).toBe(false);
+		expect(response.body.data.createVolume.volume).toEqual({ name: 'test' });
+		expect(response.body.data.createVolume.message).toBeDefined();
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {
