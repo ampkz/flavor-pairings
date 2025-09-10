@@ -3,6 +3,7 @@ import {
 	createFlavor,
 	createFlavorReference,
 	deleteFlavor,
+	deleteFlavorReference,
 	getFlavor,
 	getFlavorReference,
 	getFlavors,
@@ -116,6 +117,33 @@ describe('CRUD Flavor', () => {
 
 		const reference = await getFlavorReference(flavor1);
 		expect(reference).toBeNull();
+	});
+
+	it('should delete a reference from one flavor to another', async () => {
+		const name1 = 'dref_flavor1_' + faker.word.noun();
+		const name2 = 'dref_flavor2_' + faker.word.noun();
+		const flavor1 = new Flavor({ name: name1 });
+		const flavor2 = new Flavor({ name: name2 });
+		await createFlavor(flavor1);
+		await createFlavor(flavor2);
+		await createFlavorReference(flavor1, flavor2);
+
+		const [f1, f2] = await deleteFlavorReference(flavor1, flavor2);
+		expect(f1!.name).toBe(flavor1.name);
+		expect(f2!.name).toBe(flavor2.name);
+
+		const reference = await getFlavorReference(flavor1);
+		expect(reference).toBeNull();
+	});
+
+	it('should return null if no reference was found to delete', async () => {
+		const name1 = 'dref_flavor1_' + faker.word.noun();
+		const name2 = 'dref_flavor2_' + faker.word.noun();
+		const flavor1 = new Flavor({ name: name1 });
+		const flavor2 = new Flavor({ name: name2 });
+		const [f1, f2] = await deleteFlavorReference(flavor1, flavor2);
+		expect(f1).toBeNull();
+		expect(f2).toBeNull();
 	});
 
 	it('should delete a flavor', async () => {
