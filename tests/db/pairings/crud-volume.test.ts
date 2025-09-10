@@ -1,5 +1,14 @@
 import { FlavorVolume, Volume } from '../../../src/pairings/volume';
-import { addVolume, createVolume, deleteVolume, getFlavorVolumes, getVolume, getVolumes, updateVolume } from '../../../src/db/pairings/crud-volume';
+import {
+	addFlavorVolume,
+	createVolume,
+	deleteVolume,
+	getFlavorVolumes,
+	getVolume,
+	getVolumes,
+	removeFlavorVolume,
+	updateVolume,
+} from '../../../src/db/pairings/crud-volume';
 import * as crud from '../../../src/db/utils/crud';
 import { Flavor } from '../../../src/pairings/flavor';
 import { createFlavor } from '../../../src/db/pairings/crud-flavor';
@@ -81,7 +90,7 @@ describe('CRUD Volume', () => {
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
 
 		const flavorVolume = new FlavorVolume(createdFlavor!, createdVolume!);
-		const addedVolume = await addVolume(flavorVolume);
+		const addedVolume = await addFlavorVolume(flavorVolume);
 		expect(addedVolume!.name).toBe(volume);
 	});
 
@@ -93,8 +102,34 @@ describe('CRUD Volume', () => {
 		const createdFlavor = new Flavor({ name: flavor });
 
 		const flavorVolume = new FlavorVolume(createdFlavor!, createdVolume!);
-		const addedVolume = await addVolume(flavorVolume);
+		const addedVolume = await addFlavorVolume(flavorVolume);
 		expect(addedVolume).toBeNull();
+	});
+
+	it('should remove a FlavorVolume', async () => {
+		const flavor = (global as any).getNextNoun('volume_');
+		const volume = (global as any).getNextNoun('volume_');
+
+		const createdVolume = await createVolume(new Volume({ name: volume }));
+		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
+
+		const flavorVolume = new FlavorVolume(createdFlavor!, createdVolume!);
+		await addFlavorVolume(flavorVolume);
+
+		const removedVolume = await removeFlavorVolume(flavorVolume);
+		expect(removedVolume!.name).toBe(volume);
+	});
+
+	it('should return null if no FlavorVolume is removed', async () => {
+		const flavor = (global as any).getNextNoun('volume_');
+		const volume = (global as any).getNextNoun('volume_');
+
+		const createdVolume = new Volume({ name: volume });
+		const createdFlavor = new Flavor({ name: flavor });
+
+		const flavorVolume = new FlavorVolume(createdFlavor!, createdVolume!);
+		const removedVolume = await removeFlavorVolume(flavorVolume);
+		expect(removedVolume).toBeNull();
 	});
 
 	it('should get a list of volumes related to a flavor', async () => {
@@ -105,7 +140,7 @@ describe('CRUD Volume', () => {
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
 
 		const flavorVolume = new FlavorVolume(createdFlavor!, createdVolume!);
-		await addVolume(flavorVolume);
+		await addFlavorVolume(flavorVolume);
 
 		const relatedVolumes = await getFlavorVolumes(createdFlavor!);
 		expect(relatedVolumes).toContainEqual(expect.objectContaining({ name: volume }));

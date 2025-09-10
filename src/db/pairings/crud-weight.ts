@@ -3,7 +3,7 @@ import { UpdateFlavorInput } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { FlavorWeight, Weight } from '../../pairings/weight';
 import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
-import { createRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
+import { createRelationship, deleteRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
 export async function createWeight(weight: Weight): Promise<Weight | null> {
 	const createdNode = await createNode(NodeType.WEIGHT, ['name: $name'], { name: weight.name });
@@ -35,8 +35,13 @@ export async function getWeights(): Promise<Weight[]> {
 	return weights;
 }
 
-export async function addWeight(flavorWeight: FlavorWeight): Promise<Weight | null> {
+export async function addFlavorWeight(flavorWeight: FlavorWeight): Promise<Weight | null> {
 	const [, w] = await createRelationship(flavorWeight.getRelationship());
+	return w;
+}
+
+export async function removeFlavorWeight(flavorWeight: FlavorWeight): Promise<Weight | null> {
+	const [, w] = await deleteRelationship(flavorWeight.getRelationship());
 	return w;
 }
 

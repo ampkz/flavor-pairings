@@ -22,7 +22,7 @@ describe('AddTaste mutations', () => {
 	it('should add a taste', async () => {
 		const taste = faker.word.noun();
 		const flavor = faker.word.noun();
-		jest.spyOn(crudTaste, 'addTaste').mockResolvedValue({ name: taste });
+		jest.spyOn(crudTaste, 'addFlavorTaste').mockResolvedValue({ name: taste });
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -36,8 +36,8 @@ describe('AddTaste mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTaste($input: AddTasteInput!) {
-                    addTaste(input: $input) {
+                mutation AddFlavorTaste($input: FlavorTasteInput!) {
+                    addFlavorTaste(input: $input) {
                         success
 						taste { name }
                     }
@@ -48,23 +48,21 @@ describe('AddTaste mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addTaste).toEqual({ success: true, taste: { name: taste } });
+		expect(response.body.data.addFlavorTaste).toEqual({ success: true, taste: { name: taste } });
 	});
 
 	it('should throw an error with a bad input', async () => {
 		const taste = faker.word.noun();
-		jest.spyOn(crudTaste, 'addTaste').mockResolvedValue({ name: taste });
+		jest.spyOn(crudTaste, 'addFlavorTaste').mockResolvedValue({ name: taste });
 
 		const response = await request(app)
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTaste($input: AddTasteInput!) {
-                    addTaste(input: $input) {
+                mutation AddFlavorTaste($input: FlavorTasteInput!) {
+                    addFlavorTaste(input: $input) {
                         success
-                        taste {
-                            name
-                        }
+						taste { name }
                     }
                 }
             `,
@@ -76,7 +74,7 @@ describe('AddTaste mutations', () => {
 	});
 
 	it('should throw an error if there was issue with the server', async () => {
-		jest.spyOn(crudTaste, 'addTaste').mockRejectedValue(new InternalError('Server error'));
+		jest.spyOn(crudTaste, 'addFlavorTaste').mockRejectedValue(new InternalError('Server error'));
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
 			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
@@ -88,12 +86,10 @@ describe('AddTaste mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTaste($input: AddTasteInput!) {
-                    addTaste(input: $input) {
+                mutation AddFlavorTaste($input: FlavorTasteInput!) {
+                    addFlavorTaste(input: $input) {
                         success
-                        taste {
-                            name
-                        }
+						taste { name }
                     }
                 }
             `,
@@ -110,12 +106,10 @@ describe('AddTaste mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTaste($input: AddTasteInput!) {
-                    addTaste(input: $input) {
+               mutation AddFlavorTaste($input: FlavorTasteInput!) {
+                    addFlavorTaste(input: $input) {
                         success
-                        taste {
-                            name
-                        }
+						taste { name }
                     }
                 }
             `,

@@ -3,7 +3,7 @@ import { UpdateFlavorInput } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { FlavorTaste, Taste } from '../../pairings/taste';
 import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
-import { createRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
+import { createRelationship, deleteRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
 export async function createTaste(taste: Taste): Promise<Taste | null> {
 	const createdNode = await createNode(NodeType.TASTE, ['name: $name'], { name: taste.name });
@@ -35,8 +35,13 @@ export async function getTastes(): Promise<Taste[]> {
 	return tastes;
 }
 
-export async function addTaste(flavorTaste: FlavorTaste): Promise<Taste | null> {
+export async function addFlavorTaste(flavorTaste: FlavorTaste): Promise<Taste | null> {
 	const [, t] = await createRelationship(flavorTaste.getRelationship());
+	return t;
+}
+
+export async function removeFlavorTaste(flavorTaste: FlavorTaste): Promise<Taste | null> {
+	const [, t] = await deleteRelationship(flavorTaste.getRelationship());
 	return t;
 }
 

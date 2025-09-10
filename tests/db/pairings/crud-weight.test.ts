@@ -1,5 +1,14 @@
 import { FlavorWeight, Weight } from '../../../src/pairings/weight';
-import { addWeight, createWeight, deleteWeight, getFlavorWeights, getWeight, getWeights, updateWeight } from '../../../src/db/pairings/crud-weight';
+import {
+	addFlavorWeight,
+	createWeight,
+	deleteWeight,
+	getFlavorWeights,
+	getWeight,
+	getWeights,
+	removeFlavorWeight,
+	updateWeight,
+} from '../../../src/db/pairings/crud-weight';
 import * as crud from '../../../src/db/utils/crud';
 import { Flavor } from '../../../src/pairings/flavor';
 import { createFlavor } from '../../../src/db/pairings/crud-flavor';
@@ -81,7 +90,7 @@ describe('CRUD Weight', () => {
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
 
 		const flavorWeight = new FlavorWeight(createdFlavor!, createdWeight!);
-		const addedWeight = await addWeight(flavorWeight);
+		const addedWeight = await addFlavorWeight(flavorWeight);
 		expect(addedWeight!.name).toBe(weight);
 	});
 
@@ -93,8 +102,34 @@ describe('CRUD Weight', () => {
 		const createdFlavor = new Flavor({ name: flavor });
 
 		const flavorWeight = new FlavorWeight(createdFlavor!, createdWeight!);
-		const addedWeight = await addWeight(flavorWeight);
+		const addedWeight = await addFlavorWeight(flavorWeight);
 		expect(addedWeight).toBeNull();
+	});
+
+	it('should remove a FlavorWeight', async () => {
+		const flavor = (global as any).getNextNoun('fw_');
+		const weight = (global as any).getNextNoun('fw_');
+
+		const createdWeight = await createWeight(new Weight({ name: weight }));
+		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
+
+		const flavorWeight = new FlavorWeight(createdFlavor!, createdWeight!);
+		await addFlavorWeight(flavorWeight);
+
+		const removedWeight = await removeFlavorWeight(flavorWeight);
+		expect(removedWeight!.name).toBe(weight);
+	});
+
+	it('should return null if no FlavorWeight is removed', async () => {
+		const flavor = (global as any).getNextNoun('fw_');
+		const weight = (global as any).getNextNoun('fw_');
+
+		const createdWeight = new Weight({ name: weight });
+		const createdFlavor = new Flavor({ name: flavor });
+
+		const flavorWeight = new FlavorWeight(createdFlavor!, createdWeight!);
+		const removedWeight = await removeFlavorWeight(flavorWeight);
+		expect(removedWeight).toBeNull();
 	});
 
 	it('should get a list of weights related to a flavor', async () => {
@@ -105,7 +140,7 @@ describe('CRUD Weight', () => {
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
 
 		const flavorWeight = new FlavorWeight(createdFlavor!, createdWeight!);
-		await addWeight(flavorWeight);
+		await addFlavorWeight(flavorWeight);
 
 		const relatedWeights = await getFlavorWeights(createdFlavor!);
 		expect(relatedWeights).toContainEqual(expect.objectContaining({ name: weight }));

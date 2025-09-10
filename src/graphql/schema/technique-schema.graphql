@@ -7,7 +7,8 @@ extend type Mutation {
 	createTechnique(name: ID!): TechniqueResult!
 	updateTechnique(input: UpdateTechniqueInput!): UpdateTechniqueResult!
 	deleteTechnique(name: ID!): TechniqueResult
-	addTechnique(input: AddTechniqueInput!): AddTechniqueResult!
+	addFlavorTechnique(input: FlavorTechniqueInput!): FlavorTechniqueResult!
+	removeFlavorTechnique(input: FlavorTechniqueInput!): FlavorTechniqueResult!
 }
 
 type Technique {
@@ -26,13 +27,13 @@ type UpdateTechniqueResult {
 	previousTechnique: Technique!
 }
 
-type AddTechniqueResult {
+type FlavorTechniqueResult {
 	success: Boolean!
 	technique: Technique!
 	flavor: Flavor!
 }
 
-input AddTechniqueInput {
+input FlavorTechniqueInput {
 	flavor: ID!
 	technique: ID!
 }

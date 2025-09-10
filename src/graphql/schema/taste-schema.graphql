@@ -7,7 +7,8 @@ extend type Mutation {
 	createTaste(name: ID!): TasteResult!
 	updateTaste(input: UpdateTasteInput!): UpdateTasteResult!
 	deleteTaste(name: ID!): TasteResult!
-	addTaste(input: AddTasteInput!): AddTasteResult!
+	addFlavorTaste(input: FlavorTasteInput!): FlavorTasteResult!
+	removeFlavorTaste(input: FlavorTasteInput!): FlavorTasteResult!
 }
 
 type TasteResult {
@@ -16,7 +17,7 @@ type TasteResult {
 	message: String
 }
 
-type AddTasteResult {
+type FlavorTasteResult {
 	success: Boolean!
 	taste: Taste!
 	flavor: Flavor!
@@ -32,7 +33,7 @@ type Taste {
 	name: ID!
 }
 
-input AddTasteInput {
+input FlavorTasteInput {
 	flavor: ID!
 	taste: ID!
 }

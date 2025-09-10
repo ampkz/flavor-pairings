@@ -21,7 +21,7 @@ describe('AddTechnique mutations', () => {
 	it('should add a technique to a flavor and return the technique', async () => {
 		const flavorName = faker.word.noun();
 		const techniqueName = faker.word.noun();
-		jest.spyOn(crudTechnique, 'addTechnique').mockResolvedValue({ name: techniqueName });
+		jest.spyOn(crudTechnique, 'addFlavorTechnique').mockResolvedValue({ name: techniqueName });
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -35,8 +35,8 @@ describe('AddTechnique mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTechnique($input: AddTechniqueInput!) {
-                    addTechnique(input: $input) {
+                mutation AddTechnique($input: FlavorTechniqueInput!) {
+                    addFlavorTechnique(input: $input) {
                         success
 						technique {
 							name
@@ -49,13 +49,13 @@ describe('AddTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addTechnique).toEqual({ success: true, technique: { name: techniqueName } });
+		expect(response.body.data.addFlavorTechnique).toEqual({ success: true, technique: { name: techniqueName } });
 	});
 
 	it('should return unsuccessful if no technique was added', async () => {
 		const flavorName = faker.word.noun();
 		const techniqueName = faker.word.noun();
-		jest.spyOn(crudTechnique, 'addTechnique').mockResolvedValue(null);
+		jest.spyOn(crudTechnique, 'addFlavorTechnique').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
 			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
@@ -67,12 +67,12 @@ describe('AddTechnique mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTechnique($input: AddTechniqueInput!) {
-                    addTechnique(input: $input) {
+                mutation AddTechnique($input: FlavorTechniqueInput!) {
+                    addFlavorTechnique(input: $input) {
                         success
-                        technique {
-                            name
-                        }
+						technique {
+							name
+						}
                     }
                 }
             `,
@@ -81,11 +81,11 @@ describe('AddTechnique mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addTechnique).toEqual({ success: false, technique: { name: techniqueName } });
+		expect(response.body.data.addFlavorTechnique).toEqual({ success: false, technique: { name: techniqueName } });
 	});
 
 	it('should throw an error if there was an issue with the server', async () => {
-		jest.spyOn(crudTechnique, 'addTechnique').mockRejectedValue(new Error('Server error'));
+		jest.spyOn(crudTechnique, 'addFlavorTechnique').mockRejectedValue(new Error('Server error'));
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -99,8 +99,8 @@ describe('AddTechnique mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTechnique($input: AddTechniqueInput!) {
-                    addTechnique(input: $input) {
+                mutation AddTechnique($input: FlavorTechniqueInput!) {
+                    addFlavorTechnique(input: $input) {
                         success
                         technique {
                             name
@@ -121,8 +121,8 @@ describe('AddTechnique mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddTechnique($input: AddTechniqueInput!) {
-                    addTechnique(input: $input) {
+                mutation AddTechnique($input: FlavorTechniqueInput!) {
+                    addFlavorTechnique(input: $input) {
                         success
                         technique {
                             name

@@ -1,4 +1,12 @@
-import { addTechnique, createTechnique, deleteTechnique, getTechnique, getTechniques, updateTechnique } from '../../db/pairings/crud-technique';
+import {
+	addFlavorTechnique,
+	createTechnique,
+	deleteTechnique,
+	getTechnique,
+	getTechniques,
+	removeFlavorTechnique,
+	updateTechnique,
+} from '../../db/pairings/crud-technique';
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { FlavorTechnique, Technique } from '../../pairings/technique';
@@ -64,18 +72,34 @@ export const resolvers: Resolvers = {
 				technique: new Technique({ name }),
 			};
 		},
-		addTechnique: async (_root, { input: { flavor, technique } }, { authorizedUser }) => {
+		addFlavorTechnique: async (_root, { input: { flavor, technique } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a technique');
 			let addedTechnique = null;
 
 			try {
-				addedTechnique = await addTechnique(new FlavorTechnique(new Flavor({ name: flavor }), new Technique({ name: technique })));
+				addedTechnique = await addFlavorTechnique(new FlavorTechnique(new Flavor({ name: flavor }), new Technique({ name: technique })));
 			} catch (error) {
 				throw getGraphQLError(`adding technique: ${technique} to flavor: ${flavor}`, error);
 			}
 
 			return {
 				success: !!addedTechnique,
+				flavor: new Flavor({ name: flavor }),
+				technique: new Technique({ name: technique }),
+			};
+		},
+		removeFlavorTechnique: async (_root, { input: { flavor, technique } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to remove a technique');
+			let removedTechnique = null;
+
+			try {
+				removedTechnique = await removeFlavorTechnique(new FlavorTechnique(new Flavor({ name: flavor }), new Technique({ name: technique })));
+			} catch (error) {
+				throw getGraphQLError(`removing technique: ${technique} from flavor: ${flavor}`, error);
+			}
+
+			return {
+				success: !!removedTechnique,
 				flavor: new Flavor({ name: flavor }),
 				technique: new Technique({ name: technique }),
 			};

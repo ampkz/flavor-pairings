@@ -1,11 +1,12 @@
 import { FlavorTechnique, Technique } from '../../../src/pairings/technique';
 import {
-	addTechnique,
+	addFlavorTechnique,
 	createTechnique,
 	deleteTechnique,
 	getFlavorTechniques,
 	getTechnique,
 	getTechniques,
+	removeFlavorTechnique,
 	updateTechnique,
 } from '../../../src/db/pairings/crud-technique';
 import * as crud from '../../../src/db/utils/crud';
@@ -89,7 +90,7 @@ describe('CRUD Technique', () => {
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
 
 		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
-		const addedTechnique = await addTechnique(flavorTechnique);
+		const addedTechnique = await addFlavorTechnique(flavorTechnique);
 		expect(addedTechnique!.name).toBe(technique);
 	});
 
@@ -101,11 +102,11 @@ describe('CRUD Technique', () => {
 		const createdFlavor = new Flavor({ name: flavor });
 
 		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
-		const addedTechnique = await addTechnique(flavorTechnique);
+		const addedTechnique = await addFlavorTechnique(flavorTechnique);
 		expect(addedTechnique).toBeNull();
 	});
 
-	it('should return a list of techniques related to a flavor', async () => {
+	it('should return a technique when a FlavorTechnique is removed', async () => {
 		const flavor = (global as any).getNextNoun();
 		const technique = (global as any).getNextNoun();
 
@@ -113,9 +114,40 @@ describe('CRUD Technique', () => {
 		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
 
 		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
-		await addTechnique(flavorTechnique);
+		await addFlavorTechnique(flavorTechnique);
 
-		const relatedTechniques = await getFlavorTechniques(createdFlavor!);
-		expect(relatedTechniques).toContainEqual(expect.objectContaining({ name: technique }));
+		const removedTechnique = await removeFlavorTechnique(flavorTechnique);
+		expect(removedTechnique!.name).toBe(technique);
+	});
+
+	it('should return null if no FlavorTechnique is removed', async () => {
+		const flavor = (global as any).getNextNoun();
+		const technique = (global as any).getNextNoun();
+
+		const createdTechnique = new Technique({ name: technique });
+		const createdFlavor = new Flavor({ name: flavor });
+
+		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
+		const removedTechnique = await removeFlavorTechnique(flavorTechnique);
+		expect(removedTechnique).toBeNull();
+	});
+
+	it('should return a list of techniques attached to a flavor', async () => {
+		const flavor = (global as any).getNextNoun('gftq_');
+		const technique = (global as any).getNextNoun('gftq_');
+		const technique2 = (global as any).getNextNoun('gftq_');
+
+		const createdTechnique = await createTechnique(new Technique({ name: technique }));
+		const createdTechnique2 = await createTechnique(new Technique({ name: technique2 }));
+		const createdFlavor = await createFlavor(new Flavor({ name: flavor }));
+
+		const flavorTechnique = new FlavorTechnique(createdFlavor!, createdTechnique!);
+		const flavorTechnique2 = new FlavorTechnique(createdFlavor!, createdTechnique2!);
+		await addFlavorTechnique(flavorTechnique);
+		await addFlavorTechnique(flavorTechnique2);
+
+		const fetchedTechniques = await getFlavorTechniques(createdFlavor!);
+		expect(fetchedTechniques).toContainEqual(createdTechnique);
+		expect(fetchedTechniques).toContainEqual(createdTechnique2);
 	});
 });

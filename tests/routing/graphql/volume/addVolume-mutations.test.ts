@@ -21,7 +21,7 @@ describe('AddVolume mutations', () => {
 	it('should add a volume to a flavor and return the volume', async () => {
 		const flavorName = faker.word.noun();
 		const volumeName = faker.word.noun();
-		jest.spyOn(crudVolume, 'addVolume').mockResolvedValue({ name: volumeName });
+		jest.spyOn(crudVolume, 'addFlavorVolume').mockResolvedValue({ name: volumeName });
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
@@ -35,8 +35,8 @@ describe('AddVolume mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddVolume($input: AddVolumeInput!) {
-                    addVolume(input: $input) {
+                mutation AddVolume($input: FlavorVolumeInput!) {
+                    addFlavorVolume(input: $input) {
                         success
 						volume {
 							name
@@ -49,13 +49,13 @@ describe('AddVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addVolume).toEqual({ success: true, volume: { name: volumeName } });
+		expect(response.body.data.addFlavorVolume).toEqual({ success: true, volume: { name: volumeName } });
 	});
 
 	it('should return unsuccessful if no volume was added', async () => {
 		const flavorName = faker.word.noun();
 		const volumeName = faker.word.noun();
-		jest.spyOn(crudVolume, 'addVolume').mockResolvedValue(null);
+		jest.spyOn(crudVolume, 'addFlavorVolume').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
 			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
@@ -67,8 +67,8 @@ describe('AddVolume mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddVolume($input: AddVolumeInput!) {
-                    addVolume(input: $input) {
+                mutation AddVolume($input: FlavorVolumeInput!) {
+                    addFlavorVolume(input: $input) {
                         success
                         volume {
                             name
@@ -81,7 +81,7 @@ describe('AddVolume mutations', () => {
 			.set('Cookie', [`token=${token}`])
 			.expect(200);
 
-		expect(response.body.data.addVolume).toEqual({ success: false, volume: { name: volumeName } });
+		expect(response.body.data.addFlavorVolume).toEqual({ success: false, volume: { name: volumeName } });
 	});
 
 	it('should throw an error if the user is not authenticated', async () => {
@@ -89,8 +89,8 @@ describe('AddVolume mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddVolume($input: AddVolumeInput!) {
-                    addVolume(input: $input) {
+                mutation AddVolume($input: FlavorVolumeInput!) {
+                    addFlavorVolume(input: $input) {
                         success
 						volume {
 							name
@@ -106,7 +106,7 @@ describe('AddVolume mutations', () => {
 	});
 
 	it('should throw an error if there was an issue with the server', async () => {
-		jest.spyOn(crudVolume, 'addVolume').mockRejectedValue(new Error('Server error'));
+		jest.spyOn(crudVolume, 'addFlavorVolume').mockRejectedValue(new Error('Server error'));
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
 			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
@@ -118,8 +118,8 @@ describe('AddVolume mutations', () => {
 			.post('/graphql')
 			.send({
 				query: `
-                mutation AddVolume($input: AddVolumeInput!) {
-                    addVolume(input: $input) {
+                mutation AddVolume($input: FlavorVolumeInput!) {
+                    addFlavorVolume(input: $input) {
                         success
                         volume {
                             name

@@ -7,7 +7,8 @@ extend type Mutation {
 	createVolume(name: ID!): VolumeResult!
 	updateVolume(input: UpdateVolumeInput!): UpdateVolumeResult!
 	deleteVolume(name: ID!): VolumeResult
-	addVolume(input: AddVolumeInput!): AddVolumeResult!
+	addFlavorVolume(input: FlavorVolumeInput!): FlavorVolumeResult!
+	removeFlavorVolume(input: FlavorVolumeInput!): FlavorVolumeResult!
 }
 
 type Volume {
@@ -26,13 +27,13 @@ type UpdateVolumeResult {
 	previousVolume: Volume!
 }
 
-type AddVolumeResult {
+type FlavorVolumeResult {
 	success: Boolean!
 	volume: Volume!
 	flavor: Flavor!
 }
 
-input AddVolumeInput {
+input FlavorVolumeInput {
 	flavor: ID!
 	volume: ID!
 }

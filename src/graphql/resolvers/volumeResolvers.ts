@@ -1,4 +1,4 @@
-import { addVolume, createVolume, deleteVolume, getVolume, getVolumes, updateVolume } from '../../db/pairings/crud-volume';
+import { addFlavorVolume, createVolume, deleteVolume, getVolume, getVolumes, removeFlavorVolume, updateVolume } from '../../db/pairings/crud-volume';
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { FlavorVolume, Volume } from '../../pairings/volume';
@@ -65,18 +65,34 @@ export const resolvers: Resolvers = {
 				volume: new Volume({ name }),
 			};
 		},
-		addVolume: async (_root, { input: { flavor, volume } }, { authorizedUser }) => {
+		addFlavorVolume: async (_root, { input: { flavor, volume } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a volume');
 			let addedVolume = null;
 
 			try {
-				addedVolume = await addVolume(new FlavorVolume(new Flavor({ name: flavor }), new Volume({ name: volume })));
+				addedVolume = await addFlavorVolume(new FlavorVolume(new Flavor({ name: flavor }), new Volume({ name: volume })));
 			} catch (error) {
 				throw getGraphQLError(`adding volume: ${volume} to flavor: ${flavor}`, error);
 			}
 
 			return {
 				success: !!addedVolume,
+				flavor: new Flavor({ name: flavor }),
+				volume: new Volume({ name: volume }),
+			};
+		},
+		removeFlavorVolume: async (_root, { input: { flavor, volume } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to remove a volume');
+			let removedVolume = null;
+
+			try {
+				removedVolume = await removeFlavorVolume(new FlavorVolume(new Flavor({ name: flavor }), new Volume({ name: volume })));
+			} catch (error) {
+				throw getGraphQLError(`removing volume: ${volume} from flavor: ${flavor}`, error);
+			}
+
+			return {
+				success: !!removedVolume,
 				flavor: new Flavor({ name: flavor }),
 				volume: new Volume({ name: volume }),
 			};

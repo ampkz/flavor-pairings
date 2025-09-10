@@ -1,4 +1,4 @@
-import { addTaste, createTaste, deleteTaste, getTaste, getTastes, updateTaste } from '../../db/pairings/crud-taste';
+import { addFlavorTaste, createTaste, deleteTaste, getTaste, getTastes, removeFlavorTaste, updateTaste } from '../../db/pairings/crud-taste';
 import { Resolvers } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { FlavorTaste, Taste } from '../../pairings/taste';
@@ -65,18 +65,34 @@ export const resolvers: Resolvers = {
 				taste: new Taste({ name }),
 			};
 		},
-		addTaste: async (_root, { input: { flavor, taste } }, { authorizedUser }) => {
+		addFlavorTaste: async (_root, { input: { flavor, taste } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to add a taste');
 			let addedTaste = null;
 
 			try {
-				addedTaste = await addTaste(new FlavorTaste(new Flavor({ name: flavor }), new Taste({ name: taste })));
+				addedTaste = await addFlavorTaste(new FlavorTaste(new Flavor({ name: flavor }), new Taste({ name: taste })));
 			} catch (error) {
 				throw getGraphQLError(`adding taste: ${taste} to flavor: ${flavor}`, error);
 			}
 
 			return {
 				success: !!addedTaste,
+				flavor: new Flavor({ name: flavor }),
+				taste: new Taste({ name: taste }),
+			};
+		},
+		removeFlavorTaste: async (_root, { input: { flavor, taste } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to remove a taste');
+			let removedTaste = null;
+
+			try {
+				removedTaste = await removeFlavorTaste(new FlavorTaste(new Flavor({ name: flavor }), new Taste({ name: taste })));
+			} catch (error) {
+				throw getGraphQLError(`removing taste: ${taste} from flavor: ${flavor}`, error);
+			}
+
+			return {
+				success: !!removedTaste,
 				flavor: new Flavor({ name: flavor }),
 				taste: new Taste({ name: taste }),
 			};

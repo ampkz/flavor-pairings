@@ -7,7 +7,8 @@ extend type Mutation {
 	createWeight(name: ID!): WeightResult!
 	updateWeight(input: UpdateWeightInput!): UpdateWeightResult!
 	deleteWeight(name: ID!): WeightResult
-	addWeight(input: AddWeightInput!): AddWeightResult!
+	addFlavorWeight(input: FlavorWeightInput!): FlavorWeightResult!
+	removeFlavorWeight(input: FlavorWeightInput!): FlavorWeightResult!
 }
 
 type Weight {
@@ -26,13 +27,13 @@ type UpdateWeightResult {
 	previousWeight: Weight!
 }
 
-type AddWeightResult {
+type FlavorWeightResult {
 	success: Boolean!
 	weight: Weight!
 	flavor: Flavor!
 }
 
-input AddWeightInput {
+input FlavorWeightInput {
 	flavor: ID!
 	weight: ID!
 }
