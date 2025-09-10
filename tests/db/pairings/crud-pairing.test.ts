@@ -1,5 +1,5 @@
 import { createFlavor } from '../../../src/db/pairings/crud-flavor';
-import { createPairing, deletePairing, getFlavorPairings } from '../../../src/db/pairings/crud-pairing';
+import { createPairing, deletePairing, getFlavorPairings, updatePairing } from '../../../src/db/pairings/crud-pairing';
 import { Flavor } from '../../../src/pairings/flavor';
 import { Pairing } from '../../../src/pairings/pairing';
 import { PairingAffinity } from '../../../src/generated/graphql';
@@ -70,5 +70,34 @@ describe('CRUD Pairing', () => {
 
 		const deleted = await deletePairing(pairing);
 		expect(deleted).toBeNull();
+	});
+
+	it('should update a pairing', async () => {
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+
+		await createFlavor(flavor1);
+		await createFlavor(flavor2);
+
+		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular, 'especially with desserts');
+		await createPairing(pairing);
+
+		const updatedPairing = await updatePairing(pairing, PairingAffinity.Bold, 'especially with spicy foods');
+
+		expect(updatedPairing).not.toBeNull();
+		expect(updatedPairing!.flavor1.name).toBe(flavor1.name);
+		expect(updatedPairing!.flavor2.name).toBe(flavor2.name);
+		expect(updatedPairing!.affinity).toBe(PairingAffinity.Bold);
+		expect(updatedPairing!.especially).toBe('especially with spicy foods');
+	});
+
+	it('should return null if no pairing was found to update', async () => {
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+		const flavor2 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+
+		const pairing = new Pairing(flavor1, flavor2, PairingAffinity.Regular);
+
+		const updatedPairing = await updatePairing(pairing, PairingAffinity.Bold, 'especially with spicy foods');
+		expect(updatedPairing).toBeNull();
 	});
 });

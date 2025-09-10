@@ -170,6 +170,7 @@ export type Mutation = {
   removeFlavorVolume: FlavorVolumeResult;
   removeFlavorWeight: FlavorWeightResult;
   updateFlavor: UpdateFlavorResult;
+  updatePairing: PairingResult;
   updateTaste: UpdateTasteResult;
   updateTechnique: UpdateTechniqueResult;
   updateVolume: UpdateVolumeResult;
@@ -295,6 +296,11 @@ export type MutationRemoveFlavorWeightArgs = {
 
 export type MutationUpdateFlavorArgs = {
   input: UpdateFlavorInput;
+};
+
+
+export type MutationUpdatePairingArgs = {
+  input: UpdatePairingInput;
 };
 
 
@@ -440,6 +446,14 @@ export type UpdateFlavorResult = {
   flavor: Flavor;
   previousFlavor: Flavor;
   success: Scalars['Boolean']['output'];
+};
+
+export type UpdatePairingInput = {
+  affinity: PairingAffinity;
+  flavor1: Scalars['ID']['input'];
+  flavor2: Scalars['ID']['input'];
+  updatedAffinity: PairingAffinity;
+  updatedEspecially?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateTasteInput = {
@@ -622,6 +636,7 @@ export type ResolversTypes = {
   TechniqueResult: ResolverTypeWrapper<TechniqueResult>;
   UpdateFlavorInput: UpdateFlavorInput;
   UpdateFlavorResult: ResolverTypeWrapper<UpdateFlavorResult>;
+  UpdatePairingInput: UpdatePairingInput;
   UpdateTasteInput: UpdateTasteInput;
   UpdateTasteResult: ResolverTypeWrapper<UpdateTasteResult>;
   UpdateTechniqueInput: UpdateTechniqueInput;
@@ -674,6 +689,7 @@ export type ResolversParentTypes = {
   TechniqueResult: TechniqueResult;
   UpdateFlavorInput: UpdateFlavorInput;
   UpdateFlavorResult: UpdateFlavorResult;
+  UpdatePairingInput: UpdatePairingInput;
   UpdateTasteInput: UpdateTasteInput;
   UpdateTasteResult: UpdateTasteResult;
   UpdateTechniqueInput: UpdateTechniqueInput;
@@ -787,6 +803,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   removeFlavorVolume?: Resolver<ResolversTypes['FlavorVolumeResult'], ParentType, ContextType, RequireFields<MutationRemoveFlavorVolumeArgs, 'input'>>;
   removeFlavorWeight?: Resolver<ResolversTypes['FlavorWeightResult'], ParentType, ContextType, RequireFields<MutationRemoveFlavorWeightArgs, 'input'>>;
   updateFlavor?: Resolver<ResolversTypes['UpdateFlavorResult'], ParentType, ContextType, RequireFields<MutationUpdateFlavorArgs, 'input'>>;
+  updatePairing?: Resolver<ResolversTypes['PairingResult'], ParentType, ContextType, RequireFields<MutationUpdatePairingArgs, 'input'>>;
   updateTaste?: Resolver<ResolversTypes['UpdateTasteResult'], ParentType, ContextType, RequireFields<MutationUpdateTasteArgs, 'input'>>;
   updateTechnique?: Resolver<ResolversTypes['UpdateTechniqueResult'], ParentType, ContextType, RequireFields<MutationUpdateTechniqueArgs, 'input'>>;
   updateVolume?: Resolver<ResolversTypes['UpdateVolumeResult'], ParentType, ContextType, RequireFields<MutationUpdateVolumeArgs, 'input'>>;

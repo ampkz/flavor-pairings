@@ -2,10 +2,23 @@ import { Node, NodeType, RelationshipType } from '../../_helpers/nodes';
 import { Paired } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { Pairing } from '../../pairings/pairing';
-import { createRelationship, deleteRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
+import { createRelationship, deleteRelationship, getRelationshipsToNode, updateRelationship } from '../utils/relationship/crud-relationship';
 
 export async function createPairing(pairing: Pairing): Promise<Pairing | null> {
 	const [f1, f2, r] = await createRelationship(pairing.getRelationship());
+
+	if (f1 !== null && f2 !== null && r !== null) {
+		return new Pairing(new Flavor(f1), new Flavor(f2), r.affinity, r.especially || null);
+	}
+
+	return null;
+}
+
+export async function updatePairing(pairing: Pairing, updatedAffinity: string, updatedEspecially: string | null): Promise<Pairing | null> {
+	const [f1, f2, r] = await updateRelationship(pairing.getRelationship(), ['affinity', 'especially'], {
+		affinity: updatedAffinity,
+		especially: updatedEspecially,
+	});
 
 	if (f1 !== null && f2 !== null && r !== null) {
 		return new Pairing(new Flavor(f1), new Flavor(f2), r.affinity, r.especially || null);

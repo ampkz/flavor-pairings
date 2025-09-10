@@ -13,7 +13,7 @@ import {
 	setFlavorTips,
 	updateFlavor,
 } from '../../db/pairings/crud-flavor';
-import { createPairing, deletePairing, getFlavorPairings } from '../../db/pairings/crud-pairing';
+import { createPairing, deletePairing, getFlavorPairings, updatePairing } from '../../db/pairings/crud-pairing';
 import { getTotalNodeCountByType } from '../../db/utils/crud';
 import { getTotalRelationshipsToNodes } from '../../db/utils/relationship/crud-relationship';
 import { Resolvers } from '../../generated/graphql';
@@ -124,6 +124,29 @@ export const resolvers: Resolvers = {
 				pairing: {
 					flavor: new Flavor({ name: flavor1 }),
 					paired: { flavor: new Flavor({ name: flavor2 }), affinity, especially: especially || null },
+				},
+			};
+		},
+		updatePairing: async (_root, { input: { flavor1, flavor2, affinity, updatedAffinity, updatedEspecially } }, { authorizedUser }) => {
+			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a pairing');
+
+			let updatedPair: Pairing | null = null;
+			const pairing = new Pairing(new Flavor({ name: flavor1 }), new Flavor({ name: flavor2 }), affinity);
+			try {
+				updatedPair = await updatePairing(pairing, updatedAffinity, updatedEspecially || null);
+			} catch (error) {
+				throw getGraphQLError(`updating pairing: ${flavor1}-${affinity}->${flavor2}`, error);
+			}
+
+			return {
+				success: !!updatedPair,
+				pairing: {
+					flavor: new Flavor({ name: flavor1 }),
+					paired: {
+						flavor: new Flavor({ name: flavor2 }),
+						affinity: updatedPair ? updatedPair.affinity : affinity,
+						especially: updatedPair ? updatedPair.especially : updatedEspecially || null,
+					},
 				},
 			};
 		},

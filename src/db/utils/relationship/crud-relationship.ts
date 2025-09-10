@@ -10,6 +10,7 @@ export enum Errors {
 	COULD_NOT_CREATE_RELATIONSHIP = 'Could not create relationship.',
 	COULD_NOT_DELETE_RELATIONSHIP = 'Could not delete relationship.',
 	COULD_NOT_GET_RELATIONSHIPS = 'Could not get relationships.',
+	COULD_NOT_UPDATE_RELATIONSHIP = 'Could not update relationship.',
 }
 
 export async function createRelationship(relationship: Relationship): Promise<[any | null, any | null, any | null]> {
@@ -194,4 +195,53 @@ export async function deleteRelationship(relationship: Relationship, undirectedM
 	}
 
 	return [match.records[0].get('n1').properties, match.records[0].get('n2').properties];
+}
+
+export async function updateRelationship(
+	relationship: Relationship,
+	updatedIdProps: string[],
+	updatedIdParams: object,
+	undirectedMatch: boolean = false
+): Promise<[any | null, any | null, any | null]> {
+	const driver: Driver = await connect();
+	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
+
+	let match: RecordShape;
+
+	const query = `
+		CALL () {
+			MATCH (n:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[:${RelationshipType.REFERENCES}]-${
+		undirectedMatch ? '' : '>'
+	}(n1:${relationship.node1.nodeType})-[r:${relationship.type} ${relationship.hasIdProp() ? `{${relationship.getIdString('r')}}` : ''}]-(n2:${
+		relationship.node2.nodeType
+	} {${relationship.node2.getIdString('n2')}})
+			RETURN n1, n2, r
+		UNION
+			MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[r:${relationship.type} ${
+		relationship.hasIdProp() ? `{${relationship.getIdString('r')}}` : ''
+	}]-(n2:${relationship.node2.nodeType} {${relationship.node2.getIdString('n2')}})
+			RETURN n1, n2, r
+		}
+		SET ${updatedIdProps.map(prop => `r.${prop} = $${prop}`).join(', ')}
+		RETURN n1, n2, r
+	`;
+
+	try {
+		match = await session.run(query, { ...updatedIdParams, ...relationship.getRelationshipParams('n1', 'n2', 'r') });
+	} catch (error) {
+		throw new InternalError(Errors.COULD_NOT_UPDATE_RELATIONSHIP, { cause: error });
+	} finally {
+		await session.close();
+		await driver.close();
+	}
+
+	if (match.records.length === 0) {
+		return [null, null, null];
+	}
+
+	return [
+		match.records[0].get('n1').properties,
+		match.records[0].get('n2').properties,
+		{ type: match.records[0].get('r').type, ...match.records[0].get('r').properties },
+	];
 }

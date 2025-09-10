@@ -10,6 +10,7 @@ extend type Mutation {
 	flavorTips(name: ID!, tips: String): FlavorTipsResult!
 	createPairing(input: CreatePairingInput!): PairingResult!
 	deletePairing(input: DeletePairingInput!): PairingResult!
+	updatePairing(input: UpdatePairingInput!): PairingResult!
 	createFlavorReference(input: FlavorReferenceInput!): FlavorReferenceResult!
 	deleteFlavorReference(input: FlavorReferenceInput!): FlavorReferenceResult!
 }
@@ -90,6 +91,14 @@ input CreatePairingInput {
 	flavor2: ID!
 	affinity: PairingAffinity!
 	especially: String
+}
+
+input UpdatePairingInput {
+	flavor1: ID!
+	flavor2: ID!
+	affinity: PairingAffinity!
+	updatedAffinity: PairingAffinity!
+	updatedEspecially: String
 }
 
 type PairingResult {

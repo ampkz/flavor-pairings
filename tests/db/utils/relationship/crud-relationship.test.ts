@@ -7,8 +7,12 @@ import {
 	Errors,
 	deleteRelationship,
 	getTotalRelationshipsToNodes,
+	updateRelationship,
 } from '../../../../src/db/utils/relationship/crud-relationship';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
+import { PairingAffinity } from '../../../../src/generated/graphql';
+import { Pairing } from '../../../../src/pairings/pairing';
+import { Flavor } from '../../../../src/pairings/flavor';
 
 describe('CRUD Relationship', () => {
 	beforeEach(() => {
@@ -249,5 +253,51 @@ describe('CRUD Relationship', () => {
 		jest.spyOn(neo4j, 'driver').mockReturnValueOnce(driverMock);
 
 		await expect(deleteRelationship(r)).rejects.toThrow(Errors.COULD_NOT_DELETE_RELATIONSHIP);
+	});
+
+	it('should update a relationship', async () => {
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('ur_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('ur_'));
+
+		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
+		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
+
+		const pairing = new Pairing(new Flavor({ name: n1.idValue }), new Flavor({ name: n2.idValue }), PairingAffinity.Regular, 'especially');
+
+		await createRelationship(pairing.getRelationship());
+
+		const updatedAffinity = PairingAffinity.Bold;
+		const updatedEspecially = 'very especially';
+
+		const [updatedN1, updatedN2, updatedR] = await updateRelationship(pairing.getRelationship(), ['affinity', 'especially'], {
+			affinity: updatedAffinity,
+			especially: updatedEspecially,
+		});
+
+		expect(updatedN1.name).toEqual(n1.idValue);
+		expect(updatedN2.name).toEqual(n2.idValue);
+		expect(updatedR.type).toEqual(RelationshipType.PAIRS_WITH);
+		expect(updatedR.affinity).toEqual(updatedAffinity);
+		expect(updatedR.especially).toEqual(updatedEspecially);
+	});
+
+	it('should throw an error if there was an internal issue when updating a relationship', async () => {
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('ur_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('ur_'));
+
+		const r: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
+
+		const driverMock = {
+			session: jest.fn().mockReturnValue({
+				run: jest.fn().mockRejectedValue(new InternalError(Errors.COULD_NOT_UPDATE_RELATIONSHIP)),
+				close: jest.fn(),
+			} as unknown as Session),
+			close: jest.fn(),
+			getServerInfo: jest.fn(),
+		} as unknown as Driver;
+
+		jest.spyOn(neo4j, 'driver').mockReturnValueOnce(driverMock);
+
+		await expect(updateRelationship(r, ['affinity'], { affinity: PairingAffinity.Bold })).rejects.toThrow(Errors.COULD_NOT_UPDATE_RELATIONSHIP);
 	});
 });
