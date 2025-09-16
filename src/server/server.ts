@@ -92,7 +92,8 @@ async function startServer() {
 		'/graphql',
 		expressMiddleware(server, {
 			context: async ({ req }) => {
-				if (Config.IS_NOT_PROD && req.headers.host === `localhost:${Config.PORT}`) {
+				// Bypass auth in non-prod for Chrome browser (for easier testing with Apollo Studio)
+				if (Config.IS_NOT_PROD && req.ip === '::1' && req.headers['user-agent']?.includes('Chrome')) {
 					return { authorizedUser: new User({ email: 'apollo', auth: Auth.CONTRIBUTOR }) };
 				}
 

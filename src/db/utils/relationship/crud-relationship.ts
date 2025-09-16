@@ -245,3 +245,27 @@ export async function updateRelationship(
 		{ type: match.records[0].get('r').type, ...match.records[0].get('r').properties },
 	];
 }
+
+export async function deleteAllRelationships(node: Node): Promise<boolean> {
+	const driver: Driver = await connect();
+	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
+
+	let success = false;
+
+	const query = `
+		MATCH (n:${node.nodeType} { ${node.getIdString()} })-[r]-()
+		DELETE r
+	`;
+
+	try {
+		const match = await session.run(query, node.getIdParams());
+		success = match.summary.updateStatistics.updates().relationshipsDeleted > 0;
+	} catch (error) {
+		throw new InternalError(Errors.COULD_NOT_DELETE_RELATIONSHIP, { cause: error });
+	} finally {
+		await session.close();
+		await driver.close();
+	}
+
+	return success;
+}

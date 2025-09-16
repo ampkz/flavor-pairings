@@ -24,7 +24,7 @@ describe('DeleteVolume mutations', () => {
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -55,7 +55,7 @@ describe('DeleteVolume mutations', () => {
 		jest.spyOn(crudVolume, 'deleteVolume').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -106,7 +106,7 @@ describe('DeleteVolume mutations', () => {
 		jest.spyOn(crudVolume, 'deleteVolume').mockRejectedValue(new Error('Server error'));
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 

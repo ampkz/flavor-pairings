@@ -8,6 +8,7 @@ import {
 	deleteRelationship,
 	getTotalRelationshipsToNodes,
 	updateRelationship,
+	deleteAllRelationships,
 } from '../../../../src/db/utils/relationship/crud-relationship';
 import { InternalError } from '@ampkz/auth-neo4j/errors';
 import { PairingAffinity } from '../../../../src/generated/graphql';
@@ -299,5 +300,51 @@ describe('CRUD Relationship', () => {
 		jest.spyOn(neo4j, 'driver').mockReturnValueOnce(driverMock);
 
 		await expect(updateRelationship(r, ['affinity'], { affinity: PairingAffinity.Bold })).rejects.toThrow(Errors.COULD_NOT_UPDATE_RELATIONSHIP);
+	});
+
+	it(`should delete all relationship`, async () => {
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('dr_'));
+		const n2: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('dr_'));
+		const n3: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('dr_'));
+
+		await createNode(n1.nodeType, [n1.getIdString()], n1.getIdParams());
+		await createNode(n2.nodeType, [n2.getIdString()], n2.getIdParams());
+		await createNode(n3.nodeType, [n3.getIdString()], n3.getIdParams());
+
+		const r1: Relationship = new Relationship(n1, n2, RelationshipType.PAIRS_WITH);
+		const r2: Relationship = new Relationship(n1, n3, RelationshipType.PAIRS_WITH);
+
+		await createRelationship(r1);
+		await createRelationship(r2);
+
+		const success = await deleteAllRelationships(n1);
+		expect(success).toBe(true);
+
+		const relationships = await getRelationshipsToNode(n1, n2.nodeType, r1.type, true);
+		expect(relationships).toHaveLength(0);
+	});
+
+	it(`should throw an error if there was an internal issue when deleting all relationships`, async () => {
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('dr_'));
+
+		const driverMock = {
+			session: jest.fn().mockReturnValue({
+				run: jest.fn().mockRejectedValue(new InternalError(Errors.COULD_NOT_DELETE_RELATIONSHIP)),
+				close: jest.fn(),
+			} as unknown as Session),
+			close: jest.fn(),
+			getServerInfo: jest.fn(),
+		} as unknown as Driver;
+
+		jest.spyOn(neo4j, 'driver').mockReturnValueOnce(driverMock);
+
+		await expect(deleteAllRelationships(n1)).rejects.toThrow(Errors.COULD_NOT_DELETE_RELATIONSHIP);
+	});
+
+	it(`should return false if there were no relationships to delete`, async () => {
+		const n1: Node = new Node(NodeType.FLAVOR, 'name', (global as any).getNextNoun('dr_'));
+
+		const success = await deleteAllRelationships(n1);
+		expect(success).toBe(false);
 	});
 });

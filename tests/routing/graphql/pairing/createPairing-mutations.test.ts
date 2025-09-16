@@ -31,7 +31,7 @@ describe('CreateFlavor mutations', () => {
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -74,7 +74,7 @@ describe('CreateFlavor mutations', () => {
 		jest.spyOn(crudPairing, 'createPairing').mockResolvedValue(pairing);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -99,7 +99,7 @@ describe('CreateFlavor mutations', () => {
 		jest.spyOn(crudPairing, 'createPairing').mockRejectedValue(new InternalError('Server error'));
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 

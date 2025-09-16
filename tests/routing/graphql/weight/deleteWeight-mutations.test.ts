@@ -24,7 +24,7 @@ describe('DeleteWeight mutations', () => {
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -55,7 +55,7 @@ describe('DeleteWeight mutations', () => {
 		jest.spyOn(crudWeight, 'deleteWeight').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -106,7 +106,7 @@ describe('DeleteWeight mutations', () => {
 		jest.spyOn(crudWeight, 'deleteWeight').mockRejectedValue(new Error('Server error'));
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 

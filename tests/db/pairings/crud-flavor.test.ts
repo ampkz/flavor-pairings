@@ -13,6 +13,9 @@ import {
 } from '../../../src/db/pairings/crud-flavor';
 import * as crud from '../../../src/db/utils/crud';
 import { faker } from '@faker-js/faker';
+import { createPairing, getFlavorPairings } from '../../../src/db/pairings/crud-pairing';
+import { Pairing } from '../../../src/pairings/pairing';
+import { PairingAffinity } from '../../../src/generated/graphql';
 
 describe('CRUD Flavor', () => {
 	beforeEach(() => {
@@ -104,6 +107,34 @@ describe('CRUD Flavor', () => {
 
 		const reference = await getFlavorReference(flavor1);
 		expect(reference!.name).toBe(flavor2.name);
+	});
+
+	it('should clear all relationships and tips when creating a new reference', async () => {
+		const name1 = 'ref_flavor1_' + faker.word.noun();
+		const name2 = 'ref_flavor2_' + faker.word.noun();
+		const name3 = 'ref_flavor3_' + faker.word.noun();
+		const flavor1 = new Flavor({ name: name1 });
+		const flavor2 = new Flavor({ name: name2 });
+		const flavor3 = new Flavor({ name: name3 });
+		await createFlavor(flavor1);
+		await createFlavor(flavor2);
+		await createFlavor(flavor3);
+		await setFlavorTips(flavor1, 'These are some tips');
+		let tips = await getFlavorTips(flavor1);
+		expect(tips).toBe('These are some tips');
+
+		await createPairing(new Pairing(flavor1, flavor3, PairingAffinity.Bold, 'Especially with chocolate'));
+		const pairingsBefore = await getFlavorPairings(flavor1);
+		expect(pairingsBefore.length).toBe(1);
+
+		await createFlavorReference(flavor1, flavor2);
+		const reference = await getFlavorReference(flavor1);
+		expect(reference!.name).toBe(flavor2.name);
+		tips = await getFlavorTips(flavor1);
+		expect(tips).toBeNull();
+
+		const pairingsAfter = await getFlavorPairings(flavor1);
+		expect(pairingsAfter.length).toBe(0);
 	});
 
 	it('should return null if no reference was created', async () => {

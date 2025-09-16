@@ -3,7 +3,7 @@ import { Node, NodeType, Relationship, RelationshipType } from '../../_helpers/n
 import { UpdateFlavorInput } from '../../generated/graphql';
 import { Flavor } from '../../pairings/flavor';
 import { createNode, deleteNode, getNode, getNodes, updateNode } from '../utils/crud';
-import { createRelationship, deleteRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
+import { createRelationship, deleteAllRelationships, deleteRelationship, getRelationshipsToNode } from '../utils/relationship/crud-relationship';
 
 export async function createFlavor(flavor: Flavor): Promise<Flavor | null> {
 	const createdNode = await createNode(NodeType.FLAVOR, ['name: $name'], { name: flavor.name });
@@ -56,22 +56,25 @@ export async function getFlavorReference(flavor: Flavor): Promise<Flavor | null>
 	return new Flavor(reference[0][0]);
 }
 
-export async function createFlavorReference(reference: Flavor, flavor: Flavor): Promise<[Flavor | null, Flavor | null]> {
+export async function createFlavorReference(fromFlavor: Flavor, toFlavor: Flavor): Promise<[Flavor | null, Flavor | null]> {
+	await deleteAllRelationships(new Node(NodeType.FLAVOR, 'name', fromFlavor.name));
+	await setFlavorTips(fromFlavor, null);
+
 	const relationship = new Relationship(
-		new Node(NodeType.FLAVOR, 'name', reference.name),
-		new Node(NodeType.FLAVOR, 'name', flavor.name),
+		new Node(NodeType.FLAVOR, 'name', fromFlavor.name),
+		new Node(NodeType.FLAVOR, 'name', toFlavor.name),
 		RelationshipType.REFERENCES
 	);
 	const [from, to] = await createRelationship(relationship);
-	return [from ? reference : null, to ? flavor : null];
+	return [from ? fromFlavor : null, to ? toFlavor : null];
 }
 
-export async function deleteFlavorReference(reference: Flavor, flavor: Flavor): Promise<[Flavor | null, Flavor | null]> {
+export async function deleteFlavorReference(fromFlavor: Flavor, toFlavor: Flavor): Promise<[Flavor | null, Flavor | null]> {
 	const relationship = new Relationship(
-		new Node(NodeType.FLAVOR, 'name', reference.name),
-		new Node(NodeType.FLAVOR, 'name', flavor.name),
+		new Node(NodeType.FLAVOR, 'name', fromFlavor.name),
+		new Node(NodeType.FLAVOR, 'name', toFlavor.name),
 		RelationshipType.REFERENCES
 	);
 	const [from, to] = await deleteRelationship(relationship);
-	return [from ? reference : null, to ? flavor : null];
+	return [from ? fromFlavor : null, to ? toFlavor : null];
 }

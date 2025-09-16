@@ -25,7 +25,7 @@ describe('AddTechnique mutations', () => {
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -58,7 +58,7 @@ describe('AddTechnique mutations', () => {
 		jest.spyOn(crudTechnique, 'addFlavorTechnique').mockResolvedValue(null);
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 
@@ -89,7 +89,7 @@ describe('AddTechnique mutations', () => {
 
 		const validateSessionTokenSpy = jest.spyOn(sessions, 'validateSessionToken');
 		validateSessionTokenSpy.mockResolvedValueOnce({
-			session: { id: '', expiresAt: new Date(), userID: '', host: '', userAgent: '' },
+			session: { id: '', expiresAt: new Date(), userID: '', clientIp: '', userAgent: '' },
 			user: new User({ email: faker.internet.email(), auth: Auth.ADMIN }),
 		});
 

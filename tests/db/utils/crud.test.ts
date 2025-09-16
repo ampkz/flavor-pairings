@@ -118,7 +118,7 @@ describe('Node CRUD Operations', () => {
 	});
 
 	it('should remove properties from a node', async () => {
-		const flavor = (global as any).getNextNoun();
+		const flavor = (global as any).getNextNoun('rp_');
 		await createNode(NodeType.FLAVOR, ['name: $name', 'propToRemove: $propToRemove'], { name: flavor, propToRemove: 'removeMe' });
 		const result = await removeProperties(NodeType.FLAVOR, 'f', ['name: $name'], ['f.propToRemove'], {
 			name: flavor,
