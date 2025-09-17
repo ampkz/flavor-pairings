@@ -18,19 +18,29 @@ export async function createRelationship(relationship: Relationship): Promise<[a
 	const session: Session = driver.session(getSessionOptions(Config.PAIRINGS_DB));
 
 	let query = `
-		CALL () {
-			MATCH (n:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})-[:${RelationshipType.REFERENCES}]->(n1:${
-		relationship.node1.nodeType
-	})
-			RETURN n1
-		UNION
-			MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}})
-			RETURN n1
+		CYPHER 25
+		MATCH (n1:${relationship.node1.nodeType} {${relationship.node1.getIdString('n1')}}),
+		(n2:${relationship.node2.nodeType} {${relationship.node2.getIdString('n2')}})
+		OPTIONAL MATCH (n1)-[:${RelationshipType.REFERENCES}]->(n1ref:${relationship.node1.nodeType})
+		OPTIONAL MATCH (n2)-[:${RelationshipType.REFERENCES}]->(n2ref:${relationship.node2.nodeType})
+		RETURN n1ref, n1, n2, n2ref
+
+		NEXT
+
+		WHEN n1ref IS NOT NULL THEN {
+			MATCH (n1ref)-[r:${relationship.type} ${relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''}]-(n2)
+			RETURN n1ref AS n1, n2, r
+		} 
+		
+		WHEN n2ref IS NOT NULL THEN {
+			MATCH (n1)-[r:${relationship.type} ${relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''}]-(n2ref)
+			RETURN n1, n2ref AS n2, r
+		} 
+		
+		ELSE {
+			MATCH (n1)-[r:${relationship.type} ${relationship.hasIdProp() ? '{' + relationship.getIdString('r') + '}' : ''}]-(n2)
+			RETURN n1, n2, r
 		}
-		MATCH (n1)-[r:${relationship.type} {${relationship.hasIdProp() ? relationship.getIdString('r') : ''}}]-(n2:${
-		relationship.node2.nodeType
-	} {${relationship.node2.getIdString('n2')}})
-		RETURN n1, n2, r
 	`;
 
 	let match: RecordShape = await session.run(query, relationship.getRelationshipParams('n1', 'n2', 'r'));
