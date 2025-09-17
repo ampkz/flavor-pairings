@@ -444,6 +444,7 @@ export type UpdateFlavorInput = {
 export type UpdateFlavorResult = {
   __typename?: 'UpdateFlavorResult';
   flavor: Flavor;
+  message?: Maybe<Scalars['String']['output']>;
   previousFlavor: Flavor;
   success: Scalars['Boolean']['output'];
 };
@@ -463,6 +464,7 @@ export type UpdateTasteInput = {
 
 export type UpdateTasteResult = {
   __typename?: 'UpdateTasteResult';
+  message?: Maybe<Scalars['String']['output']>;
   previousTaste: Taste;
   success: Scalars['Boolean']['output'];
   taste: Taste;
@@ -475,6 +477,7 @@ export type UpdateTechniqueInput = {
 
 export type UpdateTechniqueResult = {
   __typename?: 'UpdateTechniqueResult';
+  message?: Maybe<Scalars['String']['output']>;
   previousTechnique: Technique;
   success: Scalars['Boolean']['output'];
   technique: Technique;
@@ -487,6 +490,7 @@ export type UpdateVolumeInput = {
 
 export type UpdateVolumeResult = {
   __typename?: 'UpdateVolumeResult';
+  message?: Maybe<Scalars['String']['output']>;
   previousVolume: Volume;
   success: Scalars['Boolean']['output'];
   volume: Volume;
@@ -499,6 +503,7 @@ export type UpdateWeightInput = {
 
 export type UpdateWeightResult = {
   __typename?: 'UpdateWeightResult';
+  message?: Maybe<Scalars['String']['output']>;
   previousWeight: Weight;
   success: Scalars['Boolean']['output'];
   weight: Weight;
@@ -880,12 +885,14 @@ export type TechniqueResultResolvers<ContextType = any, ParentType extends Resol
 
 export type UpdateFlavorResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateFlavorResult'] = ResolversParentTypes['UpdateFlavorResult']> = {
   flavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   previousFlavor?: Resolver<ResolversTypes['Flavor'], ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
 export type UpdateTasteResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateTasteResult'] = ResolversParentTypes['UpdateTasteResult']> = {
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   previousTaste?: Resolver<ResolversTypes['Taste'], ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   taste?: Resolver<ResolversTypes['Taste'], ParentType, ContextType>;
@@ -893,6 +900,7 @@ export type UpdateTasteResultResolvers<ContextType = any, ParentType extends Res
 };
 
 export type UpdateTechniqueResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateTechniqueResult'] = ResolversParentTypes['UpdateTechniqueResult']> = {
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   previousTechnique?: Resolver<ResolversTypes['Technique'], ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   technique?: Resolver<ResolversTypes['Technique'], ParentType, ContextType>;
@@ -900,6 +908,7 @@ export type UpdateTechniqueResultResolvers<ContextType = any, ParentType extends
 };
 
 export type UpdateVolumeResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateVolumeResult'] = ResolversParentTypes['UpdateVolumeResult']> = {
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   previousVolume?: Resolver<ResolversTypes['Volume'], ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   volume?: Resolver<ResolversTypes['Volume'], ParentType, ContextType>;
@@ -907,6 +916,7 @@ export type UpdateVolumeResultResolvers<ContextType = any, ParentType extends Re
 };
 
 export type UpdateWeightResultResolvers<ContextType = any, ParentType extends ResolversParentTypes['UpdateWeightResult'] = ResolversParentTypes['UpdateWeightResult']> = {
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   previousWeight?: Resolver<ResolversTypes['Weight'], ParentType, ContextType>;
   success?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   weight?: Resolver<ResolversTypes['Weight'], ParentType, ContextType>;

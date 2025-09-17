@@ -25,6 +25,7 @@ type UpdateWeightResult {
 	success: Boolean!
 	weight: Weight!
 	previousWeight: Weight!
+	message: String
 }
 
 type FlavorWeightResult {

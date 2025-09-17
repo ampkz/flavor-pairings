@@ -25,6 +25,7 @@ type UpdateTechniqueResult {
 	success: Boolean!
 	technique: Technique!
 	previousTechnique: Technique!
+	message: String
 }
 
 type FlavorTechniqueResult {

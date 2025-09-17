@@ -37,17 +37,23 @@ export const resolvers: Resolvers = {
 		updateVolume: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a volume');
 			let updatedVolume = null;
-
+			let message: string | null = null;
 			try {
 				updatedVolume = await updateVolume({ name, updatedName });
 			} catch (error) {
-				throw getGraphQLError(`updating volume: ${name}`, error);
+				const gqlError = getGraphQLError(`creating volume: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Volume with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
 			return {
 				success: !!updatedVolume,
 				volume: new Volume({ name: updatedName }),
 				previousVolume: new Volume({ name }),
+				message,
 			};
 		},
 		deleteVolume: async (_root, { name }, { authorizedUser }) => {

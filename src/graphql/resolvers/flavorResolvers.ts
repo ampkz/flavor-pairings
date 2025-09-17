@@ -64,17 +64,23 @@ export const resolvers: Resolvers = {
 		updateFlavor: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a flavor');
 			let updatedFlavor: Flavor | null = null;
-
+			let message: string | null = null;
 			try {
 				updatedFlavor = await updateFlavor({ name, updatedName });
 			} catch (error) {
-				throw getGraphQLError(`updating flavor: ${name}`, error);
+				const gqlError = getGraphQLError(`creating flavor: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Flavor with name '${updatedName}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
 			return {
 				success: !!updatedFlavor,
 				flavor: new Flavor({ name: updatedName }),
 				previousFlavor: new Flavor({ name }),
+				message,
 			};
 		},
 		deleteFlavor: async (_root, { name }, { authorizedUser }) => {

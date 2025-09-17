@@ -73,6 +73,7 @@ type UpdateFlavorResult {
 	success: Boolean!
 	flavor: Flavor!
 	previousFlavor: Flavor!
+	message: String
 }
 
 type Pairing {

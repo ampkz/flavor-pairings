@@ -27,6 +27,7 @@ type UpdateTasteResult {
 	success: Boolean!
 	taste: Taste!
 	previousTaste: Taste!
+	message: String
 }
 
 type Taste {

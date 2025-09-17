@@ -36,17 +36,23 @@ export const resolvers: Resolvers = {
 		updateWeight: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a weight');
 			let updatedWeight = null;
-
+			let message: string | null = null;
 			try {
 				updatedWeight = await updateWeight({ name, updatedName });
 			} catch (error) {
-				throw getGraphQLError(`updating weight: ${name}`, error);
+				const gqlError = getGraphQLError(`creating weight: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Weight with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
 			return {
 				success: !!updatedWeight,
 				weight: new Weight({ name: updatedName }),
 				previousWeight: new Weight({ name }),
+				message,
 			};
 		},
 		deleteWeight: async (_root, { name }, { authorizedUser }) => {

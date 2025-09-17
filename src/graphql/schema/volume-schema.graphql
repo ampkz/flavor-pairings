@@ -25,6 +25,7 @@ type UpdateVolumeResult {
 	success: Boolean!
 	volume: Volume!
 	previousVolume: Volume!
+	message: String
 }
 
 type FlavorVolumeResult {

@@ -37,17 +37,23 @@ export const resolvers: Resolvers = {
 		updateTaste: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a taste');
 			let updatedTaste = null;
-
+			let message: string | null = null;
 			try {
 				updatedTaste = await updateTaste({ name, updatedName });
 			} catch (error) {
-				throw getGraphQLError(`updating taste: ${name}`, error);
+				const gqlError = getGraphQLError(`creating taste: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Taste with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
 			return {
 				success: !!updatedTaste,
 				taste: new Taste({ name: updatedName }),
 				previousTaste: new Taste({ name }),
+				message,
 			};
 		},
 		deleteTaste: async (_root, { name }, { authorizedUser }) => {

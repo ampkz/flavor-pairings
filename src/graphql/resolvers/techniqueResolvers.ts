@@ -44,17 +44,23 @@ export const resolvers: Resolvers = {
 		updateTechnique: async (_root, { input: { name, updatedName } }, { authorizedUser }) => {
 			if (!isPermitted(authorizedUser, Auth.ADMIN, Auth.CONTRIBUTOR)) throw unauthorizedError('You are not authorized to update a technique');
 			let updatedTechnique = null;
-
+			let message: string | null = null;
 			try {
 				updatedTechnique = await updateTechnique({ name, updatedName });
 			} catch (error) {
-				throw getGraphQLError(`updating technique: ${name}`, error);
+				const gqlError = getGraphQLError(`creating technique: ${name}`, error);
+				if (gqlError.extensions?.code === 'CONFLICT') {
+					message = `Technique with name '${name}' already exists`;
+				} else {
+					throw gqlError;
+				}
 			}
 
 			return {
 				success: !!updatedTechnique,
 				technique: new Technique({ name: updatedName }),
 				previousTechnique: new Technique({ name }),
+				message,
 			};
 		},
 		deleteTechnique: async (_root, { name }, { authorizedUser }) => {
