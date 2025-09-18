@@ -150,6 +150,18 @@ describe('CRUD Flavor', () => {
 		expect(reference).toBeNull();
 	});
 
+	it('should return null if trying to create a reference to itself', async () => {
+		const name1 = 'ref_flavor1_' + faker.word.noun();
+		const flavor1 = new Flavor({ name: name1 });
+		await createFlavor(flavor1);
+		const [from, to] = await createFlavorReference(flavor1, flavor1);
+		expect(from).toBeNull();
+		expect(to).toBeNull();
+
+		const reference = await getFlavorReference(flavor1);
+		expect(reference).toBeNull();
+	});
+
 	it('should delete a reference from one flavor to another', async () => {
 		const name1 = 'dref_flavor1_' + faker.word.noun();
 		const name2 = 'dref_flavor2_' + faker.word.noun();

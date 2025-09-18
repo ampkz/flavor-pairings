@@ -29,6 +29,18 @@ describe('CRUD Pairing', () => {
 		expect(createdPairing).toBeNull();
 	});
 
+	it('should return null if pairing with itself is attempted', async () => {
+		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
+
+		await createFlavor(flavor1);
+
+		const pairing = new Pairing(flavor1, flavor1, PairingAffinity.Bold);
+
+		const createdPairing = await createPairing(pairing);
+
+		expect(createdPairing).toBeNull();
+	});
+
 	it('should return a list of created pairings', async () => {
 		const flavor1 = new Flavor({ name: (global as any).getNextNoun('lcp_') });
 		await createFlavor(flavor1);
