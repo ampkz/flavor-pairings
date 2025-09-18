@@ -5,6 +5,8 @@ import { Pairing } from '../../pairings/pairing';
 import { createRelationship, deleteRelationship, getRelationshipsToNode, updateRelationship } from '../utils/relationship/crud-relationship';
 
 export async function createPairing(pairing: Pairing): Promise<Pairing | null> {
+	if (pairing.flavor1.name === pairing.flavor2.name) return null;
+
 	const [f1, f2, r] = await createRelationship(pairing.getRelationship());
 
 	if (f1 !== null && f2 !== null && r !== null) {
