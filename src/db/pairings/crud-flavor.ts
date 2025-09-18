@@ -57,6 +57,8 @@ export async function getFlavorReference(flavor: Flavor): Promise<Flavor | null>
 }
 
 export async function createFlavorReference(fromFlavor: Flavor, toFlavor: Flavor): Promise<[Flavor | null, Flavor | null]> {
+	if (fromFlavor.name === toFlavor.name) return [null, null];
+
 	await deleteAllRelationships(new Node(NodeType.FLAVOR, 'name', fromFlavor.name));
 	await setFlavorTips(fromFlavor, null);
 
