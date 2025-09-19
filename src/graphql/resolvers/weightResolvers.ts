@@ -21,7 +21,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating weight: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Weight with name '${name}' already exists`;
+					message = `Weight with name « ${name} » already exists`;
 				} else {
 					throw gqlError;
 				}
@@ -42,7 +42,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating weight: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Weight with name '${name}' already exists`;
+					message = `Weight with name « ${updatedName} » already exists`;
 				} else {
 					throw gqlError;
 				}

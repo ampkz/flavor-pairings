@@ -22,7 +22,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating volume: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Volume with name '${name}' already exists`;
+					message = `Volume with name « ${name} » already exists`;
 				} else {
 					throw gqlError;
 				}
@@ -43,7 +43,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating volume: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Volume with name '${name}' already exists`;
+					message = `Volume with name « ${updatedName} » already exists`;
 				} else {
 					throw gqlError;
 				}

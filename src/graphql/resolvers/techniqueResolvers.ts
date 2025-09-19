@@ -29,7 +29,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating technique: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Technique with name '${name}' already exists`;
+					message = `Technique with name « ${name} » already exists`;
 				} else {
 					throw gqlError;
 				}
@@ -50,7 +50,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating technique: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Technique with name '${name}' already exists`;
+					message = `Technique with name « ${updatedName} » already exists`;
 				} else {
 					throw gqlError;
 				}

@@ -49,7 +49,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating flavor: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Flavor with name '${name}' already exists`;
+					message = `Flavor with name « ${name} » already exists`;
 				} else {
 					throw gqlError;
 				}
@@ -70,7 +70,7 @@ export const resolvers: Resolvers = {
 			} catch (error) {
 				const gqlError = getGraphQLError(`creating flavor: ${name}`, error);
 				if (gqlError.extensions?.code === 'CONFLICT') {
-					message = `Flavor with name '${updatedName}' already exists`;
+					message = `Flavor with name « ${updatedName} » already exists`;
 				} else {
 					throw gqlError;
 				}
